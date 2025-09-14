@@ -22,6 +22,11 @@ import {
   Save,
   ChevronLeft,
   ChevronRight,
+  PauseCircle,
+  PlayCircle,
+  ClipboardList,
+Hourglass,
+  Loader,
 } from "lucide-react";
 
 function KanbanBoardThree() {
@@ -72,30 +77,6 @@ function KanbanBoardThree() {
       storyPoints: 41,
       totalTime: "112:40",
     },
-    {
-      id: 6,
-      name: "Lisa Wang",
-      role: "DEVELOPER",
-      status: "Present",
-      storyPoints: 35,
-      totalTime: "89:25",
-    },
-    {
-      id: 7,
-      name: "David Brown",
-      role: "HR",
-      status: "Present",
-      storyPoints: 29,
-      totalTime: "76:10",
-    },
-    {
-      id: 8,
-      name: "Emma Wilson",
-      role: "ADMIN",
-      status: "Absent",
-      storyPoints: 31,
-      totalTime: "82:55",
-    },
   ];
 
   const backlogTasks = [
@@ -129,16 +110,6 @@ function KanbanBoardThree() {
       createdAt: "2025-01-17",
       deadline: "2025-01-30",
       project: "MOL",
-    },
-    {
-      id: "b4",
-      title: "Mobile App Optimization",
-      description: "Optimize mobile app performance and reduce bundle size",
-      priority: "High",
-      createdBy: "Emily Davis",
-      createdAt: "2025-01-18",
-      deadline: "2025-01-24",
-      project: "PRET-A-MED",
     },
   ];
 
@@ -335,25 +306,46 @@ function KanbanBoardThree() {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="w-4 h-4" />;
-      case "ongoing":
-        return <Circle className="w-4 h-4" />;
+    switch (status.toLowerCase()) {
+      case "un-assigned":
+        return <Circle className="w-4 h-4 text-gray-400" />;
+
       case "pending":
-        return <Clock className="w-4 h-4" />;
-      case "scheduled":
-        return <Calendar className="w-4 h-4" />;
-      case "due":
-        return <AlertCircle className="w-4 h-4" />;
+        return <Clock className="w-4 h-4 text-yellow-500" />;
+
+      case "in queue":
+        return <Hourglass className="w-4 h-4 text-blue-500" />;
+
+      case "on going":
+        return <Loader className="w-4 h-4 text-green-500 animate-spin" />;
+
+      case "finished":
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+
+      case "review":
+        return <ClipboardList className="w-4 h-4 text-purple-500" />;
+
+      case "completed":
+        return <CheckCircle className="w-4 h-4 text-emerald-600" />;
+
+      case "resume":
+        return <PlayCircle className="w-4 h-4 text-indigo-500" />;
+
       case "cancelled":
-        return <XCircle className="w-4 h-4" />;
+        return <XCircle className="w-4 h-4 text-red-500" />;
+
+      case "scheduled":
+        return <Calendar className="w-4 h-4 text-blue-400" />;
+
+      case "due":
+        return <AlertCircle className="w-4 h-4 text-orange-500" />;
+
       default:
-        return <Circle className="w-4 h-4" />;
+        return <Circle className="w-4 h-4 text-gray-400" />;
     }
   };
 
-  const TaskCard = ({ task, isBacklog = false }) => (
+  const TaskCard = ({ index, task, isBacklog = false }) => (
     <div
       className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer  ${
         task.priority === "High"
@@ -365,17 +357,25 @@ function KanbanBoardThree() {
       onClick={() => setSelectedTask(task)}
     >
       <div className="flex items-center justify-between mb-2">
-        <h4 className="font-bold text-gray-800 truncate flex-1">
-          {task.title}
-        </h4>
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getPriorityColor(
-            task.priority
-          )} text-white ${task.priority === "High" ? "animate-pulse" : ""}`}
-        >
-          <Flag className="w-3 h-3 mr-1" />
-          {task.priority}
-        </span>
+        {isBacklog ? (
+          <h4 className="font-bold text-gray-800 truncate flex-1">
+            {task.title}
+          </h4>
+        ) : (
+          <h4 className="font-bold text-gray-800 truncate flex-1">
+            {index}. {task.title}
+          </h4>
+        )}
+        {!isBacklog && (
+          <span
+            className={`inline-flex items-center px-2 py-1 rounded-full animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
+              task.status
+            )} text-white`}
+          >
+            {getStatusIcon(task.status)}
+            <span className="ml-1 capitalize">{task.status}</span>
+          </span>
+        )}
       </div>
 
       {isBacklog ? (
@@ -396,12 +396,12 @@ function KanbanBoardThree() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getStatusColor(
-                task.status
-              )} text-white`}
+              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getPriorityColor(
+                task.priority
+              )} text-white ${task.priority === "High" ? "" : ""}`}
             >
-              {getStatusIcon(task.status)}
-              <span className="ml-1 capitalize">{task.status}</span>
+              <Flag className="w-3 h-3 mr-1" />
+              {task.priority}
             </span>
             <span className="text-gray-500">{task.timeSpent}</span>
           </div>
@@ -798,7 +798,7 @@ function KanbanBoardThree() {
             {users.map((user) => (
               <div
                 key={user.id}
-                className="w-[45vw] md:w-[25vw] lg:w-[15vw] bg-white/10 backdrop-blur-md rounded-2xl p-2 md:p-4 border border-white/20"
+                className="w-[45vw] md:w-[30vw] lg:w-[20vw] bg-white/10 backdrop-blur-md rounded-2xl p-2 md:p-4 border border-white/20"
               >
                 {/* User Header */}
                 <div className="mb-2 md:mb-4">
@@ -839,7 +839,7 @@ function KanbanBoardThree() {
                             PTS
                           </span>
                         </div>
-                        <div className="flex items-center font-semibold space-x-1">
+                        <div className="mt-1 flex items-center font-semibold space-x-1">
                           <Timer className="w-3 h-3 md:w-4 md:h-4" />
                           <span className="font-medium text-xs md:text-sm">
                             {user.totalTime}
@@ -852,8 +852,8 @@ function KanbanBoardThree() {
 
                 {/* User Tasks */}
                 <div className="space-y-2 md:space-y-3 max-h-64 md:max-h-96 overflow-y-auto">
-                  {(userTasks[user.id] || []).map((task) => (
-                    <TaskCard key={task.id} task={task} />
+                  {(userTasks[user.id] || []).map((task, index) => (
+                    <TaskCard index={index + 1} key={task.id} task={task} />
                   ))}
 
                   {(!userTasks[user.id] || userTasks[user.id].length === 0) && (
@@ -870,7 +870,7 @@ function KanbanBoardThree() {
 
         {/* Create Task Section - Toggleable */}
         {showRightColumn && (
-          <div className="w-1/4 md:w-1/5 lg:w-[30%] bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto">
+          <div className="w-1/4 md:w-1/6 lg:w-[20%] bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
                 <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-2">
