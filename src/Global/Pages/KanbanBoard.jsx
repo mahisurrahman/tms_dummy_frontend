@@ -1,5 +1,24 @@
 import React, { useEffect, useState, useRef } from "react";
 
+// Unified task status enum and helpers
+const TaskStatus = {
+  PENDING: "pending",
+  IN_QUEUE: "in_queue",
+  ONGOING: "ongoing",
+  PAUSED: "paused",
+  REVIEW: "review",
+  COMPLETE: "complete",
+};
+
+const statusOrder = [
+  TaskStatus.PENDING,
+  TaskStatus.IN_QUEUE,
+  TaskStatus.ONGOING,
+  TaskStatus.PAUSED,
+  TaskStatus.REVIEW,
+  TaskStatus.COMPLETE,
+];
+
 // Single-file Kanban React Component (TailwindCSS required)
 // Features added:
 // 1) Glowing high-priority badges
@@ -31,6 +50,9 @@ const initialBacklog = {
       project: "dncrp",
       assignedBy: "PM",
       assignedAt: "2025-09-01 10:30",
+      status: TaskStatus.PENDING,
+      totalElapsedSec: 0,
+      startedAtSec: null,
     },
     {
       _id: generateObjectId(),
@@ -40,6 +62,9 @@ const initialBacklog = {
       project: "mol",
       assignedBy: "Lead Dev",
       assignedAt: "2025-09-02 14:15",
+      status: TaskStatus.PENDING,
+      totalElapsedSec: 0,
+      startedAtSec: null,
     },
     {
       _id: generateObjectId(),
@@ -49,6 +74,9 @@ const initialBacklog = {
       project: "None",
       assignedBy: "QA",
       assignedAt: "2025-09-03 09:00",
+      status: TaskStatus.PENDING,
+      totalElapsedSec: 0,
+      startedAtSec: null,
     },
   ],
 };
@@ -66,6 +94,9 @@ const initialUsers = [
         project: "dol",
         assignedBy: "Nirob",
         assignedAt: "2025-09-05 09:00",
+        status: TaskStatus.IN_QUEUE,
+        totalElapsedSec: 0,
+        startedAtSec: null,
       },
       {
         _id: generateObjectId(),
@@ -74,6 +105,9 @@ const initialUsers = [
         project: "tms",
         assignedBy: "Arnab",
         assignedAt: "2025-09-06 11:20",
+        status: TaskStatus.IN_QUEUE,
+        totalElapsedSec: 0,
+        startedAtSec: null,
       },
     ],
   },
@@ -170,6 +204,24 @@ export default function KanbanBoard() {
     )}`;
   };
 
+  // compute elapsed seconds for a task (includes running time if ongoing)
+  const computeTaskElapsedSec = (task) => {
+    const base = task.totalElapsedSec || 0;
+    if (task.status === TaskStatus.ONGOING && task.startedAtSec) {
+      const nowSec = Math.floor(Date.now() / 1000);
+      return base + Math.max(0, nowSec - task.startedAtSec);
+    }
+    return base;
+  };
+
+  // compute total per user
+  const computeUserTotalSec = (user) => {
+    return (user.items || []).reduce(
+      (sum, it) => sum + computeTaskElapsedSec(it),
+      0
+    );
+  };
+
   // priority color classes + glow for high
   const priorityClass = (p) => {
     switch ((p || "").toLowerCase()) {
@@ -186,6 +238,22 @@ export default function KanbanBoard() {
 
   // start a task timer and add to running list
   const startTask = (task, userId) => {
+    // status -> ongoing, set startedAtSec
+    const nowSec = Math.floor(Date.now() / 1000);
+    setUsers((prev) =>
+      prev.map((u) =>
+        u._id === userId
+          ? {
+              ...u,
+              items: u.items.map((it) =>
+                it._id === task._id
+                  ? { ...it, status: TaskStatus.ONGOING, startedAtSec: nowSec }
+                  : it
+              ),
+            }
+          : u
+      )
+    );
     // ensure timer exists
     setTimers((prev) => ({ ...prev, [task._id]: prev[task._id] || 0 }));
     // add to running tasks if not already
@@ -198,20 +266,112 @@ export default function KanbanBoard() {
 
   // cancel: stop timer and reset to 0, remove from running list
   const cancelTask = (taskId) => {
+    // treat cancel as pause: accumulate and set status paused
+    const nowSec = Math.floor(Date.now() / 1000);
+    setUsers((prev) =>
+      prev.map((u) => ({
+        ...u,
+        items: u.items.map((it) => {
+          if (it._id !== taskId) return it;
+          const started = it.startedAtSec || 0;
+          const add = started ? Math.max(0, nowSec - started) : 0;
+          return {
+            ...it,
+            status: TaskStatus.PAUSED,
+            totalElapsedSec: (it.totalElapsedSec || 0) + add,
+            startedAtSec: null,
+          };
+        }),
+      }))
+    );
     setRunningTasks((prev) => prev.filter((t) => t._id !== taskId));
-    setTimers((prev) => ({ ...prev, [taskId]: 0 }));
   };
 
   // end: stop timer, remove from running list and increment monthly completed
   const endTask = (taskId) => {
+    // finalize: accumulate if running, mark complete
+    const nowSec = Math.floor(Date.now() / 1000);
+    setUsers((prev) =>
+      prev.map((u) => ({
+        ...u,
+        items: u.items.map((it) => {
+          if (it._id !== taskId) return it;
+          const started = it.startedAtSec || 0;
+          const add = started ? Math.max(0, nowSec - started) : 0;
+          return {
+            ...it,
+            status: TaskStatus.COMPLETE,
+            totalElapsedSec: (it.totalElapsedSec || 0) + add,
+            startedAtSec: null,
+          };
+        }),
+      }))
+    );
     setRunningTasks((prev) => prev.filter((t) => t._id !== taskId));
-    // keep timer value (final), but remove timer from active increments by removing from runningTasks
-    // update stats (dummy behaviour)
     setMonthlyStats((prev) => ({
       ...prev,
       completed: prev.completed + 1,
       pending: Math.max(0, prev.pending - 1),
     }));
+  };
+
+  // explicit transitions
+  const moveToQueue = (taskId, userId) => {
+    setUsers((prev) =>
+      prev.map((u) =>
+        u._id === userId
+          ? {
+              ...u,
+              items: u.items.map((it) =>
+                it._id === taskId ? { ...it, status: TaskStatus.IN_QUEUE } : it
+              ),
+            }
+          : u
+      )
+    );
+  };
+
+  const moveToReview = (taskId, userId) => {
+    const nowSec = Math.floor(Date.now() / 1000);
+    setUsers((prev) =>
+      prev.map((u) =>
+        u._id === userId
+          ? {
+              ...u,
+              items: u.items.map((it) => {
+                if (it._id !== taskId) return it;
+                const started = it.startedAtSec || 0;
+                const add = started ? Math.max(0, nowSec - started) : 0;
+                return {
+                  ...it,
+                  status: TaskStatus.REVIEW,
+                  totalElapsedSec: (it.totalElapsedSec || 0) + add,
+                  startedAtSec: null,
+                };
+              }),
+            }
+          : u
+      )
+    );
+    setRunningTasks((prev) => prev.filter((t) => t._id !== taskId));
+  };
+
+  const resumeTask = (taskId, userId) => {
+    const nowSec = Math.floor(Date.now() / 1000);
+    setUsers((prev) =>
+      prev.map((u) =>
+        u._id === userId
+          ? {
+              ...u,
+              items: u.items.map((it) =>
+                it._id === taskId
+                  ? { ...it, status: TaskStatus.ONGOING, startedAtSec: nowSec }
+                  : it
+              ),
+            }
+          : u
+      )
+    );
   };
 
   // drag handlers
@@ -319,6 +479,10 @@ export default function KanbanBoard() {
       project: form.project === "None" ? "None" : form.project,
       assignedBy: loggedInUser.name,
       assignedAt: new Date().toLocaleString(),
+      status:
+        form.assignTo === backlog._id ? TaskStatus.PENDING : TaskStatus.IN_QUEUE,
+      totalElapsedSec: 0,
+      startedAtSec: null,
     };
     if (form.assignTo === backlog._id)
       setBacklog((prev) => ({ ...prev, items: [...prev.items, newTask] }));
@@ -487,86 +651,117 @@ export default function KanbanBoard() {
                   onDrop={(e) => onDropToUser(e, user._id)}
                   className="space-y-3 min-h-[220px]"
                 >
-                  {user.items.length === 0 ? (
+                  {(user.items || []).length === 0 ? (
                     <div className="text-zinc-500 italic text-sm p-4 rounded-lg bg-zinc-900/40">
-                      Drop tasks here
+                      No tasks
                     </div>
                   ) : (
-                    user.items.map((it) => (
-                      <div
-                        key={it._id}
-                        draggable
-                        onDragStart={(e) =>
-                          onDragStart("user", user._id, it, e)
-                        }
-                        className={`p-3 rounded-lg shadow flex flex-col gap-2 ${priorityClass(
-                          it.priority
-                        )}`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="font-medium">{it.title}</div>
-                            {it.description && (
-                              <div className="text-xs text-zinc-100/80">
-                                {it.description}
+                    statusOrder.map((st) => (
+                      <div key={st} className="space-y-2">
+                        <div className="text-[10px] uppercase tracking-wide text-zinc-400">
+                          {st.replace(/_/g, " ")}
+                        </div>
+                        {(user.items || [])
+                          .filter((it) => (it.status || TaskStatus.IN_QUEUE) === st)
+                          .map((it) => (
+                            <div
+                              key={it._id}
+                              className={`p-3 rounded-lg shadow flex flex-col gap-2 ${priorityClass(
+                                it.priority
+                              )}`}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <div className="font-medium">{it.title}</div>
+                                  {it.description && (
+                                    <div className="text-xs text-zinc-100/80">
+                                      {it.description}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
+                                  <div className="text-[11px] px-2 py-1 rounded bg-black/30">
+                                    {it.project}
+                                  </div>
+                                  <button
+                                    onClick={() => removeItem("user", user._id, it._id)}
+                                    className="text-white/70 hover:text-white"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
                               </div>
-                            )}
-                          </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <div className="text-[11px] px-2 py-1 rounded bg-black/30">
-                              {it.project}
+
+                              <div className="flex items-center justify-between text-xs text-zinc-300">
+                                <div>By {it.assignedBy}</div>
+                                <div>{it.assignedAt}</div>
+                              </div>
+
+                              <div className="flex items-center justify-between mt-2">
+                                <div className="text-xs text-zinc-200">
+                                  {it.deadline ? `Due: ${it.deadline}` : ""}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {(it.status === TaskStatus.PENDING || it.status === TaskStatus.PAUSED) && (
+                                    <button
+                                      onClick={() =>
+                                        it.status === TaskStatus.PENDING
+                                          ? moveToQueue(it._id, user._id)
+                                          : resumeTask(it._id, user._id)
+                                      }
+                                      className="px-2 py-1 text-xs rounded bg-green-600"
+                                    >
+                                      {it.status === TaskStatus.PENDING ? "Queue" : "Resume"}
+                                    </button>
+                                  )}
+                                  {it.status === TaskStatus.IN_QUEUE && (
+                                    <button
+                                      onClick={() => startTask(it, user._id)}
+                                      className="px-2 py-1 text-xs rounded bg-green-600"
+                                    >
+                                      Start
+                                    </button>
+                                  )}
+                                  {it.status === TaskStatus.ONGOING && (
+                                    <>
+                                      <button
+                                        onClick={() => cancelTask(it._id)}
+                                        className="px-2 py-1 text-xs rounded bg-amber-600"
+                                      >
+                                        Pause
+                                      </button>
+                                      <button
+                                        onClick={() => moveToReview(it._id, user._id)}
+                                        className="px-2 py-1 text-xs rounded bg-indigo-600"
+                                      >
+                                        Review
+                                      </button>
+                                    </>
+                                  )}
+                                  {it.status === TaskStatus.REVIEW && (
+                                    <>
+                                      <button
+                                        onClick={() => endTask(it._id)}
+                                        className="px-2 py-1 text-xs rounded bg-green-600"
+                                      >
+                                        Complete
+                                      </button>
+                                      <button
+                                        onClick={() => moveToQueue(it._id, user._id)}
+                                        className="px-2 py-1 text-xs rounded bg-zinc-600"
+                                      >
+                                        Back to Queue
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="text-xs text-zinc-100/80 mt-1">
+                                ⏱ {formatTime(computeTaskElapsedSec(it))}
+                              </div>
                             </div>
-                            <button
-                              onClick={() =>
-                                removeItem("user", user._id, it._id)
-                              }
-                              className="text-white/70 hover:text-white"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between text-xs text-zinc-300">
-                          <div>By {it.assignedBy}</div>
-                          <div>{it.assignedAt}</div>
-                        </div>
-
-                        <div className="flex items-center justify-between mt-2">
-                          <div className="text-xs text-zinc-200">
-                            {it.deadline ? `Due: ${it.deadline}` : ""}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => startTask(it, user._id)}
-                              className={`px-2 py-1 text-xs rounded ${
-                                runningTasks.find((t) => t._id === it._id)
-                                  ? "bg-green-700/80"
-                                  : "bg-green-600"
-                              }`}
-                            >
-                              Start
-                            </button>
-                            <button
-                              onClick={() => cancelTask(it._id)}
-                              className="px-2 py-1 text-xs rounded bg-amber-600"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={() => endTask(it._id)}
-                              className="px-2 py-1 text-xs rounded bg-red-600"
-                            >
-                              End
-                            </button>
-                          </div>
-                        </div>
-
-                        {timers[it._id] !== undefined && (
-                          <div className="text-xs text-zinc-100/80 mt-1">
-                            ⏱ {formatTime(timers[it._id])}
-                          </div>
-                        )}
+                          ))}
                       </div>
                     ))
                   )}

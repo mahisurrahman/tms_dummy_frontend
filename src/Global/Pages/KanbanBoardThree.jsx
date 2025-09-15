@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Filter,
   Plus,
@@ -34,6 +34,22 @@ function KanbanBoardThree() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showRightColumn, setShowRightColumn] = useState(true);
   const [isMobileView, setIsMobileView] = useState(false);
+
+  // Unified status model
+  const TaskStatus = {
+    PENDING: "pending",
+    IN_QUEUE: "in_queue",
+    ONGOING: "ongoing",
+    REVIEW: "review",
+    COMPLETE: "complete",
+  };
+  const allStatuses = [
+    TaskStatus.PENDING,
+    TaskStatus.IN_QUEUE,
+    TaskStatus.ONGOING,
+    TaskStatus.REVIEW,
+    TaskStatus.COMPLETE,
+  ];
 
   // Dummy data
   const users = [
@@ -79,7 +95,7 @@ function KanbanBoardThree() {
     },
   ];
 
-  const backlogTasks = [
+  const [backlogTasks, setBacklogTasks] = useState([
     {
       id: "b1",
       title: "User Authentication System",
@@ -90,6 +106,9 @@ function KanbanBoardThree() {
       createdAt: "2025-01-15",
       deadline: "2025-01-25",
       project: "DNCRP",
+      status: TaskStatus.PENDING,
+      totalElapsedSec: 0,
+      startedAtSec: null,
     },
     {
       id: "b2",
@@ -100,6 +119,9 @@ function KanbanBoardThree() {
       createdAt: "2025-01-16",
       deadline: "2025-01-28",
       project: "DOLE",
+      status: TaskStatus.PENDING,
+      totalElapsedSec: 0,
+      startedAtSec: null,
     },
     {
       id: "b3",
@@ -110,125 +132,220 @@ function KanbanBoardThree() {
       createdAt: "2025-01-17",
       deadline: "2025-01-30",
       project: "MOL",
+      status: TaskStatus.PENDING,
+      totalElapsedSec: 0,
+      startedAtSec: null,
     },
-  ];
+  ]);
 
-  const userTasks = {
+  const normalizeStatus = (s) => {
+    const map = {
+      completed: TaskStatus.COMPLETE,
+      ongoing: TaskStatus.ONGOING,
+      pending: TaskStatus.PENDING,
+      review: TaskStatus.REVIEW,
+      scheduled: TaskStatus.IN_QUEUE,
+      due: TaskStatus.IN_QUEUE,
+      cancelled: TaskStatus.PENDING,
+    };
+    return map[(s || "").toLowerCase()] || TaskStatus.PENDING;
+  };
+
+  const [userTasks, setUserTasks] = useState({
     1: [
       {
         id: "t1",
         title: "Login Page Design",
-        status: "ongoing",
+        status: TaskStatus.ONGOING,
         priority: "High",
         assignedDate: "2025-01-20",
         assignedBy: "Emily Davis",
-        timeSpent: "02:30",
+        totalElapsedSec: 2 * 3600 + 30 * 60,
+        startedAtSec: null,
       },
       {
         id: "t2",
         title: "Password Reset Feature",
-        status: "completed",
+        status: TaskStatus.COMPLETE,
         priority: "Medium",
         assignedDate: "2025-01-19",
         assignedBy: "Sarah Chen",
-        timeSpent: "04:15",
+        totalElapsedSec: 4 * 3600 + 15 * 60,
+        startedAtSec: null,
       },
     ],
     2: [
       {
         id: "t3",
         title: "Database Schema",
-        status: "pending",
+        status: TaskStatus.PENDING,
         priority: "High",
         assignedDate: "2025-01-21",
         assignedBy: "John Doe",
-        timeSpent: "00:00",
+        totalElapsedSec: 0,
+        startedAtSec: null,
       },
       {
         id: "t4",
         title: "Data Validation",
-        status: "ongoing",
+        status: TaskStatus.ONGOING,
         priority: "Medium",
         assignedDate: "2025-01-20",
         assignedBy: "Mike Johnson",
-        timeSpent: "01:45",
+        totalElapsedSec: 1 * 3600 + 45 * 60,
+        startedAtSec: null,
       },
     ],
     3: [
       {
         id: "t5",
         title: "Employee Onboarding",
-        status: "scheduled",
+        status: TaskStatus.IN_QUEUE,
         priority: "Low",
         assignedDate: "2025-01-22",
         assignedBy: "Lisa Wang",
-        timeSpent: "00:00",
+        totalElapsedSec: 0,
+        startedAtSec: null,
       },
     ],
     4: [
       {
         id: "t6",
         title: "System Backup",
-        status: "completed",
+        status: TaskStatus.COMPLETE,
         priority: "High",
         assignedDate: "2025-01-18",
         assignedBy: "Alex Kumar",
-        timeSpent: "03:20",
+        totalElapsedSec: 3 * 3600 + 20 * 60,
+        startedAtSec: null,
       },
       {
         id: "t7",
         title: "Security Audit",
-        status: "ongoing",
+        status: TaskStatus.ONGOING,
         priority: "High",
         assignedDate: "2025-01-21",
         assignedBy: "David Brown",
-        timeSpent: "05:10",
+        totalElapsedSec: 5 * 3600 + 10 * 60,
+        startedAtSec: null,
       },
     ],
     5: [
       {
         id: "t8",
         title: "Code Review",
-        status: "pending",
+        status: TaskStatus.PENDING,
         priority: "Medium",
         assignedDate: "2025-01-21",
         assignedBy: "Emma Wilson",
-        timeSpent: "00:00",
+        totalElapsedSec: 0,
+        startedAtSec: null,
       },
     ],
     6: [
       {
         id: "t9",
         title: "UI Testing",
-        status: "ongoing",
+        status: TaskStatus.ONGOING,
         priority: "Low",
         assignedDate: "2025-01-20",
         assignedBy: "John Doe",
-        timeSpent: "02:00",
+        totalElapsedSec: 2 * 3600,
+        startedAtSec: null,
       },
     ],
     7: [
       {
         id: "t10",
         title: "Payroll System",
-        status: "due",
+        status: TaskStatus.IN_QUEUE,
         priority: "High",
         assignedDate: "2025-01-15",
         assignedBy: "Sarah Chen",
-        timeSpent: "01:30",
+        totalElapsedSec: 1 * 3600 + 30 * 60,
+        startedAtSec: null,
       },
     ],
     8: [
       {
         id: "t11",
         title: "Server Maintenance",
-        status: "cancelled",
+        status: TaskStatus.PENDING,
         priority: "Medium",
         assignedDate: "2025-01-19",
         assignedBy: "Mike Johnson",
-        timeSpent: "00:45",
+        totalElapsedSec: 45 * 60,
+        startedAtSec: null,
       },
     ],
+  });
+
+  // tick every second to update display for running timers
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const formatTime = (sec) => {
+    const hours = Math.floor(sec / 3600);
+    const minutes = Math.floor((sec % 3600) / 60);
+    const seconds = sec % 60;
+    if (hours > 0)
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
+
+  const computeTaskElapsed = (task) => {
+    const base = task.totalElapsedSec || 0;
+    if (task.status === TaskStatus.ONGOING && task.startedAtSec) {
+      const now = Math.floor(Date.now() / 1000);
+      return base + Math.max(0, now - task.startedAtSec);
+    }
+    return base;
+  };
+
+  const updateTask = (userId, taskId, updater) => {
+    setUserTasks((prev) => ({
+      ...prev,
+      [userId]: (prev[userId] || []).map((t) => (t.id === taskId ? updater(t) : t)),
+    }));
+  };
+
+  const startTimer = (userId, taskId) => {
+    const now = Math.floor(Date.now() / 1000);
+    updateTask(userId, taskId, (t) => ({ ...t, status: TaskStatus.ONGOING, startedAtSec: t.startedAtSec || now }));
+  };
+
+  const pauseTimer = (userId, taskId) => {
+    const now = Math.floor(Date.now() / 1000);
+    updateTask(userId, taskId, (t) => {
+      const add = t.startedAtSec ? Math.max(0, now - t.startedAtSec) : 0;
+      return { ...t, totalElapsedSec: (t.totalElapsedSec || 0) + add, startedAtSec: null, status: TaskStatus.ONGOING };
+    });
+  };
+
+  const [statusModal, setStatusModal] = useState({ open: false, userId: null, task: null });
+  const openStatusModal = (userId, task) => setStatusModal({ open: true, userId, task });
+  const closeStatusModal = () => setStatusModal({ open: false, userId: null, task: null });
+
+  const changeStatus = (userId, taskId, nextStatus) => {
+    const now = Math.floor(Date.now() / 1000);
+    updateTask(userId, taskId, (t) => {
+      let total = t.totalElapsedSec || 0;
+      let started = t.startedAtSec;
+      // if leaving ongoing and running, accumulate
+      if (t.status === TaskStatus.ONGOING && t.startedAtSec && nextStatus !== TaskStatus.ONGOING) {
+        total += Math.max(0, now - t.startedAtSec);
+        started = null;
+      }
+      // if moving to ongoing and not running, set startedAt
+      if (nextStatus === TaskStatus.ONGOING && !started) {
+        started = now;
+      }
+      return { ...t, status: nextStatus, totalElapsedSec: total, startedAtSec: started };
+    });
+    closeStatusModal();
   };
 
   const filterOptions = [
@@ -287,65 +404,40 @@ function KanbanBoardThree() {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch ((status || "").toLowerCase()) {
       case "completed":
         return "from-green-500 to-emerald-600";
       case "ongoing":
         return "from-blue-500 to-cyan-500";
       case "pending":
         return "from-yellow-500 to-amber-500";
-      case "scheduled":
+      case "in_queue":
         return "from-purple-500 to-violet-500";
-      case "due":
-        return "from-red-500 to-rose-500";
-      case "cancelled":
-        return "from-gray-500 to-slate-500";
       default:
         return "from-gray-400 to-gray-500";
     }
   };
 
   const getStatusIcon = (status) => {
-    switch (status.toLowerCase()) {
-      case "un-assigned":
-        return <Circle className="w-4 h-4 text-gray-400" />;
-
+    const s = (status || "").toLowerCase();
+    switch (s) {
       case "pending":
         return <Clock className="w-4 h-4 text-yellow-500" />;
-
-      case "in queue":
+      case "in_queue":
         return <Hourglass className="w-4 h-4 text-blue-500" />;
-
-      case "on going":
+      case "ongoing":
         return <Loader className="w-4 h-4 text-green-500 animate-spin" />;
-
-      case "finished":
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-
       case "review":
         return <ClipboardList className="w-4 h-4 text-purple-500" />;
-
+      case "complete":
       case "completed":
         return <CheckCircle className="w-4 h-4 text-emerald-600" />;
-
-      case "resume":
-        return <PlayCircle className="w-4 h-4 text-indigo-500" />;
-
-      case "cancelled":
-        return <XCircle className="w-4 h-4 text-red-500" />;
-
-      case "scheduled":
-        return <Calendar className="w-4 h-4 text-blue-400" />;
-
-      case "due":
-        return <AlertCircle className="w-4 h-4 text-orange-500" />;
-
       default:
         return <Circle className="w-4 h-4 text-gray-400" />;
     }
   };
 
-  const TaskCard = ({ index, task, isBacklog = false }) => (
+  const TaskCard = ({ index, task, isBacklog = false, userId }) => (
     <div
       className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer  ${
         task.priority === "High"
@@ -369,7 +461,7 @@ function KanbanBoardThree() {
         {!isBacklog && (
           <span
             className={`inline-flex items-center px-2 py-1 rounded-full animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
-              task.status
+              (task.status || "").toString()
             )} text-white`}
           >
             {getStatusIcon(task.status)}
@@ -403,7 +495,11 @@ function KanbanBoardThree() {
               <Flag className="w-3 h-3 mr-1" />
               {task.priority}
             </span>
-            <span className="text-gray-500">{task.timeSpent}</span>
+            {task.status === TaskStatus.ONGOING && (
+              <span className="text-gray-800 font-mono text-xs">
+                {formatTime(computeTaskElapsed(task))}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center justify-between text-xs text-gray-500">
@@ -412,13 +508,45 @@ function KanbanBoardThree() {
           </div>
 
           <div className="flex gap-1 mt-3">
-            <button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center">
-              <Play className="w-3 h-3 mr-1" />
-              Start
-            </button>
-            <button className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center">
+            {task.status === TaskStatus.ONGOING && (
+              <>
+                {!task.startedAtSec ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startTimer(userId, task.id);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                  >
+                    <Play className="w-3 h-3 mr-1" />
+                    Start
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      pauseTimer(userId, task.id);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-yellow-600 to-amber-700 text-white text-lg py-2 px-2 rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all flex items-center justify-center"
+                  >
+                    <Pause className="w-3 h-3 mr-1" />
+                    Pause
+                  </button>
+                )}
+              </>
+            )}
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openStatusModal(userId, task);
+              }}
+              className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center"
+            >
               <Square className="w-3 h-3 mr-1" />
-              End
+              <span className="capitalize">
+                {task.status === TaskStatus.ONGOING ? "ongoing" : task.status || "status"}
+              </span>
             </button>
           </div>
         </div>
@@ -853,7 +981,7 @@ function KanbanBoardThree() {
                 {/* User Tasks */}
                 <div className="space-y-2 md:space-y-3 max-h-64 md:max-h-96 overflow-y-auto">
                   {(userTasks[user.id] || []).map((task, index) => (
-                    <TaskCard index={index + 1} key={task.id} task={task} />
+                    <TaskCard index={index + 1} key={task.id} task={task} userId={user.id} />
                   ))}
 
                   {(!userTasks[user.id] || userTasks[user.id].length === 0) && (
@@ -1022,6 +1150,30 @@ function KanbanBoardThree() {
 
       {showCreateTask && (
         <CreateTaskForm onClose={() => setShowCreateTask(false)} />
+      )}
+
+      {statusModal.open && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl">
+            <div className="p-4 border-b flex items-center justify-between">
+              <div className="font-semibold">Change Status</div>
+              <button onClick={closeStatusModal} className="p-1 rounded hover:bg-gray-100">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-2">
+              {allStatuses.map((st) => (
+                <button
+                  key={st}
+                  onClick={() => changeStatus(statusModal.userId, statusModal.task.id, st)}
+                  className={`w-full text-left px-3 py-2 rounded border hover:bg-gray-50 capitalize`}
+                >
+                  {st.replace(/_/g, " ")}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Floating Action Button for Mobile */}

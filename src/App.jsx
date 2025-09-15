@@ -8,8 +8,8 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/three" element={<KanbanBoard />} />
-        <Route path="/two" element={<KanbanBoardTwo />} />
+        {/* <Route path="/three" element={<KanbanBoard />} />
+        <Route path="/two" element={<KanbanBoardTwo />} /> */}
         <Route path="/" element={<KanbanBoardThree />} />
       </Routes>
     </div>
