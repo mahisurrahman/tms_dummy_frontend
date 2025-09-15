@@ -264,25 +264,16 @@ function KanbanBoardThree() {
     "cancelled",
   ];
 
+  const sections = ["pending", "review", "ongoing", "completed", "cancelled", "scheduled"];
+
   const sectionTitles = {
     pending: "Pending",
+    review: "On Review",
     ongoing: "On Going",
-    scheduled: "Re-scheduled",
-    due: "Due",
     completed: "Completed",
     cancelled: "Cancelled",
-    review: "On Reviews",
+    scheduled: "Re-scheduled",
   };
-
-  const statusOrder = [
-    "pending",
-    "scheduled",
-    "ongoing",
-    "due",
-    "review",
-    "completed",
-    "cancelled",
-  ];
 
   // Check screen size on component mount and resize
   React.useEffect(() => {
@@ -820,7 +811,7 @@ function KanbanBoardThree() {
 
         {/* User Columns - Adjustable width based on right column visibility */}
         <div
-          className={`p-2 md:p-4 overflow-x-auto ${
+          className={`p-2 md:p-4 overflow-x-auto transition-all duration-300 ease-in-out ${
             showRightColumn ? "w-3/4 md:w-4/5 lg:w-[70%]" : "w-full"
           }`}
         >
@@ -834,11 +825,6 @@ function KanbanBoardThree() {
                   return acc;
                 },
                 {}
-              );
-
-              const statuses = Object.keys(groupedTasks).sort(
-                (a, b) =>
-                  statusOrder.indexOf(a) - statusOrder.indexOf(b)
               );
 
               return (
@@ -897,55 +883,53 @@ function KanbanBoardThree() {
                   </div>
 
                   {/* User Tasks Sections */}
-                  <div className="max-h-64 md:max-h-96 overflow-y-auto">
-                    {statuses.length > 0 ? (
-                      statuses.map((status) => {
-                        const key = `${user.id}-${status}`;
-                        const isExpanded =
-                          expandedSections[key] ?? true;
-                        return (
-                          <div key={status} className="mb-4">
-                            <div
-                              className="flex justify-between items-center mb-2 cursor-pointer"
-                              onClick={() =>
-                                toggleSection(user.id, status)
-                              }
-                            >
-                              <h4 className="text-white font-semibold text-sm md:text-base">
-                                {sectionTitles[status] ||
-                                  status.charAt(0).toUpperCase() +
-                                    status.slice(1)}
-                              </h4>
-                              <ChevronRight
-                                className={`w-5 h-5 text-white transition-transform ${
-                                  isExpanded ? "rotate-90" : ""
-                                }`}
-                              />
-                            </div>
-                            {isExpanded && (
+                  <div className="max-h-[95vh] overflow-y-auto">
+                    {sections.map((status) => {
+                      const key = `${user.id}-${status}`;
+                      const isExpanded = expandedSections[key] ?? true;
+                      const tasks = groupedTasks[status] || [];
+                      return (
+                        <div key={status} className="mb-4">
+                          <div
+                            className="flex justify-between items-center mb-2 cursor-pointer"
+                            onClick={() =>
+                              toggleSection(user.id, status)
+                            }
+                          >
+                            <h4 className="text-white font-semibold text-sm md:text-base">
+                              {sectionTitles[status]}
+                            </h4>
+                            <ChevronRight
+                              className={`w-5 h-5 text-white transition-transform duration-300 ease-in-out ${
+                                isExpanded ? "rotate-90" : ""
+                              }`}
+                            />
+                          </div>
+                          <div
+                            className={`overflow-hidden transition-max-height duration-300 ease-in-out ${
+                              isExpanded ? "max-h-[500px]" : "max-h-0"
+                            }`}
+                          >
+                            {tasks.length > 0 ? (
                               <div className="space-y-2 md:space-y-3">
-                                {groupedTasks[status].map(
-                                  (task, index) => (
-                                    <TaskCard
-                                      index={index + 1}
-                                      key={task.id}
-                                      task={task}
-                                    />
-                                  )
-                                )}
+                                {tasks.map((task, index) => (
+                                  <TaskCard
+                                    index={index + 1}
+                                    key={task.id}
+                                    task={task}
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-4 md:py-8 text-white/50">
+                                <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
+                                <p className="text-xs md:text-sm">No works present here</p>
                               </div>
                             )}
                           </div>
-                        );
-                      })
-                    ) : (
-                      <div className="text-center py-4 md:py-8 text-white/50">
-                        <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
-                        <p className="text-xs md:text-sm">
-                          No tasks assigned
-                        </p>
-                      </div>
-                    )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -955,7 +939,7 @@ function KanbanBoardThree() {
 
         {/* Create Task Section - Toggleable */}
         {showRightColumn && (
-          <div className="w-1/4 md:w-1/6 lg:w-[20%] bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto">
+          <div className="w-1/4 md:w-1/6 lg:w-[20%] bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
                 <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-2">
