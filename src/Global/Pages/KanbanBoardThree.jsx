@@ -412,16 +412,19 @@ function KanbanBoardThree() {
 
   const getStatusColor = (status) => {
     switch ((status || "").toLowerCase()) {
-      case "completed":
-        return "from-green-500 to-emerald-600";
+      case "review":
+        return "bg-orange-500";
       case "ongoing":
-        return "from-blue-500 to-cyan-500";
-      case "pending":
-        return "from-yellow-500 to-amber-500";
+        return "bg-green-600";
       case "in_queue":
-        return "from-purple-500 to-violet-500";
+        return "bg-yellow-400";
+      case "pending":
+        return "bg-gray-500";
+      case "complete":
+      case "completed":
+        return "bg-blue-600";
       default:
-        return "from-gray-400 to-gray-500";
+        return "bg-gray-400";
     }
   };
 
@@ -467,7 +470,7 @@ function KanbanBoardThree() {
         )}
         {!isBacklog && (
           <span
-            className={`inline-flex items-center px-2 py-1 rounded-full animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
+            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
               (task.status || "").toString()
             )} text-white`}
           >
@@ -523,7 +526,7 @@ function KanbanBoardThree() {
                       e.stopPropagation();
                       startTimer(userId, task.id);
                     }}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                    className="flex-1 bg-green-600 text-white text-lg py-2 px-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center"
                   >
                     <Play className="w-3 h-3 mr-1" />
                     Start
@@ -534,7 +537,7 @@ function KanbanBoardThree() {
                       e.stopPropagation();
                       pauseTimer(userId, task.id);
                     }}
-                    className="flex-1 bg-gradient-to-r from-yellow-600 to-amber-700 text-white text-lg py-2 px-2 rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all flex items-center justify-center"
+                    className="flex-1 bg-green-600 text-white text-lg py-2 px-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center"
                   >
                     <Pause className="w-3 h-3 mr-1" />
                     Pause
@@ -548,7 +551,17 @@ function KanbanBoardThree() {
                 e.stopPropagation();
                 openStatusModal(userId, task);
               }}
-              className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center"
+              className={`flex-1 text-white text-lg py-2 px-2 rounded-lg transition-all flex items-center justify-center ${
+                task.status === TaskStatus.REVIEW
+                  ? "bg-orange-500 hover:bg-orange-600"
+                  : task.status === TaskStatus.ONGOING
+                  ? "bg-green-600 hover:bg-green-700"
+                  : task.status === TaskStatus.IN_QUEUE
+                  ? "bg-yellow-400 hover:bg-yellow-500 text-black"
+                  : task.status === TaskStatus.PENDING
+                  ? "bg-gray-500 hover:bg-gray-600"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
               <Square className="w-3 h-3 mr-1" />
               <span className="capitalize">
@@ -805,6 +818,69 @@ function KanbanBoardThree() {
     </div>
   );
 
+  const TaskListForUser = ({ tasks, userId }) => {
+    const nodesRef = React.useRef(new Map());
+    const positionsRef = React.useRef(new Map());
+
+    React.useLayoutEffect(() => {
+      const prev = positionsRef.current || new Map();
+      const current = new Map();
+      nodesRef.current.forEach((node, key) => {
+        if (!node) return;
+        current.set(key, node.getBoundingClientRect());
+      });
+      nodesRef.current.forEach((node, key) => {
+        if (!node) return;
+        const p = prev.get(key);
+        const c = current.get(key);
+        if (p && c) {
+          const dx = p.left - c.left;
+          const dy = p.top - c.top;
+          if (dx !== 0 || dy !== 0) {
+            node.style.transform = `translate(${dx}px, ${dy}px)`;
+            node.style.transition = 'transform 0s';
+            requestAnimationFrame(() => {
+              node.style.transition = 'transform 300ms ease';
+              node.style.transform = '';
+            });
+          }
+        }
+      });
+      positionsRef.current = current;
+    });
+
+    const sorted = (tasks || [])
+      .slice()
+      .sort((a, b) => {
+        const sa = statusSortOrder[a.status] ?? 99;
+        const sb = statusSortOrder[b.status] ?? 99;
+        if (sa !== sb) return sa - sb;
+        return (a.assignedDate || '').localeCompare(b.assignedDate || '');
+      });
+
+    return (
+      <div className="space-y-2 md:space-y-3 max-h-64 md:max-h-96 overflow-y-auto">
+        {sorted.map((task, index) => (
+          <div
+            key={task.id}
+            ref={(el) => {
+              if (el) nodesRef.current.set(task.id, el);
+              else nodesRef.current.delete(task.id);
+            }}
+          >
+            <TaskCard index={index + 1} task={task} userId={userId} />
+          </div>
+        ))}
+        {sorted.length === 0 && (
+          <div className="text-center py-4 md:py-8 text-white/50">
+            <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
+            <p className="text-xs md:text-sm">No tasks assigned</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-800 ">
       {/* Header */}
@@ -986,26 +1062,7 @@ function KanbanBoardThree() {
                 </div>
 
                 {/* User Tasks */}
-                <div className="space-y-2 md:space-y-3 max-h-64 md:max-h-96 overflow-y-auto">
-                  {(userTasks[user.id] || [])
-                    .slice()
-                    .sort((a, b) => {
-                      const sa = statusSortOrder[a.status] ?? 99;
-                      const sb = statusSortOrder[b.status] ?? 99;
-                      if (sa !== sb) return sa - sb;
-                      return (a.assignedDate || "").localeCompare(b.assignedDate || "");
-                    })
-                    .map((task, index) => (
-                      <TaskCard index={index + 1} key={task.id} task={task} userId={user.id} />
-                    ))}
-
-                  {(!userTasks[user.id] || userTasks[user.id].length === 0) && (
-                    <div className="text-center py-4 md:py-8 text-white/50">
-                      <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
-                      <p className="text-xs md:text-sm">No tasks assigned</p>
-                    </div>
-                  )}
-                </div>
+                <TaskListForUser tasks={userTasks[user.id]} userId={user.id} />
               </div>
             ))}
           </div>
