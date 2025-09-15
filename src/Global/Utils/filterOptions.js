@@ -1,0 +1,15 @@
+export const filterOptions = [
+  "All",
+  "Project: DNCRP",
+  "Project: DOLE",
+  "Project: MOL",
+  "Project: PRET-A-MED",
+  "Priority: High",
+  "Priority: Medium",
+  "Priority: Low",
+  "Team: DEVELOPER",
+  "Team: HR",
+  "Team: ADMIN",
+  "Status: Present",
+  "Status: Absent",
+];

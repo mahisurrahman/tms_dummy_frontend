@@ -1,0 +1,1 @@
+export const roleOptions = ["All", "DEVELOPER", "HR", "ADMIN"];

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Filter,
@@ -25,8 +26,9 @@ import {
   PauseCircle,
   PlayCircle,
   ClipboardList,
-Hourglass,
+  Hourglass,
   Loader,
+  ChevronDown,
 } from "lucide-react";
 
 function KanbanBoardThree() {
@@ -34,6 +36,7 @@ function KanbanBoardThree() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showRightColumn, setShowRightColumn] = useState(true);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({});
 
   // Dummy data
   const users = [
@@ -261,6 +264,26 @@ function KanbanBoardThree() {
     "cancelled",
   ];
 
+  const sectionTitles = {
+    pending: "Pending",
+    ongoing: "On Going",
+    scheduled: "Re-scheduled",
+    due: "Due",
+    completed: "Completed",
+    cancelled: "Cancelled",
+    review: "On Reviews",
+  };
+
+  const statusOrder = [
+    "pending",
+    "scheduled",
+    "ongoing",
+    "due",
+    "review",
+    "completed",
+    "cancelled",
+  ];
+
   // Check screen size on component mount and resize
   React.useEffect(() => {
     const checkScreenSize = () => {
@@ -316,7 +339,7 @@ function KanbanBoardThree() {
       case "in queue":
         return <Hourglass className="w-4 h-4 text-blue-500" />;
 
-      case "on going":
+      case "ongoing":
         return <Loader className="w-4 h-4 text-green-500 animate-spin" />;
 
       case "finished":
@@ -343,6 +366,11 @@ function KanbanBoardThree() {
       default:
         return <Circle className="w-4 h-4 text-gray-400" />;
     }
+  };
+
+  const toggleSection = (userId, status) => {
+    const key = `${userId}-${status}`;
+    setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const TaskCard = ({ index, task, isBacklog = false }) => (
@@ -763,7 +791,9 @@ function KanbanBoardThree() {
             </div>
 
             <div>
-              <button className="animate-pulse text-white text-xs md:text-sm w-full bg-gradient-to-r from-green-600 to-lime-800 px-3 py-1 md:px-4 md:py-2 rounded shadow-md flex items-center gap-x-1 md:gap-x-2 hover:scale-110 hover:cursor-pointer transition-all duration-200">
+              <button 
+                onClick={() => setShowCreateTask(true)}
+                className="animate-pulse text-white text-xs md:text-sm w-full bg-gradient-to-r from-green-600 to-lime-800 px-3 py-1 md:px-4 md:py-2 rounded shadow-md flex items-center gap-x-1 md:gap-x-2 hover:scale-110 hover:cursor-pointer transition-all duration-200">
                 <Plus className="w-3 h-3 md:w-4 md:h-4" />
                 Add New Task
               </button>
@@ -795,76 +825,131 @@ function KanbanBoardThree() {
           }`}
         >
           <div className="flex space-x-2 md:space-x-4 min-w-max">
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="w-[45vw] md:w-[30vw] lg:w-[20vw] bg-white/10 backdrop-blur-md rounded-2xl p-2 md:p-4 border border-white/20"
-              >
-                {/* User Header */}
-                <div className="mb-2 md:mb-4">
-                  <div className="flex items-center justify-between mb-1 md:mb-2">
-                    <div className="flex items-center space-x-2 md:space-x-3">
-                      <div
-                        className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center ${
-                          user.status === "Present"
-                            ? "bg-green-500"
-                            : "bg-red-500"
-                        } text-white font-bold text-xs md:text-sm`}
-                      >
-                        {user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+            {users.map((user) => {
+              const groupedTasks = (userTasks[user.id] || []).reduce(
+                (acc, task) => {
+                  const stat = task.status;
+                  if (!acc[stat]) acc[stat] = [];
+                  acc[stat].push(task);
+                  return acc;
+                },
+                {}
+              );
+
+              const statuses = Object.keys(groupedTasks).sort(
+                (a, b) =>
+                  statusOrder.indexOf(a) - statusOrder.indexOf(b)
+              );
+
+              return (
+                <div
+                  key={user.id}
+                  className="w-[45vw] md:w-[30vw] lg:w-[20vw] bg-white/10 backdrop-blur-md rounded-2xl p-2 md:p-4 border border-white/20"
+                >
+                  {/* User Header */}
+                  <div className="mb-2 md:mb-4">
+                    <div className="flex items-center justify-between mb-1 md:mb-2">
+                      <div className="flex items-center space-x-2 md:space-x-3">
+                        <div
+                          className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center ${
+                            user.status === "Present"
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                          } text-white font-bold text-xs md:text-sm`}
+                        >
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white text-sm md:text-base">
+                            {user.name}
+                          </h3>
+                          <p className="text-xs md:text-sm text-white/70">
+                            {user.role}
+                          </p>
+                        </div>
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-sm md:text-base">
-                          {user.name}
-                        </h3>
-                        <p className="text-xs md:text-sm text-white/70">
-                          {user.role}
-                        </p>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex text-sm md:text-lg text-white flex-col items-center justify-between">
-                        <div className="flex items-center gap-x-1">
-                          <Star
-                            fill
-                            className="w-4 h-4 md:w-5 md:h-5 text-yellow-400"
-                          />
-                          <span className="font-bold text-orange-400 text-xs md:text-sm">
-                            {user.storyPoints}
-                          </span>
-                          <span className="text-red-400 font-semibold text-xs md:text-sm">
-                            PTS
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center font-semibold space-x-1">
-                          <Timer className="w-3 h-3 md:w-4 md:h-4" />
-                          <span className="font-medium text-xs md:text-sm">
-                            {user.totalTime}
-                          </span>
+                        <div className="flex text-sm md:text-lg text-white flex-col items-center justify-between">
+                          <div className="flex items-center gap-x-1">
+                            <Star
+                              fill
+                              className="w-4 h-4 md:w-5 md:h-5 text-yellow-400"
+                            />
+                            <span className="font-bold text-orange-400 text-xs md:text-sm">
+                              {user.storyPoints}
+                            </span>
+                            <span className="text-red-400 font-semibold text-xs md:text-sm">
+                              PTS
+                            </span>
+                          </div>
+                          <div className="mt-1 flex items-center font-semibold space-x-1">
+                            <Timer className="w-3 h-3 md:w-4 md:h-4" />
+                            <span className="font-medium text-xs md:text-sm">
+                              {user.totalTime}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* User Tasks */}
-                <div className="space-y-2 md:space-y-3 max-h-64 md:max-h-96 overflow-y-auto">
-                  {(userTasks[user.id] || []).map((task, index) => (
-                    <TaskCard index={index + 1} key={task.id} task={task} />
-                  ))}
-
-                  {(!userTasks[user.id] || userTasks[user.id].length === 0) && (
-                    <div className="text-center py-4 md:py-8 text-white/50">
-                      <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
-                      <p className="text-xs md:text-sm">No tasks assigned</p>
-                    </div>
-                  )}
+                  {/* User Tasks Sections */}
+                  <div className="max-h-64 md:max-h-96 overflow-y-auto">
+                    {statuses.length > 0 ? (
+                      statuses.map((status) => {
+                        const key = `${user.id}-${status}`;
+                        const isExpanded =
+                          expandedSections[key] ?? true;
+                        return (
+                          <div key={status} className="mb-4">
+                            <div
+                              className="flex justify-between items-center mb-2 cursor-pointer"
+                              onClick={() =>
+                                toggleSection(user.id, status)
+                              }
+                            >
+                              <h4 className="text-white font-semibold text-sm md:text-base">
+                                {sectionTitles[status] ||
+                                  status.charAt(0).toUpperCase() +
+                                    status.slice(1)}
+                              </h4>
+                              <ChevronRight
+                                className={`w-5 h-5 text-white transition-transform ${
+                                  isExpanded ? "rotate-90" : ""
+                                }`}
+                              />
+                            </div>
+                            {isExpanded && (
+                              <div className="space-y-2 md:space-y-3">
+                                {groupedTasks[status].map(
+                                  (task, index) => (
+                                    <TaskCard
+                                      index={index + 1}
+                                      key={task.id}
+                                      task={task}
+                                    />
+                                  )
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-4 md:py-8 text-white/50">
+                        <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
+                        <p className="text-xs md:text-sm">
+                          No tasks assigned
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -880,9 +965,9 @@ function KanbanBoardThree() {
               </h2>
               <button
                 onClick={() => setShowRightColumn(false)}
-                className="lg:hidden p-1 bg-white/20 rounded-md text-white"
+                className="p-1 bg-white/20 rounded-md text-white"
               >
-                <X className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
