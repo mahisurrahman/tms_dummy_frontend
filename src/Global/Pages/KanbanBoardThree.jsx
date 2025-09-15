@@ -202,6 +202,16 @@ function KanbanBoardThree() {
         totalElapsedSec: 1 * 3600 + 45 * 60,
         startedAtSec: null,
       },
+      {
+        id: "t5",
+        title: "Bug Fix",
+        status: TaskStatus.ONGOING,
+        priority: "Medium",
+        assignedDate: "2025-01-20",
+        assignedBy: "Mike Johnson",
+        totalElapsedSec: 1 * 3600 + 45 * 60,
+        startedAtSec: null,
+      },
     ],
     3: [
       {
@@ -290,7 +300,7 @@ function KanbanBoardThree() {
   // tick every second to update display for running timers
   const [tick, setTick] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    const id = setInterval(() => setTick((t) => t + 1), 50);
     return () => clearInterval(id);
   }, []);
 
@@ -472,7 +482,7 @@ function KanbanBoardThree() {
           <span
             className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
               (task.status || "").toString()
-            )} text-white`}
+            )} text-white ${task.status === TaskStatus.ONGOING ? "animate-pulse" : ""}`}
           >
             {getStatusIcon(task.status)}
             <span className="ml-1 capitalize">{task.status}</span>
@@ -859,7 +869,7 @@ function KanbanBoardThree() {
       });
 
     return (
-      <div className="space-y-2 md:space-y-3 max-h-64 md:max-h-96 overflow-y-auto">
+      <div className="space-y-2 md:space-y-3  overflow-y-auto">
         {sorted.map((task, index) => (
           <div
             key={task.id}
