@@ -50,6 +50,13 @@ function KanbanBoardThree() {
     TaskStatus.REVIEW,
     TaskStatus.COMPLETE,
   ];
+  const statusSortOrder = {
+    [TaskStatus.REVIEW]: 0,
+    [TaskStatus.ONGOING]: 1,
+    [TaskStatus.IN_QUEUE]: 2,
+    [TaskStatus.PENDING]: 3,
+    [TaskStatus.COMPLETE]: 4,
+  };
 
   // Dummy data
   const users = [
@@ -439,7 +446,7 @@ function KanbanBoardThree() {
 
   const TaskCard = ({ index, task, isBacklog = false, userId }) => (
     <div
-      className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer  ${
+      className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 ease-in-out transform hover:-translate-y-[1px] cursor-pointer  ${
         task.priority === "High"
           ? "border-red-500 shadow-red-100"
           : task.priority === "Medium"
@@ -980,9 +987,17 @@ function KanbanBoardThree() {
 
                 {/* User Tasks */}
                 <div className="space-y-2 md:space-y-3 max-h-64 md:max-h-96 overflow-y-auto">
-                  {(userTasks[user.id] || []).map((task, index) => (
-                    <TaskCard index={index + 1} key={task.id} task={task} userId={user.id} />
-                  ))}
+                  {(userTasks[user.id] || [])
+                    .slice()
+                    .sort((a, b) => {
+                      const sa = statusSortOrder[a.status] ?? 99;
+                      const sb = statusSortOrder[b.status] ?? 99;
+                      if (sa !== sb) return sa - sb;
+                      return (a.assignedDate || "").localeCompare(b.assignedDate || "");
+                    })
+                    .map((task, index) => (
+                      <TaskCard index={index + 1} key={task.id} task={task} userId={user.id} />
+                    ))}
 
                   {(!userTasks[user.id] || userTasks[user.id].length === 0) && (
                     <div className="text-center py-4 md:py-8 text-white/50">
