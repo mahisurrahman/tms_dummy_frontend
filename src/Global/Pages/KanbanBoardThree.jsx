@@ -49,6 +49,9 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-20",
         assignedBy: "Emily Davis",
         timeSpent: "02:30:00",
+        description: "Design the login page UI",
+        deadline: "2025-01-25",
+        project: "DNCRP",
       },
       {
         id: "t2",
@@ -58,6 +61,82 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-19",
         assignedBy: "Sarah Chen",
         timeSpent: "04:15:00",
+        description: "Implement password reset",
+        deadline: "2025-01-24",
+        project: "DOLE",
+      },
+      // Additional dummy data
+      {
+        id: "p1-1",
+        title: "Pending Task 1",
+        status: "pending",
+        priority: "Low",
+        assignedDate: "2025-09-10",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Pending description",
+        deadline: "2025-09-20",
+        project: "MOL",
+      },
+      {
+        id: "p1-2",
+        title: "Pending Task 2",
+        status: "pending",
+        priority: "High",
+        assignedDate: "2025-09-11",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Another pending",
+        deadline: "2025-09-21",
+        project: "PRET-A-MED",
+      },
+      {
+        id: "r1-1",
+        title: "Review Task 1",
+        status: "review",
+        priority: "Medium",
+        assignedDate: "2025-09-12",
+        assignedBy: "Admin",
+        timeSpent: "01:00:00",
+        description: "Review this",
+        deadline: "2025-09-22",
+        project: "DNCRP",
+      },
+      {
+        id: "c1-1",
+        title: "Cancelled Task 1",
+        status: "cancelled",
+        priority: "Low",
+        assignedDate: "2025-09-13",
+        assignedBy: "Admin",
+        timeSpent: "00:30:00",
+        description: "Cancelled",
+        deadline: "2025-09-23",
+        project: "DOLE",
+      },
+      {
+        id: "s1-1",
+        title: "Scheduled Task 1",
+        status: "scheduled",
+        priority: "High",
+        assignedDate: "2025-09-14",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Scheduled",
+        deadline: "2025-09-24",
+        project: "MOL",
+      },
+      {
+        id: "f1-1",
+        title: "Finished Task 1",
+        status: "finished",
+        priority: "Medium",
+        assignedDate: "2025-09-15",
+        assignedBy: "Admin",
+        timeSpent: "03:00:00",
+        description: "Finished",
+        deadline: "2025-09-25",
+        project: "PRET-A-MED",
       },
     ],
     2: [
@@ -69,6 +148,9 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-21",
         assignedBy: "John Doe",
         timeSpent: "00:00:00",
+        description: "Design schema",
+        deadline: "2025-01-26",
+        project: "DNCRP",
       },
       {
         id: "t4",
@@ -78,6 +160,82 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-20",
         assignedBy: "Mike Johnson",
         timeSpent: "01:45:00",
+        description: "Validate data",
+        deadline: "2025-01-25",
+        project: "DOLE",
+      },
+      // Additional
+      {
+        id: "p2-1",
+        title: "Pending Task 1",
+        status: "pending",
+        priority: "Low",
+        assignedDate: "2025-09-10",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Pending",
+        deadline: "2025-09-20",
+        project: "MOL",
+      },
+      {
+        id: "r2-1",
+        title: "Review Task 1",
+        status: "review",
+        priority: "High",
+        assignedDate: "2025-09-11",
+        assignedBy: "Admin",
+        timeSpent: "00:45:00",
+        description: "Review",
+        deadline: "2025-09-21",
+        project: "PRET-A-MED",
+      },
+      {
+        id: "comp2-1",
+        title: "Completed Task 1",
+        status: "completed",
+        priority: "Medium",
+        assignedDate: "2025-09-12",
+        assignedBy: "Admin",
+        timeSpent: "02:00:00",
+        description: "Completed",
+        deadline: "2025-09-22",
+        project: "DNCRP",
+      },
+      {
+        id: "c2-1",
+        title: "Cancelled Task 1",
+        status: "cancelled",
+        priority: "Low",
+        assignedDate: "2025-09-13",
+        assignedBy: "Admin",
+        timeSpent: "00:15:00",
+        description: "Cancelled",
+        deadline: "2025-09-23",
+        project: "DOLE",
+      },
+      {
+        id: "s2-1",
+        title: "Scheduled Task 1",
+        status: "scheduled",
+        priority: "High",
+        assignedDate: "2025-09-14",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Scheduled",
+        deadline: "2025-09-24",
+        project: "MOL",
+      },
+      {
+        id: "f2-1",
+        title: "Finished Task 1",
+        status: "finished",
+        priority: "Medium",
+        assignedDate: "2025-09-15",
+        assignedBy: "Admin",
+        timeSpent: "04:00:00",
+        description: "Finished",
+        deadline: "2025-09-25",
+        project: "PRET-A-MED",
       },
     ],
     3: [
@@ -89,6 +247,69 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-22",
         assignedBy: "Lisa Wang",
         timeSpent: "00:00:00",
+        description: "Onboard employees",
+        deadline: "2025-01-27",
+        project: "HR Project",
+      },
+      {
+        id: "p3-1",
+        title: "Pending Task 1",
+        status: "pending",
+        priority: "Medium",
+        assignedDate: "2025-09-10",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Pending",
+        deadline: "2025-09-20",
+        project: "DNCRP",
+      },
+      {
+        id: "r3-1",
+        title: "Review Task 1",
+        status: "review",
+        priority: "High",
+        assignedDate: "2025-09-11",
+        assignedBy: "Admin",
+        timeSpent: "01:15:00",
+        description: "Review",
+        deadline: "2025-09-21",
+        project: "DOLE",
+      },
+      {
+        id: "comp3-1",
+        title: "Completed Task 1",
+        status: "completed",
+        priority: "Low",
+        assignedDate: "2025-09-12",
+        assignedBy: "Admin",
+        timeSpent: "00:50:00",
+        description: "Completed",
+        deadline: "2025-09-22",
+        project: "MOL",
+      },
+      {
+        id: "c3-1",
+        title: "Cancelled Task 1",
+        status: "cancelled",
+        priority: "Medium",
+        assignedDate: "2025-09-13",
+        assignedBy: "Admin",
+        timeSpent: "00:20:00",
+        description: "Cancelled",
+        deadline: "2025-09-23",
+        project: "PRET-A-MED",
+      },
+      {
+        id: "f3-1",
+        title: "Finished Task 1",
+        status: "finished",
+        priority: "High",
+        assignedDate: "2025-09-15",
+        assignedBy: "Admin",
+        timeSpent: "05:00:00",
+        description: "Finished",
+        deadline: "2025-09-25",
+        project: "DNCRP",
       },
     ],
     4: [
@@ -100,6 +321,9 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-18",
         assignedBy: "Alex Kumar",
         timeSpent: "03:20:00",
+        description: "Backup system",
+        deadline: "2025-01-23",
+        project: "Admin Project",
       },
       {
         id: "t7",
@@ -109,6 +333,69 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-21",
         assignedBy: "David Brown",
         timeSpent: "05:10:00",
+        description: "Audit security",
+        deadline: "2025-01-26",
+        project: "Security",
+      },
+      {
+        id: "p4-1",
+        title: "Pending Task 1",
+        status: "pending",
+        priority: "Low",
+        assignedDate: "2025-09-10",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Pending",
+        deadline: "2025-09-20",
+        project: "DOLE",
+      },
+      {
+        id: "r4-1",
+        title: "Review Task 1",
+        status: "review",
+        priority: "Medium",
+        assignedDate: "2025-09-11",
+        assignedBy: "Admin",
+        timeSpent: "00:30:00",
+        description: "Review",
+        deadline: "2025-09-21",
+        project: "MOL",
+      },
+      {
+        id: "c4-1",
+        title: "Cancelled Task 1",
+        status: "cancelled",
+        priority: "High",
+        assignedDate: "2025-09-13",
+        assignedBy: "Admin",
+        timeSpent: "00:10:00",
+        description: "Cancelled",
+        deadline: "2025-09-23",
+        project: "PRET-A-MED",
+      },
+      {
+        id: "s4-1",
+        title: "Scheduled Task 1",
+        status: "scheduled",
+        priority: "Low",
+        assignedDate: "2025-09-14",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Scheduled",
+        deadline: "2025-09-24",
+        project: "DNCRP",
+      },
+      {
+        id: "f4-1",
+        title: "Finished Task 1",
+        status: "finished",
+        priority: "Medium",
+        assignedDate: "2025-09-15",
+        assignedBy: "Admin",
+        timeSpent: "02:30:00",
+        description: "Finished",
+        deadline: "2025-09-25",
+        project: "DOLE",
       },
     ],
     5: [
@@ -120,39 +407,93 @@ function KanbanBoardThree() {
         assignedDate: "2025-01-21",
         assignedBy: "Emma Wilson",
         timeSpent: "00:00:00",
+        description: "Review code",
+        deadline: "2025-01-26",
+        project: "Development",
       },
-    ],
-    6: [
       {
-        id: "t9",
-        title: "UI Testing",
+        id: "p5-1",
+        title: "Pending Task 1",
+        status: "pending",
+        priority: "High",
+        assignedDate: "2025-09-10",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Pending",
+        deadline: "2025-09-20",
+        project: "MOL",
+      },
+      {
+        id: "o5-1",
+        title: "Ongoing Task 1",
         status: "ongoing",
         priority: "Low",
-        assignedDate: "2025-01-20",
-        assignedBy: "John Doe",
-        timeSpent: "02:00:00",
-      },
-    ],
-    7: [
-      {
-        id: "t10",
-        title: "Payroll System",
-        status: "due",
-        priority: "High",
-        assignedDate: "2025-01-15",
-        assignedBy: "Sarah Chen",
-        timeSpent: "01:30:00",
-      },
-    ],
-    8: [
-      {
-        id: "t11",
-        title: "Server Maintenance",
-        status: "cancelled",
-        priority: "Medium",
-        assignedDate: "2025-01-19",
-        assignedBy: "Mike Johnson",
+        assignedDate: "2025-09-11",
+        assignedBy: "Admin",
         timeSpent: "00:45:00",
+        description: "Ongoing",
+        deadline: "2025-09-21",
+        project: "PRET-A-MED",
+      },
+      {
+        id: "r5-1",
+        title: "Review Task 1",
+        status: "review",
+        priority: "Medium",
+        assignedDate: "2025-09-12",
+        assignedBy: "Admin",
+        timeSpent: "01:00:00",
+        description: "Review",
+        deadline: "2025-09-22",
+        project: "DNCRP",
+      },
+      {
+        id: "comp5-1",
+        title: "Completed Task 1",
+        status: "completed",
+        priority: "High",
+        assignedDate: "2025-09-13",
+        assignedBy: "Admin",
+        timeSpent: "03:00:00",
+        description: "Completed",
+        deadline: "2025-09-23",
+        project: "DOLE",
+      },
+      {
+        id: "c5-1",
+        title: "Cancelled Task 1",
+        status: "cancelled",
+        priority: "Low",
+        assignedDate: "2025-09-14",
+        assignedBy: "Admin",
+        timeSpent: "00:05:00",
+        description: "Cancelled",
+        deadline: "2025-09-24",
+        project: "MOL",
+      },
+      {
+        id: "s5-1",
+        title: "Scheduled Task 1",
+        status: "scheduled",
+        priority: "Medium",
+        assignedDate: "2025-09-15",
+        assignedBy: "Admin",
+        timeSpent: "00:00:00",
+        description: "Scheduled",
+        deadline: "2025-09-25",
+        project: "PRET-A-MED",
+      },
+      {
+        id: "f5-1",
+        title: "Finished Task 1",
+        status: "finished",
+        priority: "High",
+        assignedDate: "2025-09-16",
+        assignedBy: "Admin",
+        timeSpent: "06:00:00",
+        description: "Finished",
+        deadline: "2025-09-26",
+        project: "DNCRP",
       },
     ],
   });
@@ -272,6 +613,7 @@ function KanbanBoardThree() {
     "completed",
     "cancelled",
     "scheduled",
+    "finished",
   ];
 
   const sectionTitles = {
@@ -281,6 +623,7 @@ function KanbanBoardThree() {
     completed: "Completed",
     cancelled: "Cancelled",
     scheduled: "Re-scheduled",
+    finished: "Finished",
   };
 
   // Initialize expanded sections with ongoing open by default
@@ -305,7 +648,7 @@ function KanbanBoardThree() {
   }, [timers]);
 
   // Check screen size on component mount and resize
-  React.useEffect(() => {
+  useEffect(() => {
     const checkScreenSize = () => {
       setIsMobileView(window.innerWidth < 1024);
     };
@@ -325,39 +668,77 @@ function KanbanBoardThree() {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(
-      2,
-      "0"
-    )}:${String(s).padStart(2, "0")}`;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   };
 
-  const handleStartPauseResume = (task, userId) => {
+  const pauseAllOtherTasks = (userId, currentTaskId) => {
+    setTimers((prev) => {
+      const newTimers = { ...prev };
+      (userTasks[userId] || []).forEach((t) => {
+        if (t.id !== currentTaskId && t.status === "ongoing" && newTimers[t.id]?.isRunning) {
+          const ex = newTimers[t.id];
+          if (ex.intervalId) clearInterval(ex.intervalId);
+          newTimers[t.id] = { ...ex, isRunning: false, intervalId: undefined };
+        }
+      });
+      return newTimers;
+    });
+  };
+
+  const moveTask = (userId, taskId, newStatus) => {
+    setUserTasks((prev) => {
+      const userT = prev[userId] || [];
+      const taskIndex = userT.findIndex((t) => t.id === taskId);
+      if (taskIndex === -1) return prev;
+      const newTasks = [...userT];
+      newTasks[taskIndex] = { ...newTasks[taskIndex], status: newStatus };
+      return { ...prev, [userId]: newTasks };
+    });
+  };
+
+  const handleStart = (task, userId) => {
+    const taskId = task.id;
+    if (task.status === "pending") {
+      moveTask(userId, taskId, "ongoing");
+    }
+    pauseAllOtherTasks(userId, taskId);
+    setTimers((prev) => {
+      const existing = prev[taskId];
+      if (existing && existing.isRunning) return prev;
+      const baseSeconds = existing ? existing.accumulated : parseTimeToSeconds(task.timeSpent);
+      const intervalId = setInterval(() => {
+        setTimers((p) => ({
+          ...p,
+          [taskId]: { ...p[taskId], accumulated: p[taskId].accumulated + 1 },
+        }));
+      }, 1000);
+      return { ...prev, [taskId]: { accumulated: baseSeconds, isRunning: true, intervalId } };
+    });
+  };
+
+  const handlePause = (task, userId) => {
     const taskId = task.id;
     setTimers((prev) => {
       const existing = prev[taskId];
-      if (existing && existing.isRunning) {
-        // Pause
-        if (existing.intervalId) clearInterval(existing.intervalId);
-        return {
-          ...prev,
-          [taskId]: { ...existing, isRunning: false, intervalId: undefined },
-        };
-      } else {
-        // Start or Resume
-        const baseSeconds = existing
-          ? existing.accumulated
-          : parseTimeToSeconds(task.timeSpent);
-        const intervalId = setInterval(() => {
-          setTimers((p) => ({
-            ...p,
-            [taskId]: { ...p[taskId], accumulated: p[taskId].accumulated + 1 },
-          }));
-        }, 1000);
-        return {
-          ...prev,
-          [taskId]: { accumulated: baseSeconds, isRunning: true, intervalId },
-        };
-      }
+      if (!existing || !existing.isRunning) return prev;
+      if (existing.intervalId) clearInterval(existing.intervalId);
+      return { ...prev, [taskId]: { ...existing, isRunning: false, intervalId: undefined } };
+    });
+  };
+
+  const handleResume = (task, userId) => {
+    const taskId = task.id;
+    pauseAllOtherTasks(userId, taskId);
+    setTimers((prev) => {
+      const existing = prev[taskId];
+      if (!existing || existing.isRunning) return prev;
+      const intervalId = setInterval(() => {
+        setTimers((p) => ({
+          ...p,
+          [taskId]: { ...p[taskId], accumulated: p[taskId].accumulated + 1 },
+        }));
+      }, 1000);
+      return { ...prev, [taskId]: { ...existing, isRunning: true, intervalId } };
     });
   };
 
@@ -368,7 +749,6 @@ function KanbanBoardThree() {
       if (existing) {
         if (existing.intervalId) clearInterval(existing.intervalId);
         const newTime = formatSecondsToTime(existing.accumulated);
-        // Update userTasks
         setUserTasks((prevTasks) => ({
           ...prevTasks,
           [userId]: prevTasks[userId].map((t) =>
@@ -380,6 +760,14 @@ function KanbanBoardThree() {
       }
       return prev;
     });
+    moveTask(userId, taskId, "completed");
+  };
+
+  const handleAddTask = (newTask, userId) => {
+    setUserTasks((prev) => ({
+      ...prev,
+      [userId]: [...(prev[userId] || []), newTask],
+    }));
   };
 
   const getPriorityColor = (priority) => {
@@ -409,6 +797,8 @@ function KanbanBoardThree() {
         return "from-red-500 to-rose-500";
       case "cancelled":
         return "from-gray-500 to-slate-500";
+      case "finished":
+        return "from-green-600 to-lime-600";
       default:
         return "from-gray-400 to-gray-500";
     }
@@ -525,7 +915,7 @@ function KanbanBoardThree() {
                 <Flag className="w-3 h-3 mr-1" />
                 {task.priority}
               </span>
-              <span className="text-gray-500">{displayTime}</span>
+              <span className={`text-yellow-600 text-xl font-bold ${isRunning ? "animate-pulse" : ""}`}>{displayTime}</span>
             </div>
 
             <div className="flex items-center justify-between text-xs text-gray-500">
@@ -534,30 +924,82 @@ function KanbanBoardThree() {
             </div>
 
             <div className="flex gap-1 mt-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStartPauseResume(task, userId);
-                }}
-                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
-              >
-                {isRunning ? (
-                  <Pause className="w-3 h-3 mr-1" />
-                ) : (
+              {task.status === "pending" && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStart(task, userId);
+                  }}
+                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                >
                   <Play className="w-3 h-3 mr-1" />
-                )}
-                {isRunning ? "Pause" : hasTimer ? "Resume" : "Start"}
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEnd(task, userId);
-                }}
-                className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center"
-              >
-                <Square className="w-3 h-3 mr-1" />
-                End
-              </button>
+                  Start
+                </button>
+              )}
+              {task.status === "ongoing" && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isRunning) {
+                        handlePause(task, userId);
+                      } else {
+                        handleResume(task, userId);
+                      }
+                    }}
+                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                  >
+                    {isRunning ? <Pause className="w-3 h-3 mr-1" /> : <Play className="w-3 h-3 mr-1" />}
+                    {isRunning ? "Pause" : "Resume"}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEnd(task, userId);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center"
+                  >
+                    <Square className="w-3 h-3 mr-1" />
+                    End
+                  </button>
+                </>
+              )}
+              {task.status === "completed" && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    moveTask(userId, task.id, "review");
+                  }}
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-violet-700 text-white text-lg py-2 px-2 rounded-lg hover:from-purple-600 hover:to-violet-600 transition-all flex items-center justify-center"
+                >
+                  <ClipboardList className="w-3 h-3 mr-1" />
+                  Review this task
+                </button>
+              )}
+              {task.status === "review" && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      moveTask(userId, task.id, "pending");
+                    }}
+                    className="flex-1 bg-gradient-to-r from-yellow-600 to-orange-700 text-white text-lg py-2 px-2 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center"
+                  >
+                    <Calendar className="w-3 h-3 mr-1" />
+                    Re-assign
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      moveTask(userId, task.id, "finished");
+                    }}
+                    className="flex-1 bg-gradient-to-r from-green-600 to-lime-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-lime-600 transition-all flex items-center justify-center"
+                  >
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Confirmed
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -817,7 +1259,7 @@ function KanbanBoardThree() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center">
               <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
-                <img src={logo} className="w-20 h-40 object-contain" alt="" />
+              <img src={logo} className="w-20 h-40 object-contain" alt="" />
               </div>
               Traban
             </h1>
@@ -902,10 +1344,9 @@ function KanbanBoardThree() {
             </div>
 
             <div>
-              <button
+              <button 
                 onClick={() => setShowCreateTask(true)}
-                className=" text-white text-xs md:text-sm w-full bg-gradient-to-r from-green-600 to-lime-600 px-3 py-1 md:px-4 md:py-2 rounded shadow-md flex items-center gap-x-1 md:gap-x-2 hover:scale-110 hover:cursor-pointer transition-all duration-200"
-              >
+                className="animate-pulse text-white text-xs md:text-sm w-full bg-gradient-to-r from-green-600 to-lime-800 px-3 py-1 md:px-4 md:py-2 rounded shadow-md flex items-center gap-x-1 md:gap-x-2 hover:scale-110 hover:cursor-pointer transition-all duration-200">
                 <Plus className="w-3 h-3 md:w-4 md:h-4" />
                 Add New Task
               </button>
@@ -940,8 +1381,12 @@ function KanbanBoardThree() {
           </div>
         )}
 
-        {/* User Columns */}
-        <div className="flex-1 p-2 md:p-4 overflow-x-auto">
+        {/* User Columns - Adjustable width based on right column visibility */}
+        <div
+          className={`p-2 md:p-4 overflow-x-auto transition-all duration-300 ease-in-out ${
+            showRightColumn ? "w-3/4 md:w-4/5 lg:w-[70%]" : "w-full"
+          }`}
+        >
           <div className="flex space-x-2 md:space-x-4 min-w-max">
             {users.map((user) => {
               const groupedTasks = (userTasks[user.id] || []).reduce(
@@ -1049,9 +1494,7 @@ function KanbanBoardThree() {
                             ) : (
                               <div className="text-center py-4 md:py-8 text-white/50">
                                 <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
-                                <p className="text-xs md:text-sm">
-                                  No works present here
-                                </p>
+                                <p className="text-xs md:text-sm">No works present here</p>
                               </div>
                             )}
                           </div>
@@ -1186,73 +1629,73 @@ function KanbanBoardThree() {
             </div>
           </div>
         )}
-      </div>
 
-      {/* Toggle button for right column */}
-      {!showRightColumn && (
-        <button
-          onClick={() => setShowRightColumn(true)}
-          className="hidden lg:flex fixed right-0 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-2 rounded-l-lg z-10 hover:bg-white/30 transition-all"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-      )}
+        {/* Toggle button for right column */}
+        {!showRightColumn && (
+          <button
+            onClick={() => setShowRightColumn(true)}
+            className="hidden lg:flex fixed right-0 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-2 rounded-l-lg z-10 hover:bg-white/30 transition-all"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
 
-      {/* Toggle button for backlog column */}
-      {!showBacklog && (
-        <button
-          onClick={() => setShowBacklog(true)}
-          className="hidden lg:flex fixed left-0 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-2 rounded-r-lg z-10 hover:bg-white/30 transition-all"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      )}
+        {/* Toggle button for backlog column */}
+        {!showBacklog && (
+          <button
+            onClick={() => setShowBacklog(true)}
+            className="hidden lg:flex fixed left-0 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-2 rounded-r-lg z-10 hover:bg-white/30 transition-all"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        )}
 
-      {/* Mobile toggle button for right column */}
-      <div className="fixed bottom-20 right-4 lg:hidden">
-        <button
-          onClick={() => setShowRightColumn(!showRightColumn)}
-          className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center"
-        >
-          {showRightColumn ? (
-            <ChevronRight className="w-6 h-6" />
-          ) : (
-            <ChevronLeft className="w-6 h-6" />
-          )}
-        </button>
-      </div>
+        {/* Mobile toggle button for right column */}
+        <div className="fixed bottom-20 right-4 lg:hidden">
+          <button
+            onClick={() => setShowRightColumn(!showRightColumn)}
+            className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center"
+          >
+            {showRightColumn ? (
+              <ChevronRight className="w-6 h-6" />
+            ) : (
+              <ChevronLeft className="w-6 h-6" />
+            )}
+          </button>
+        </div>
 
-      {/* Mobile toggle button for backlog column */}
-      <div className="fixed bottom-20 left-4 lg:hidden">
-        <button
-          onClick={() => setShowBacklog(!showBacklog)}
-          className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center"
-        >
-          {showBacklog ? (
-            <ChevronLeft className="w-6 h-6" />
-          ) : (
-            <ChevronRight className="w-6 h-6" />
-          )}
-        </button>
-      </div>
+        {/* Mobile toggle button for backlog column */}
+        <div className="fixed bottom-20 left-4 lg:hidden">
+          <button
+            onClick={() => setShowBacklog(!showBacklog)}
+            className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center"
+          >
+            {showBacklog ? (
+              <ChevronLeft className="w-6 h-6" />
+            ) : (
+              <ChevronRight className="w-6 h-6" />
+            )}
+          </button>
+        </div>
 
-      {/* Modals */}
-      {selectedTask && (
-        <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
-      )}
+        {/* Modals */}
+        {selectedTask && (
+          <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
+        )}
 
-      {showCreateTask && (
-        <CreateTaskForm onClose={() => setShowCreateTask(false)} />
-      )}
+        {showCreateTask && (
+          <CreateTaskForm onClose={() => setShowCreateTask(false)} />
+        )}
 
-      {/* Floating Action Button for Mobile */}
-      <div className="fixed bottom-6 right-6 lg:hidden">
-        <button
-          onClick={() => setShowCreateTask(true)}
-          className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
+        {/* Floating Action Button for Mobile */}
+        <div className="fixed bottom-6 right-6 lg:hidden">
+          <button
+            onClick={() => setShowCreateTask(true)}
+            className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center"
+          >
+            <Plus className="w-6 h-6" />
+          </button>
+        </div>
       </div>
     </div>
   );
