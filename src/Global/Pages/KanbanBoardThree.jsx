@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Filter,
   Plus,
@@ -30,13 +29,133 @@ import {
   Loader,
   ChevronDown,
 } from "lucide-react";
+import logo from "../../assets/images/Final-V.png";
 
 function KanbanBoardThree() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showRightColumn, setShowRightColumn] = useState(true);
+  const [showBacklog, setShowBacklog] = useState(true);
   const [isMobileView, setIsMobileView] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
+  const [timers, setTimers] = useState({}); // taskId: { accumulated: seconds, isRunning: boolean, intervalId?: number }
+  const [userTasks, setUserTasks] = useState({
+    1: [
+      {
+        id: "t1",
+        title: "Login Page Design",
+        status: "ongoing",
+        priority: "High",
+        assignedDate: "2025-01-20",
+        assignedBy: "Emily Davis",
+        timeSpent: "02:30:00",
+      },
+      {
+        id: "t2",
+        title: "Password Reset Feature",
+        status: "completed",
+        priority: "Medium",
+        assignedDate: "2025-01-19",
+        assignedBy: "Sarah Chen",
+        timeSpent: "04:15:00",
+      },
+    ],
+    2: [
+      {
+        id: "t3",
+        title: "Database Schema",
+        status: "pending",
+        priority: "High",
+        assignedDate: "2025-01-21",
+        assignedBy: "John Doe",
+        timeSpent: "00:00:00",
+      },
+      {
+        id: "t4",
+        title: "Data Validation",
+        status: "ongoing",
+        priority: "Medium",
+        assignedDate: "2025-01-20",
+        assignedBy: "Mike Johnson",
+        timeSpent: "01:45:00",
+      },
+    ],
+    3: [
+      {
+        id: "t5",
+        title: "Employee Onboarding",
+        status: "scheduled",
+        priority: "Low",
+        assignedDate: "2025-01-22",
+        assignedBy: "Lisa Wang",
+        timeSpent: "00:00:00",
+      },
+    ],
+    4: [
+      {
+        id: "t6",
+        title: "System Backup",
+        status: "completed",
+        priority: "High",
+        assignedDate: "2025-01-18",
+        assignedBy: "Alex Kumar",
+        timeSpent: "03:20:00",
+      },
+      {
+        id: "t7",
+        title: "Security Audit",
+        status: "ongoing",
+        priority: "High",
+        assignedDate: "2025-01-21",
+        assignedBy: "David Brown",
+        timeSpent: "05:10:00",
+      },
+    ],
+    5: [
+      {
+        id: "t8",
+        title: "Code Review",
+        status: "pending",
+        priority: "Medium",
+        assignedDate: "2025-01-21",
+        assignedBy: "Emma Wilson",
+        timeSpent: "00:00:00",
+      },
+    ],
+    6: [
+      {
+        id: "t9",
+        title: "UI Testing",
+        status: "ongoing",
+        priority: "Low",
+        assignedDate: "2025-01-20",
+        assignedBy: "John Doe",
+        timeSpent: "02:00:00",
+      },
+    ],
+    7: [
+      {
+        id: "t10",
+        title: "Payroll System",
+        status: "due",
+        priority: "High",
+        assignedDate: "2025-01-15",
+        assignedBy: "Sarah Chen",
+        timeSpent: "01:30:00",
+      },
+    ],
+    8: [
+      {
+        id: "t11",
+        title: "Server Maintenance",
+        status: "cancelled",
+        priority: "Medium",
+        assignedDate: "2025-01-19",
+        assignedBy: "Mike Johnson",
+        timeSpent: "00:45:00",
+      },
+    ],
+  });
 
   // Dummy data
   const users = [
@@ -116,124 +235,6 @@ function KanbanBoardThree() {
     },
   ];
 
-  const userTasks = {
-    1: [
-      {
-        id: "t1",
-        title: "Login Page Design",
-        status: "ongoing",
-        priority: "High",
-        assignedDate: "2025-01-20",
-        assignedBy: "Emily Davis",
-        timeSpent: "02:30",
-      },
-      {
-        id: "t2",
-        title: "Password Reset Feature",
-        status: "completed",
-        priority: "Medium",
-        assignedDate: "2025-01-19",
-        assignedBy: "Sarah Chen",
-        timeSpent: "04:15",
-      },
-    ],
-    2: [
-      {
-        id: "t3",
-        title: "Database Schema",
-        status: "pending",
-        priority: "High",
-        assignedDate: "2025-01-21",
-        assignedBy: "John Doe",
-        timeSpent: "00:00",
-      },
-      {
-        id: "t4",
-        title: "Data Validation",
-        status: "ongoing",
-        priority: "Medium",
-        assignedDate: "2025-01-20",
-        assignedBy: "Mike Johnson",
-        timeSpent: "01:45",
-      },
-    ],
-    3: [
-      {
-        id: "t5",
-        title: "Employee Onboarding",
-        status: "scheduled",
-        priority: "Low",
-        assignedDate: "2025-01-22",
-        assignedBy: "Lisa Wang",
-        timeSpent: "00:00",
-      },
-    ],
-    4: [
-      {
-        id: "t6",
-        title: "System Backup",
-        status: "completed",
-        priority: "High",
-        assignedDate: "2025-01-18",
-        assignedBy: "Alex Kumar",
-        timeSpent: "03:20",
-      },
-      {
-        id: "t7",
-        title: "Security Audit",
-        status: "ongoing",
-        priority: "High",
-        assignedDate: "2025-01-21",
-        assignedBy: "David Brown",
-        timeSpent: "05:10",
-      },
-    ],
-    5: [
-      {
-        id: "t8",
-        title: "Code Review",
-        status: "pending",
-        priority: "Medium",
-        assignedDate: "2025-01-21",
-        assignedBy: "Emma Wilson",
-        timeSpent: "00:00",
-      },
-    ],
-    6: [
-      {
-        id: "t9",
-        title: "UI Testing",
-        status: "ongoing",
-        priority: "Low",
-        assignedDate: "2025-01-20",
-        assignedBy: "John Doe",
-        timeSpent: "02:00",
-      },
-    ],
-    7: [
-      {
-        id: "t10",
-        title: "Payroll System",
-        status: "due",
-        priority: "High",
-        assignedDate: "2025-01-15",
-        assignedBy: "Sarah Chen",
-        timeSpent: "01:30",
-      },
-    ],
-    8: [
-      {
-        id: "t11",
-        title: "Server Maintenance",
-        status: "cancelled",
-        priority: "Medium",
-        assignedDate: "2025-01-19",
-        assignedBy: "Mike Johnson",
-        timeSpent: "00:45",
-      },
-    ],
-  };
-
   const filterOptions = [
     "All",
     "Project: DNCRP",
@@ -264,7 +265,14 @@ function KanbanBoardThree() {
     "cancelled",
   ];
 
-  const sections = ["pending", "review", "ongoing", "completed", "cancelled", "scheduled"];
+  const sections = [
+    "pending",
+    "review",
+    "ongoing",
+    "completed",
+    "cancelled",
+    "scheduled",
+  ];
 
   const sectionTitles = {
     pending: "Pending",
@@ -274,6 +282,27 @@ function KanbanBoardThree() {
     cancelled: "Cancelled",
     scheduled: "Re-scheduled",
   };
+
+  // Initialize expanded sections with ongoing open by default
+  useEffect(() => {
+    const initialExpanded = {};
+    users.forEach((user) => {
+      sections.forEach((status) => {
+        const key = `${user.id}-${status}`;
+        initialExpanded[key] = status === "ongoing";
+      });
+    });
+    setExpandedSections(initialExpanded);
+  }, []);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(timers).forEach((timer) => {
+        if (timer.intervalId) clearInterval(timer.intervalId);
+      });
+    };
+  }, [timers]);
 
   // Check screen size on component mount and resize
   React.useEffect(() => {
@@ -286,6 +315,72 @@ function KanbanBoardThree() {
 
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  const parseTimeToSeconds = (timeStr) => {
+    const [h, m, s] = timeStr.split(":").map(Number);
+    return h * 3600 + m * 60 + (s || 0);
+  };
+
+  const formatSecondsToTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(
+      2,
+      "0"
+    )}:${String(s).padStart(2, "0")}`;
+  };
+
+  const handleStartPauseResume = (task, userId) => {
+    const taskId = task.id;
+    setTimers((prev) => {
+      const existing = prev[taskId];
+      if (existing && existing.isRunning) {
+        // Pause
+        if (existing.intervalId) clearInterval(existing.intervalId);
+        return {
+          ...prev,
+          [taskId]: { ...existing, isRunning: false, intervalId: undefined },
+        };
+      } else {
+        // Start or Resume
+        const baseSeconds = existing
+          ? existing.accumulated
+          : parseTimeToSeconds(task.timeSpent);
+        const intervalId = setInterval(() => {
+          setTimers((p) => ({
+            ...p,
+            [taskId]: { ...p[taskId], accumulated: p[taskId].accumulated + 1 },
+          }));
+        }, 1000);
+        return {
+          ...prev,
+          [taskId]: { accumulated: baseSeconds, isRunning: true, intervalId },
+        };
+      }
+    });
+  };
+
+  const handleEnd = (task, userId) => {
+    const taskId = task.id;
+    setTimers((prev) => {
+      const existing = prev[taskId];
+      if (existing) {
+        if (existing.intervalId) clearInterval(existing.intervalId);
+        const newTime = formatSecondsToTime(existing.accumulated);
+        // Update userTasks
+        setUserTasks((prevTasks) => ({
+          ...prevTasks,
+          [userId]: prevTasks[userId].map((t) =>
+            t.id === taskId ? { ...t, timeSpent: newTime } : t
+          ),
+        }));
+        const { [taskId]: _, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+  };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -364,86 +459,111 @@ function KanbanBoardThree() {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const TaskCard = ({ index, task, isBacklog = false }) => (
-    <div
-      className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer  ${
-        task.priority === "High"
-          ? "border-red-500 shadow-red-100"
-          : task.priority === "Medium"
-          ? "border-yellow-500 shadow-yellow-100"
-          : "border-green-500 shadow-green-100"
-      }`}
-      onClick={() => setSelectedTask(task)}
-    >
-      <div className="flex items-center justify-between mb-2">
+  const TaskCard = ({ index, task, isBacklog = false, userId }) => {
+    const timer = timers[task.id];
+    const isRunning = timer ? timer.isRunning : false;
+    const hasTimer = !!timer;
+    const displayTime = timer
+      ? formatSecondsToTime(timer.accumulated)
+      : task.timeSpent;
+
+    return (
+      <div
+        className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer  ${
+          task.priority === "High"
+            ? "border-red-500 shadow-red-100"
+            : task.priority === "Medium"
+            ? "border-yellow-500 shadow-yellow-100"
+            : "border-green-500 shadow-green-100"
+        }`}
+        onClick={() => setSelectedTask(task)}
+      >
+        <div className="flex items-center justify-between mb-2">
+          {isBacklog ? (
+            <h4 className="font-bold text-gray-800 truncate flex-1">
+              {task.title}
+            </h4>
+          ) : (
+            <h4 className="font-bold text-gray-800 truncate flex-1">
+              {index}. {task.title}
+            </h4>
+          )}
+          {!isBacklog && (
+            <span
+              className={`inline-flex items-center px-2 py-1 rounded-full animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
+                task.status
+              )} text-white`}
+            >
+              {getStatusIcon(task.status)}
+              <span className="ml-1 capitalize">{task.status}</span>
+            </span>
+          )}
+        </div>
+
         {isBacklog ? (
-          <h4 className="font-bold text-gray-800 truncate flex-1">
-            {task.title}
-          </h4>
+          <div className="space-y-2 text-sm text-gray-600">
+            <p className="text-xs leading-relaxed">{task.description}</p>
+            <div className="flex flex-col items-start justify-between">
+              <span className="flex items-center">
+                <User className="w-3 h-3 mr-1" />
+                {task.createdBy}
+              </span>
+              <span className="flex items-center">
+                <Calendar className="w-3 h-3 mr-1" />
+                {task.deadline}
+              </span>
+            </div>
+          </div>
         ) : (
-          <h4 className="font-bold text-gray-800 truncate flex-1">
-            {index}. {task.title}
-          </h4>
-        )}
-        {!isBacklog && (
-          <span
-            className={`inline-flex items-center px-2 py-1 rounded-full animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
-              task.status
-            )} text-white`}
-          >
-            {getStatusIcon(task.status)}
-            <span className="ml-1 capitalize">{task.status}</span>
-          </span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getPriorityColor(
+                  task.priority
+                )} text-white ${task.priority === "High" ? "" : ""}`}
+              >
+                <Flag className="w-3 h-3 mr-1" />
+                {task.priority}
+              </span>
+              <span className="text-gray-500">{displayTime}</span>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>By: {task.assignedBy}</span>
+              <span>{task.assignedDate}</span>
+            </div>
+
+            <div className="flex gap-1 mt-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStartPauseResume(task, userId);
+                }}
+                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+              >
+                {isRunning ? (
+                  <Pause className="w-3 h-3 mr-1" />
+                ) : (
+                  <Play className="w-3 h-3 mr-1" />
+                )}
+                {isRunning ? "Pause" : hasTimer ? "Resume" : "Start"}
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEnd(task, userId);
+                }}
+                className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center"
+              >
+                <Square className="w-3 h-3 mr-1" />
+                End
+              </button>
+            </div>
+          </div>
         )}
       </div>
-
-      {isBacklog ? (
-        <div className="space-y-2 text-sm text-gray-600">
-          <p className="text-xs leading-relaxed">{task.description}</p>
-          <div className="flex flex-col items-start justify-between">
-            <span className="flex items-center">
-              <User className="w-3 h-3 mr-1" />
-              {task.createdBy}
-            </span>
-            <span className="flex items-center">
-              <Calendar className="w-3 h-3 mr-1" />
-              {task.deadline}
-            </span>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getPriorityColor(
-                task.priority
-              )} text-white ${task.priority === "High" ? "" : ""}`}
-            >
-              <Flag className="w-3 h-3 mr-1" />
-              {task.priority}
-            </span>
-            <span className="text-gray-500">{task.timeSpent}</span>
-          </div>
-
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>By: {task.assignedBy}</span>
-            <span>{task.assignedDate}</span>
-          </div>
-
-          <div className="flex gap-1 mt-3">
-            <button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center">
-              <Play className="w-3 h-3 mr-1" />
-              Start
-            </button>
-            <button className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center">
-              <Square className="w-3 h-3 mr-1" />
-              End
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
+  };
 
   const TaskModal = ({ task, onClose }) => (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-xl flex items-center justify-center z-50 p-4">
@@ -697,7 +817,7 @@ function KanbanBoardThree() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center">
               <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
-                <Trophy className="w-4 h-4 md:w-6 md:h-6 text-white" />
+                <img src={logo} className="w-20 h-40 object-contain" alt="" />
               </div>
               Traban
             </h1>
@@ -782,9 +902,10 @@ function KanbanBoardThree() {
             </div>
 
             <div>
-              <button 
+              <button
                 onClick={() => setShowCreateTask(true)}
-                className="animate-pulse text-white text-xs md:text-sm w-full bg-gradient-to-r from-green-600 to-lime-800 px-3 py-1 md:px-4 md:py-2 rounded shadow-md flex items-center gap-x-1 md:gap-x-2 hover:scale-110 hover:cursor-pointer transition-all duration-200">
+                className=" text-white text-xs md:text-sm w-full bg-gradient-to-r from-green-600 to-lime-600 px-3 py-1 md:px-4 md:py-2 rounded shadow-md flex items-center gap-x-1 md:gap-x-2 hover:scale-110 hover:cursor-pointer transition-all duration-200"
+              >
                 <Plus className="w-3 h-3 md:w-4 md:h-4" />
                 Add New Task
               </button>
@@ -794,27 +915,33 @@ function KanbanBoardThree() {
       </div>
 
       <div className="flex h-[calc(100vh-78px)]">
-        {/* Backlog Section - 20% */}
-        <div className="w-1/4 md:w-1/5 lg:w-1/6 bg-white/10 backdrop-blur-md border-r border-white/20 p-2 md:p-4 overflow-y-auto">
-          <h2 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center">
-            <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center mr-2">
-              <Clock className="w-3 h-3 md:w-4 md:h-4 text-white" />
+        {/* Backlog Section - Collapsible */}
+        {showBacklog && (
+          <div className="w-1/7 bg-white/10 backdrop-blur-md border-r border-white/20 p-2 md:p-4 overflow-y-auto shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center mr-2">
+                  <Clock className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                </div>
+                Backlog
+              </h2>
+              <button
+                onClick={() => setShowBacklog(false)}
+                className="p-1 bg-white/20 rounded-md text-white"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
             </div>
-            Backlog
-          </h2>
-          <div className="space-y-2 md:space-y-3">
-            {backlogTasks.map((task) => (
-              <TaskCard key={task.id} task={task} isBacklog={true} />
-            ))}
+            <div className="space-y-2 md:space-y-3">
+              {backlogTasks.map((task) => (
+                <TaskCard key={task.id} task={task} isBacklog={true} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* User Columns - Adjustable width based on right column visibility */}
-        <div
-          className={`p-2 md:p-4 overflow-x-auto transition-all duration-300 ease-in-out ${
-            showRightColumn ? "w-3/4 md:w-4/5 lg:w-[70%]" : "w-full"
-          }`}
-        >
+        {/* User Columns */}
+        <div className="flex-1 p-2 md:p-4 overflow-x-auto">
           <div className="flex space-x-2 md:space-x-4 min-w-max">
             {users.map((user) => {
               const groupedTasks = (userTasks[user.id] || []).reduce(
@@ -886,18 +1013,16 @@ function KanbanBoardThree() {
                   <div className="max-h-[95vh] overflow-y-auto">
                     {sections.map((status) => {
                       const key = `${user.id}-${status}`;
-                      const isExpanded = expandedSections[key] ?? true;
+                      const isExpanded = expandedSections[key];
                       const tasks = groupedTasks[status] || [];
                       return (
                         <div key={status} className="mb-4">
                           <div
-                            className="flex justify-between items-center mb-2 cursor-pointer"
-                            onClick={() =>
-                              toggleSection(user.id, status)
-                            }
+                            className="flex justify-between items-center mb-2 cursor-pointer bg-white/10 p-2 rounded-lg border border-white/20"
+                            onClick={() => toggleSection(user.id, status)}
                           >
                             <h4 className="text-white font-semibold text-sm md:text-base">
-                              {sectionTitles[status]}
+                              {sectionTitles[status]} ({tasks.length})
                             </h4>
                             <ChevronRight
                               className={`w-5 h-5 text-white transition-transform duration-300 ease-in-out ${
@@ -917,13 +1042,16 @@ function KanbanBoardThree() {
                                     index={index + 1}
                                     key={task.id}
                                     task={task}
+                                    userId={user.id}
                                   />
                                 ))}
                               </div>
                             ) : (
                               <div className="text-center py-4 md:py-8 text-white/50">
                                 <Circle className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-1 md:mb-2" />
-                                <p className="text-xs md:text-sm">No works present here</p>
+                                <p className="text-xs md:text-sm">
+                                  No works present here
+                                </p>
                               </div>
                             )}
                           </div>
@@ -939,7 +1067,7 @@ function KanbanBoardThree() {
 
         {/* Create Task Section - Toggleable */}
         {showRightColumn && (
-          <div className="w-1/4 md:w-1/6 lg:w-[20%] bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out">
+          <div className="w-1/6 bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out shrink-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
                 <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-2">
@@ -1058,17 +1186,27 @@ function KanbanBoardThree() {
             </div>
           </div>
         )}
-
-        {/* Toggle button for right column */}
-        {!showRightColumn && (
-          <button
-            onClick={() => setShowRightColumn(true)}
-            className="hidden lg:flex fixed right-0 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-2 rounded-l-lg z-10 hover:bg-white/30 transition-all"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-        )}
       </div>
+
+      {/* Toggle button for right column */}
+      {!showRightColumn && (
+        <button
+          onClick={() => setShowRightColumn(true)}
+          className="hidden lg:flex fixed right-0 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-2 rounded-l-lg z-10 hover:bg-white/30 transition-all"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Toggle button for backlog column */}
+      {!showBacklog && (
+        <button
+          onClick={() => setShowBacklog(true)}
+          className="hidden lg:flex fixed left-0 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-md text-white p-2 rounded-r-lg z-10 hover:bg-white/30 transition-all"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      )}
 
       {/* Mobile toggle button for right column */}
       <div className="fixed bottom-20 right-4 lg:hidden">
@@ -1080,6 +1218,20 @@ function KanbanBoardThree() {
             <ChevronRight className="w-6 h-6" />
           ) : (
             <ChevronLeft className="w-6 h-6" />
+          )}
+        </button>
+      </div>
+
+      {/* Mobile toggle button for backlog column */}
+      <div className="fixed bottom-20 left-4 lg:hidden">
+        <button
+          onClick={() => setShowBacklog(!showBacklog)}
+          className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center"
+        >
+          {showBacklog ? (
+            <ChevronLeft className="w-6 h-6" />
+          ) : (
+            <ChevronRight className="w-6 h-6" />
           )}
         </button>
       </div>
