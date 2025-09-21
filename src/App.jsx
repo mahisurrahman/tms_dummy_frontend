@@ -1,16 +1,12 @@
-import React from "react";
+
 import { Route, Routes } from "react-router";
-import KanbanBoard from "./Global/Pages/KanbanBoard";
-import KanbanBoardTwo from "./Global/Pages/kanbanBoardTwo";
-import KanbanBoardThree from "./Global/Pages/KanbanBoardThree";
+import KanbanBoard from "./components/KanbanBoard/KanbanBoard";
 
 function App() {
   return (
     <div>
       <Routes>
-        <Route path="/three" element={<KanbanBoard />} />
-        <Route path="/two" element={<KanbanBoardTwo />} />
-        <Route path="/" element={<KanbanBoardThree />} />
+        <Route path="/" element={<KanbanBoard />} />
       </Routes>
     </div>
   );
