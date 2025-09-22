@@ -2,7 +2,12 @@ import React from "react";
 import { ChevronLeft, Clock } from "lucide-react";
 import TaskCard from "../TaskCard/TaskCard";
 
-const BacklogSection = ({ showBacklog, setShowBacklog, backlogTasks, setSelectedTask }) => {
+const BacklogSection = ({
+  showBacklog,
+  setShowBacklog,
+  backlogTasks,
+  setSelectedTask,
+}) => {
   if (!showBacklog) return null;
 
   return (
@@ -23,11 +28,11 @@ const BacklogSection = ({ showBacklog, setShowBacklog, backlogTasks, setSelected
       </div>
       <div className="space-y-2 md:space-y-3">
         {backlogTasks.map((task) => (
-          <TaskCard 
-            key={task.id} 
-            task={task} 
-            isBacklog={true} 
-            onClick={() => setSelectedTask({ task, userId: null })} 
+          <TaskCard
+            key={task.id}
+            task={task}
+            isBacklog={true}
+            onClick={() => setSelectedTask({ task, userId: null })}
           />
         ))}
       </div>

@@ -6,7 +6,7 @@ const QuickCreateColumn = ({
   setShowRightColumn,
   users,
   setSelectedUserForCreate,
-  setShowCreateTask
+  setShowCreateTask,
 }) => {
   if (!showRightColumn) return null;
 
@@ -32,7 +32,7 @@ const QuickCreateColumn = ({
           setSelectedUserForCreate(null);
           setShowCreateTask(true);
         }}
-        className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-green-500 to-teal-500 text-white p-2 md:p-4 rounded font-semibold text-sm md:text-base hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
+        className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 rounded font-semibold text-sm md:text-base hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
       >
         <Plus className="w-3 h-3 md:w-4 md:h-4" />
         New Task
@@ -49,29 +49,41 @@ const QuickCreateColumn = ({
         </div>
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
-            <span className="text-white/80 text-xs md:text-sm">Total Tasks</span>
-            <span className="text-white font-bold text-base md:text-lg">24</span>
+            <span className="text-white/80 text-xs md:text-sm">
+              Total Tasks
+            </span>
+            <span className="text-white font-bold text-base md:text-lg">
+              24
+            </span>
           </div>
         </div>
 
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
             <span className="text-white/80 text-xs md:text-sm">Completed</span>
-            <span className="text-green-400 font-bold text-base md:text-lg">12</span>
+            <span className="text-green-400 font-bold text-base md:text-lg">
+              12
+            </span>
           </div>
         </div>
 
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
-            <span className="text-white/80 text-xs md:text-sm">In Progress</span>
-            <span className="text-blue-400 font-bold text-base md:text-lg">8</span>
+            <span className="text-white/80 text-xs md:text-sm">
+              In Progress
+            </span>
+            <span className="text-blue-400 font-bold text-base md:text-lg">
+              8
+            </span>
           </div>
         </div>
 
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
             <span className="text-white/80 text-xs md:text-sm">Overdue</span>
-            <span className="text-red-400 font-bold text-base md:text-lg animate-pulse">4</span>
+            <span className="text-red-400 font-bold text-base md:text-lg animate-pulse">
+              4
+            </span>
           </div>
         </div>
       </div>

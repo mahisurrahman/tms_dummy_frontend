@@ -1,6 +1,20 @@
 import React from "react";
-import { User, Calendar, Flag, Play, Pause, Square, ClipboardList, CheckCircle, Bell } from "lucide-react";
-import { getPriorityColor, getStatusColor, getStatusIcon } from "../../Utils/TaskUtils";
+import {
+  User,
+  Calendar,
+  Flag,
+  Play,
+  Pause,
+  Square,
+  ClipboardList,
+  CheckCircle,
+  Bell,
+} from "lucide-react";
+import {
+  getPriorityColor,
+  getStatusColor,
+  getStatusIcon,
+} from "../../Utils/TaskUtils";
 
 const TaskCard = ({
   index,
@@ -14,19 +28,17 @@ const TaskCard = ({
   handleResume,
   handleEnd,
   moveTask,
-  onClick
+  onClick,
 }) => {
-  console.log("TaskCard props", { task, timers, userId });
   const timer = task[task?.id];
   const isRunning = timer ? timer.isRunning : false;
   const displayTime = timer
     ? formatSecondsToTime(timer.accumulated)
     : task.timeSpent;
 
-
   return (
     <div
-      className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer  ${
+      className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer border-4 ${
         task.priority === "High"
           ? "border-red-500 shadow-red-100"
           : task.priority === "Medium"
@@ -47,19 +59,13 @@ const TaskCard = ({
         )}
         {!isBacklog && (
           <span
-            className={`inline-flex items-center  mt-3 px-2 py-1 rounded animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
+            className={`inline-flex items-center px-2 py-1 rounded animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
               task.status
             )} text-white`}
           >
             {getStatusIcon(task.status)}
             <span className="ml-1 capitalize">{task.status}</span>
           </span>
-        )}
-        {!isBacklog && task.comments?.length > 0 && (
-          <div className="absolute top-[-8px] right-[-8px]">
-            <Bell className="w-5 h-5 text-gray-600" />
-            <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-          </div>
         )}
       </div>
 
@@ -81,7 +87,7 @@ const TaskCard = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getPriorityColor(
+              className={`inline-flex items-center px-2 py-1  rounded text-xs font-medium bg-gradient-to-r ${getPriorityColor(
                 task.priority
               )} text-white`}
             >
@@ -97,9 +103,22 @@ const TaskCard = ({
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>By: {task.assignedBy}</span>
-            <span>{task.assignedDate}</span>
+          <div className="flex flex-col items-start text-xs text-gray-900">
+            <span>
+              <span className="font-semibold">Assigned By:</span>{" "}
+              {task.assignedBy}
+            </span>
+            <span>
+              <span className="font-semibold">Assigned Date:</span>{" "}
+              {task.assignedDate}, 11:00 AM
+            </span>
+            <span>
+              <span className="font-semibold">Project Title:</span> DOL
+            </span>
+            <span>
+              <span className="font-semibold">Expected Deadline:</span>{" "}
+              2025-01-20, 12:00 PM
+            </span>
           </div>
 
           <div className="flex gap-1 mt-3">
@@ -109,7 +128,7 @@ const TaskCard = ({
                   e.stopPropagation();
                   handleStart(task, userId);
                 }}
-                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-sm py-1 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
               >
                 <Play className="w-3 h-3 mr-1" />
                 Start
@@ -126,7 +145,7 @@ const TaskCard = ({
                       handleResume(task, userId);
                     }
                   }}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-sm py-1 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
                 >
                   {isRunning ? (
                     <Pause className="w-3 h-3 mr-1" />
@@ -140,7 +159,7 @@ const TaskCard = ({
                     e.stopPropagation();
                     handleEnd(task, userId);
                   }}
-                  className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-lg py-2 px-2 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center"
+                  className="flex-1 bg-gradient-to-r from-red-700 to-pink-700 text-white text-sm py-1 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center"
                 >
                   <Square className="w-3 h-3 mr-1" />
                   End
@@ -153,10 +172,10 @@ const TaskCard = ({
                   e.stopPropagation();
                   moveTask(userId, task.id, "review");
                 }}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-violet-700 text-white text-lg py-2 px-2 rounded-lg hover:from-purple-600 hover:to-violet-600 transition-all flex items-center justify-center"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-violet-700 text-white text-sm py-1 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-purple-600 hover:to-violet-600 transition-all flex items-center justify-center"
               >
                 <ClipboardList className="w-3 h-3 mr-1" />
-                Review this task
+                Review this task Again
               </button>
             )}
             {task.status === "review" && (
@@ -166,7 +185,7 @@ const TaskCard = ({
                     e.stopPropagation();
                     moveTask(userId, task.id, "pending");
                   }}
-                  className="flex-1 bg-gradient-to-r from-yellow-600 to-orange-700 text-white text-lg py-2 px-2 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center"
+                  className="flex-1 bg-gradient-to-r from-yellow-600 to-orange-700 text-white text-sm py-1 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center"
                 >
                   <Calendar className="w-3 h-3 mr-1" />
                   Re-assign
@@ -176,7 +195,7 @@ const TaskCard = ({
                     e.stopPropagation();
                     moveTask(userId, task.id, "finished");
                   }}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-lime-700 text-white text-lg py-2 px-2 rounded-lg hover:from-green-600 hover:to-lime-600 transition-all flex items-center justify-center"
+                  className="flex-1 bg-gradient-to-r from-green-600 to-lime-700 text-white text-sm py-1 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-green-600 hover:to-lime-600 transition-all flex items-center justify-center"
                 >
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Confirmed

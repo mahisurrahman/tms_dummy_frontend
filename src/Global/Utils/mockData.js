@@ -109,7 +109,7 @@ export const sections = [
   "ongoing",
   "in-queue",
   "pending",
-  "finished",
+  // "finished",
   "review",
   "completed",
 ];

@@ -18,11 +18,11 @@ const UserColumn = ({
   moveTask,
   setSelectedTask,
   setSelectedUserForCreate,
-  setShowCreateTask
+  setShowCreateTask,
 }) => {
   return (
-    <div className="w-[45vw] md:w-[30vw] lg:w-[20vw] bg-white/10 backdrop-blur-md rounded-2xl p-2 md:p-4 border border-white/20">
-      <div className="mb-2 md:mb-4">
+    <div className="w-[45vw] md:w-[40vw] lg:w-[20vw] bg-transparent p-2 md:p-4">
+      <div className="mb-2 md:mb-4 border rounded-lg pt-2 px-4 border-white/20 bg-white/20 backdrop-blur-3xl">
         <div className="flex items-center justify-between mb-1 md:mb-2">
           <div className="flex items-center space-x-2 md:space-x-3">
             <div
@@ -71,7 +71,7 @@ const UserColumn = ({
             userId={user.id}
             status={status}
             title={sectionTitles[status]}
-            tasks={userTasks.filter(task => task.status === status)}
+            tasks={userTasks.filter((task) => task.status === status)}
             isExpanded={expandedSections[`${user.id}-${status}`]}
             onToggle={() => toggleSection(user.id, status)}
             timers={timers}
@@ -91,7 +91,7 @@ const UserColumn = ({
           setSelectedUserForCreate(user.id);
           setShowCreateTask(true);
         }}
-        className="w-full mt-4 bg-transparent border text-white py-3 rounded-lg font-medium hover:bg-slate-950 cursor-pointer transition-all flex items-center justify-center gap-2"
+        className="w-full mt-4 bg-transparent border text-white py-2 rounded-lg font-medium hover:bg-slate-950 cursor-pointer transition-all flex items-center justify-center gap-2"
       >
         <Plus className="w-5 h-5" />
         Add Task
