@@ -137,11 +137,11 @@ const TaskModal = ({
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-xl flex items-center justify-center z-50 p-4">
       <div className="bg-transparent rounded-2xl max-w-4xl w-full max-h-[100vh] overflow-y-auto">
-        {/* <TaskModalHeader
+        <TaskModalHeader
           title={task.title}
           onClose={onClose}
           onStatusChange={() => setShowStatusModal(true)}
-        /> */}
+        />
 
         <div className="space-y-6">
           <div className="mt-5">
