@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { X, Timer, MessageSquare } from "lucide-react";
-import Comment from "../Comment/Comment";
-import { getColorForIndex } from "../../Utils/TaskUtils.jsx";
+import React, { useState, useRef } from "react";
 import TaskDetailsSection from "../TaskDetailsSection/TaskDetailsSection.jsx";
 import HorizontalTimeline from "../HorizontalTimeline/HorizontalTimeline.jsx";
+import StatusModal from "../StatusModal/StatusModal.jsx";
+import CommentsSection from "../CommentsSection/CommentsSection.jsx";
+import TaskModalHeader from "../TaskModalHeader/TaskModalHeader.jsx";
+import PriorityModal from "../PriorityModa/PriorityModal.jsx";
 
 const TaskModal = ({
   data,
@@ -19,20 +20,43 @@ const TaskModal = ({
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
   const [newReply, setNewReply] = useState("");
+  const [showPriorityModal, setShowPriorityModal] = useState(false);
+  const commentEditorRef = useRef(null);
+
+  const calculateTotalTaskTime = () => {
+    if (!task.history || task.history.length === 0) return "0h 0m";
+    const startDate = new Date(task.history[0].date);
+    const endDate = new Date(task.history[task.history.length - 1].date);
+    const diffMs = endDate - startDate;
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
+
     const newCom = {
       id: `c${Date.now()}`,
       author: "Current User",
       text: newComment,
       date: new Date().toISOString().split("T")[0],
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      status: task.status,
+      totalTime: calculateTotalTaskTime(),
       replies: [],
     };
+
     updateTask(userId, task.id, {
       comments: [...(task.comments || []), newCom],
     });
     setNewComment("");
+    if (commentEditorRef.current) {
+      commentEditorRef.current.clear();
+    }
   };
 
   const handleReply = (commentId) => {
@@ -41,6 +65,7 @@ const TaskModal = ({
 
   const handleAddReply = (parentId) => {
     if (!newReply.trim()) return;
+
     const updateComments = (comments) =>
       comments.map((c) => {
         if (c.id === parentId) {
@@ -53,6 +78,12 @@ const TaskModal = ({
                 author: "Current User",
                 text: newReply,
                 date: new Date().toISOString().split("T")[0],
+                time: new Date().toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+                status: task.status,
+                totalTime: calculateTotalTaskTime(),
                 replies: [],
               },
             ],
@@ -63,6 +94,7 @@ const TaskModal = ({
         }
         return c;
       });
+
     updateTask(userId, task.id, {
       comments: updateComments(task.comments || []),
     });
@@ -70,121 +102,93 @@ const TaskModal = ({
     setReplyingTo(null);
   };
 
+  const handleStatusChange = (status) => {
+    const newStat = status;
+    moveTask(userId, task.id, newStat);
+    updateTask(userId, task.id, {
+      history: [
+        ...task.history,
+        {
+          status: newStat,
+          date: new Date().toISOString().split("T")[0],
+        },
+      ],
+    });
+    setShowStatusModal(false);
+  };
+
+  const handlePriorityChange = (priority) => {
+    updateTask(userId, task.id, {
+      priority: priority,
+    });
+    setShowPriorityModal(false);
+  };
+
+  const handleAddCustomPriority = () => {
+    const customPriority = prompt("Enter custom priority name:");
+    if (customPriority) {
+      updateTask(userId, task.id, {
+        priority: customPriority.toLowerCase(),
+      });
+    }
+    setShowPriorityModal(false);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-xl flex items-center justify-center z-50 p-4">
-      <div className="bg-transparent rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-2xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">{task.title}</h2>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowStatusModal(true)}
-                className="bg-white text-blue-600 px-4 py-2 rounded font-medium hover:bg-gray-100"
-              >
-                Change Status
-              </button>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-white/20 rounded-full transition-all"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="bg-transparent rounded-2xl max-w-4xl w-full max-h-[100vh] overflow-y-auto">
+        {/* <TaskModalHeader
+          title={task.title}
+          onClose={onClose}
+          onStatusChange={() => setShowStatusModal(true)}
+        /> */}
 
         <div className="space-y-6">
           <div className="mt-5">
-            <TaskDetailsSection />
+            <TaskDetailsSection
+              onStatusChange={() => setShowStatusModal(true)}
+            />
           </div>
 
           <div>
             <HorizontalTimeline />
           </div>
 
-          <div className=" bg-white rounded-2xl p-6 border-4 border-blue-600">
-            <h3 className="text-lg font-semibold mb-4 flex items-center">
-              <MessageSquare className="w-5 h-5 mr-2 text-blue-600" />
-              Comments & Updates
-            </h3>
-            <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
-              {task?.comments?.length === 0 ? (
-                <p className="text-gray-500 text-center">No comments yet</p>
-              ) : (
-                task?.comments?.map((comment) => (
-                  <Comment
-                    key={comment.id}
-                    comment={comment}
-                    onReply={handleReply}
-                    replyingTo={replyingTo}
-                    onAddReply={(value) => {
-                      if (typeof value === "string") {
-                        setNewReply(value);
-                      } else {
-                        handleAddReply(comment.id);
-                      }
-                    }}
-                  />
-                ))
-              )}
-            </div>
-            <div className="mt-4">
-              <textarea
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                rows="3"
-                placeholder="Add a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              />
-              <button
-                onClick={handleAddComment}
-                className="mt-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Add Comment
-              </button>
-            </div>
-          </div>
+          <CommentsSection
+            comments={task.comments}
+            replyingTo={replyingTo}
+            newComment={newComment}
+            onCommentChange={setNewComment}
+            onAddComment={handleAddComment}
+            onReply={handleReply}
+            onAddReply={handleAddReply}
+            editorRef={commentEditorRef}
+            onClose={onClose}
+          />
         </div>
 
         {showStatusModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60 p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-              <h3 className="text-xl font-bold mb-4 text-gray-800">
-                Change Status
-              </h3>
-              <div className="space-y-2">
-                {sections.map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => {
-                      const newStat = status;
-                      moveTask(userId, task.id, newStat);
-                      updateTask(userId, task.id, {
-                        history: [
-                          ...task.history,
-                          {
-                            status: newStat,
-                            date: new Date().toISOString().split("T")[0],
-                          },
-                        ],
-                      });
-                      setShowStatusModal(false);
-                    }}
-                    className="w-full py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-left px-4 font-medium text-gray-700 transition-all"
-                  >
-                    {sectionTitles[status]}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setShowStatusModal(false)}
-                className="mt-4 w-full py-3 bg-red-100 hover:bg-red-200 rounded-lg text-red-700 font-medium transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+          <StatusModal
+            sections={sections}
+            sectionTitles={sectionTitles}
+            onStatusChange={handleStatusChange}
+            onClose={() => setShowStatusModal(false)}
+          />
+        )}
+
+        {showPriorityModal && (
+          <PriorityModal
+            priorities={[
+              { value: "extreme", label: "Extreme", color: "#dc2626" },
+              { value: "high", label: "High", color: "#ea580c" },
+              { value: "medium", label: "Medium", color: "#d97706" },
+              { value: "low", label: "Low", color: "#16a34a" },
+              { value: "extra", label: "Extra", color: "#9333ea" },
+            ]}
+            onPriorityChange={handlePriorityChange}
+            onAddCustom={handleAddCustomPriority}
+            onClose={() => setShowPriorityModal(false)}
+          />
         )}
       </div>
     </div>

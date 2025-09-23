@@ -16,7 +16,7 @@ const TaskSection = ({
   handleResume,
   handleEnd,
   moveTask,
-  setSelectedTask
+  setSelectedTask,
 }) => {
   return (
     <div key={status}>
