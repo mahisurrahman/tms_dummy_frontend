@@ -9,7 +9,7 @@ const Header = ({
   priorityOptions,
   statusOptions,
   setShowCreateTask,
-  setSelectedUserForCreate
+  setSelectedUserForCreate,
 }) => {
   return (
     <div className="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-40">
@@ -19,13 +19,15 @@ const Header = ({
             <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
               <img src={logo} className="w-20 h-40 object-contain" alt="" />
             </div>
-            Traban
+            Traiban
           </h1>
 
           <div className="flex flex-wrap justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center space-x-2">
-                <span className="text-white/80 text-sm md:text-lg">Attendance:</span>
+                <span className="text-white/80 text-sm md:text-lg">
+                  Attendance:
+                </span>
                 <select className="bg-white/20 backdrop-blur-md text-white rounded px-2 py-1 md:px-3 md:py-2 focus:outline-none focus:ring-2 focus:ring-white/50 text-xs md:text-sm">
                   {attendanceOptions.map((option) => (
                     <option key={option} className="text-gray-800">
@@ -47,7 +49,9 @@ const Header = ({
               </div>
 
               <div className="flex items-center space-x-2">
-                <span className="text-white/80 text-sm md:text-lg">Priority:</span>
+                <span className="text-white/80 text-sm md:text-lg">
+                  Priority:
+                </span>
                 <select className="bg-white/20 backdrop-blur-md text-white rounded px-2 py-1 md:px-3 md:py-2 focus:outline-none focus:ring-2 focus:ring-white/50 text-xs md:text-sm">
                   {priorityOptions.map((option) => (
                     <option key={option} className="text-gray-800">
@@ -58,7 +62,9 @@ const Header = ({
               </div>
 
               <div className="flex items-center space-x-2">
-                <span className="text-white/80 text-sm md:text-lg">Status:</span>
+                <span className="text-white/80 text-sm md:text-lg">
+                  Status:
+                </span>
                 <select className="bg-white/20 backdrop-blur-md text-white rounded px-2 py-1 md:px-3 md:py-2 focus:outline-none focus:ring-2 focus:ring-white/50 text-xs md:text-sm">
                   {statusOptions.map((option) => (
                     <option key={option} className="text-gray-800">
