@@ -1,5 +1,14 @@
 import React from "react";
-import { ChevronRight, Plus, Trophy, Timer } from "lucide-react";
+import {
+  ChevronRight,
+  Plus,
+  Trophy,
+  Timer,
+  User,
+  Settings,
+  LogOut,
+} from "lucide-react";
+import { useNavigate } from "react-router";
 
 const QuickCreateColumn = ({
   showRightColumn,
@@ -8,7 +17,18 @@ const QuickCreateColumn = ({
   setSelectedUserForCreate,
   setShowCreateTask,
 }) => {
+  const navigate = useNavigate();
+
   if (!showRightColumn) return null;
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const handleLogout = () => {
+    // Add logout logic here
+    navigate("/login");
+  };
 
   return (
     <div className="w-1/6 bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out shrink-0">
@@ -124,6 +144,33 @@ const QuickCreateColumn = ({
               </div>
             ))}
         </div>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="mt-6 md:mt-8 space-y-2 md:space-y-3">
+        <button
+          onClick={() => handleNavigation("/profile")}
+          className="w-full flex items-center justify-start gap-x-2 md:gap-x-3 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium text-sm md:text-base transition-all duration-200 transform hover:scale-105 border border-white/20 hover:border-white/30"
+        >
+          <User className="w-4 h-4 md:w-5 md:h-5" />
+          Profile
+        </button>
+
+        <button
+          onClick={() => handleNavigation("/settings")}
+          className="w-full flex items-center justify-start gap-x-2 md:gap-x-3 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium text-sm md:text-base transition-all duration-200 transform hover:scale-105 border border-white/20 hover:border-white/30"
+        >
+          <Settings className="w-4 h-4 md:w-5 md:h-5" />
+          Settings
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-start gap-x-2 md:gap-x-3 bg-red-800/80 hover:bg-red-800/70 text-red-300 hover:text-red-200 py-2 px-3 rounded-lg font-medium text-sm md:text-base transition-all duration-200 transform hover:scale-105 border border-red-400/20 hover:border-red-400/30"
+        >
+          <LogOut className="w-4 h-4 md:w-5 md:h-5" />
+          Logout
+        </button>
       </div>
     </div>
   );

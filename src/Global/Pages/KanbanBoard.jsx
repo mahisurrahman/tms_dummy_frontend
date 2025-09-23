@@ -59,7 +59,7 @@ function KanbanBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-800 to-sky-800">
       <Header
         filterOptions={filterOptions}
         attendanceOptions={attendanceOptions}
