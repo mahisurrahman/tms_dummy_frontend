@@ -16,6 +16,7 @@ const QuickCreateColumn = ({
   users,
   setSelectedUserForCreate,
   setShowCreateTask,
+  setShowCreateUser,
 }) => {
   const navigate = useNavigate();
 
@@ -56,6 +57,16 @@ const QuickCreateColumn = ({
       >
         <Plus className="w-3 h-3 md:w-4 md:h-4" />
         New Task
+      </button>
+      <button
+        onClick={() => {
+          setSelectedUserForCreate(null);
+          setShowCreateUser(true);
+        }}
+        className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 rounded font-semibold text-sm md:text-base hover:from-blue-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
+      >
+        <User className="w-3 h-3 md:w-4 md:h-4" />
+        Add User
       </button>
 
       <div className="space-y-2 md:space-y-3 mt-3 md:mt-5">
@@ -108,7 +119,7 @@ const QuickCreateColumn = ({
         </div>
       </div>
 
-      <div className="mt-4 md:mt-6">
+      {/* <div className="mt-4 md:mt-6">
         <h3 className="text-base md:text-lg font-semibold text-white mb-2 md:mb-3 flex items-center">
           <Trophy className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 text-yellow-400" />
           Top Performers
@@ -144,7 +155,7 @@ const QuickCreateColumn = ({
               </div>
             ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Navigation Buttons */}
       <div className="mt-6 md:mt-8 space-y-2 md:space-y-3">

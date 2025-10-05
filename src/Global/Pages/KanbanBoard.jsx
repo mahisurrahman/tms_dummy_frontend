@@ -6,7 +6,7 @@ import { useScreenSize } from "../Utils/useScreenSize";
 import useTimers from "../Utils/useTimers";
 import useTask from "../Utils/useTask";
 import {
-  users,
+  // users,
   backlogTasks,
   filterOptions,
   attendanceOptions,
@@ -20,6 +20,11 @@ import Header from "../components/Header/Header";
 import BacklogSection from "../components/BacklogSection/BacklogSection";
 import UserColumns from "../components/UserColumns/UserColumns";
 import QuickCreateColumn from "../components/QuickCreateColumn/QuickCreateColumn";
+// import Spinner from "../components/Spinner/Spinner";
+import { userAPI } from "../../api/endpoints/user.api";
+import CreateUserForm from "../components/CreateUserForm/CreateUserForm";
+import toast, { Toaster } from "react-hot-toast";
+import Spinner from "../components/Spinner/Spinner";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -28,6 +33,22 @@ function KanbanBoard() {
   const [showRightColumn, setShowRightColumn] = useState(true);
   const [showBacklog, setShowBacklog] = useState(true);
   const [expandedSections, setExpandedSections] = useState({});
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await userAPI.getAll();
+      setUsers(response.data);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const isMobileView = useScreenSize();
   const {
@@ -56,6 +77,26 @@ function KanbanBoard() {
   const toggleSection = (userId, status) => {
     const key = `${userId}-${status}`;
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleCreateUser = async (userData) => {
+    try {
+      setLoading(true);
+      const response = await userAPI.create(userData);
+
+      if (response.error === false) {
+        toast.success("User created successfully!");
+        setShowCreateUser(false);
+        setLoading(false);
+      } else {
+        toast.error(response.message || "Failed to create user");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error.message);
+      toast.error("Something went wrong while creating the user");
+      setLoading(false);
+    }
   };
 
   return (
@@ -103,6 +144,7 @@ function KanbanBoard() {
           users={users}
           setSelectedUserForCreate={setSelectedUserForCreate}
           setShowCreateTask={setShowCreateTask}
+          setShowCreateUser={setShowCreateUser}
         />
 
         <FloatingButtons
@@ -134,6 +176,14 @@ function KanbanBoard() {
           defaultUserId={selectedUserForCreate}
           users={users}
           handleAddTask={handleAddTask}
+        />
+      )}
+
+      {showCreateUser && (
+        <CreateUserForm
+          onClose={() => setShowCreateUser(false)}
+          onCreateUser={handleCreateUser}
+          loading={loading}
         />
       )}
     </div>

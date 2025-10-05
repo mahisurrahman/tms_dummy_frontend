@@ -4,6 +4,7 @@ import KanbanBoard from "./Global/Pages/KanbanBoard";
 import LoginPage from "./Global/Pages/LoginPage";
 import ProfilePage from "./Global/Pages/ProfilePage";
 import SettingsPage from "./Global/Pages/SettingsPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
