@@ -20,6 +20,8 @@ import Header from "../components/Header/Header";
 import BacklogSection from "../components/BacklogSection/BacklogSection";
 import UserColumns from "../components/UserColumns/UserColumns";
 import QuickCreateColumn from "../components/QuickCreateColumn/QuickCreateColumn";
+import { handleApiError } from "../Utils/handleApiError";
+import apiService from "../../api/apiService";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -28,6 +30,20 @@ function KanbanBoard() {
   const [showRightColumn, setShowRightColumn] = useState(true);
   const [showBacklog, setShowBacklog] = useState(true);
   const [expandedSections, setExpandedSections] = useState({});
+  const [userLists, setUserLists] = useState([]);
+
+  const fetchAllUsers = async () => {
+    try {
+      const result = await apiService.getData("/user/getAllUsers");
+      console.log(result, "Result");
+    } catch (error) {
+      handleApiError(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
 
   const isMobileView = useScreenSize();
   const {

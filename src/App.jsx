@@ -8,6 +8,7 @@ import SettingsPage from "./Global/Pages/SettingsPage";
 function App() {
   return (
     <div>
+      <Toaster position="top-right" />
       <Routes>
         <Route path="/" element={<KanbanBoard />} />
         <Route path="/login" element={<LoginPage />} />
