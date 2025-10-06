@@ -25,7 +25,7 @@ const UserColumns = ({
       <div className="flex space-x-2 md:space-x-0 min-w-max">
         {users.map((user) => (
           <UserColumn
-            key={user.id}
+            key={user._id}
             user={user}
             userTasks={userTasks[user.id] || []}
             sections={sections}

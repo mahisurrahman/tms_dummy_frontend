@@ -6,27 +6,31 @@ import { handleRequest } from "../apiHelper";
 const baseMiddlePoint = "/user";
 
 export const userAPI = {
+  loginUser: (payload) =>
+    handleRequest(
+      apiClient.post(`${baseMiddlePoint}/auth/login`, payload),
+      "Failed to Login"
+    ),
+
   getAll: () =>
     handleRequest(
       apiClient.get(`${baseMiddlePoint}/getAllUsers`),
       "Failed to fetch users"
     ),
 
-  // getById: (id) =>
-  //   handleRequest(
-  //     apiClient.get(`${baseMiddlePoint}/${id}`),
-  //     "Failed to fetch user"
-  //   ),
+  getUserInfo: (token) =>
+    handleRequest(
+      apiClient.get("/user/getUserInfo", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      "Failed to fetch user info"
+    ),
 
   create: (payload) =>
     handleRequest(
       apiClient.post(`${baseMiddlePoint}/register`, payload),
       "Failed to create user"
     ),
-
-  // update: (id, data) =>
-  //   handleRequest(apiClient.put(`/user/${id}`, data), "Failed to update user"),
-
-  // delete: (id) =>
-  //   handleRequest(apiClient.delete(`/user/${id}`), "Failed to delete user"),
 };

@@ -1,26 +1,37 @@
 import React, { useState } from "react";
 import { X, Plus, Upload } from "lucide-react";
+import Spinner from "../Spinner/Spinner";
 
-const CreateTaskForm = ({ onClose, defaultUserId, users, handleAddTask }) => {
+const CreateTaskForm = ({
+  onClose,
+  defaultUserId,
+  users,
+  handleAddTask,
+  loading,
+}) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     priority: "Medium",
     project: "DNCRP",
-    assignedTo: defaultUserId || users[0].id,
+    assignedTo: defaultUserId || "",
     deadline: "",
     assignedBy: "Current User",
-    assignedDate: new Date().toISOString().split("T")[0],
-    timeSpent: "00:00:00",
+    assignedDate: new Date().toISOString(),
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "deadline") {
+      const isoDate = value ? new Date(value).toISOString() : "";
+      setFormData({ ...formData, [name]: isoDate });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = () => {
-    handleAddTask(formData, formData.assignedTo);
-    onClose();
+    handleAddTask(formData);
   };
 
   return (
@@ -113,11 +124,13 @@ const CreateTaskForm = ({ onClose, defaultUserId, users, handleAddTask }) => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
+                <option value="">Select Developer / Backlog</option>
+                {users?.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.username}
                   </option>
                 ))}
+                <option value="">Backlog</option>
               </select>
             </div>
 
@@ -128,13 +141,17 @@ const CreateTaskForm = ({ onClose, defaultUserId, users, handleAddTask }) => {
               <input
                 type="date"
                 name="deadline"
-                value={formData.deadline}
+                value={
+                  formData.deadline
+                    ? new Date(formData.deadline).toISOString().split("T")[0]
+                    : ""
+                }
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
           </div>
-
+          {/* 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Attachments
@@ -145,7 +162,7 @@ const CreateTaskForm = ({ onClose, defaultUserId, users, handleAddTask }) => {
                 Click to upload files or drag and drop
               </p>
             </div>
-          </div>
+          </div> */}
 
           <div className="flex gap-3 justify-end pt-4">
             <button
@@ -158,8 +175,14 @@ const CreateTaskForm = ({ onClose, defaultUserId, users, handleAddTask }) => {
               onClick={handleSubmit}
               className="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition-all flex items-center"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Task
+              {loading ? (
+                <Spinner />
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Task
+                </>
+              )}
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import TaskModal from "../components/TaskModal/TaskModal";
 import CreateTaskForm from "../components/CreateTaskForm/CreateTaskForm";
 import FloatingButtons from "../components/FloatingButtons/FloatingButtons";
@@ -25,6 +25,9 @@ import { userAPI } from "../../api/endpoints/user.api";
 import CreateUserForm from "../components/CreateUserForm/CreateUserForm";
 import toast, { Toaster } from "react-hot-toast";
 import Spinner from "../components/Spinner/Spinner";
+import { AuthContext } from "../../provider/AuthProvider";
+import { useNavigate } from "react-router";
+import { taskAPI } from "../../api/endpoints/task.api";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -36,6 +39,13 @@ function KanbanBoard() {
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const { user, handleLogout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  if (!user) {
+    navigate("/login");
+  }
 
   const fetchUsers = async () => {
     try {
@@ -46,9 +56,39 @@ function KanbanBoard() {
     }
   };
 
+  const fetchTasks = async () => {
+    try {
+      const response = await taskAPI.getAllTask();
+      console.log(response, "response");
+      setTasks(response.data);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
+    fetchTasks();
   }, []);
+
+  const handleLogoutButton = async () => {
+    try {
+      const logoutData = await handleLogout();
+      if (logoutData) {
+        toast.success("Successfully logged out", {
+          duration: 2000,
+          position: "top-center",
+        });
+
+        navigate("/login");
+      }
+    } catch (error) {
+      toast.error("There was a problem while logging out", {
+        duration: 3000,
+        position: "top-center",
+      });
+    }
+  };
 
   const isMobileView = useScreenSize();
   const {
@@ -61,7 +101,7 @@ function KanbanBoard() {
     formatSecondsToTime,
     pauseAllOtherTasks,
   } = useTimers();
-  const { userTasks, moveTask, updateTask, handleAddTask } = useTask();
+  const { userTasks, moveTask, updateTask } = useTask();
 
   useEffect(() => {
     const initialExpanded = {};
@@ -73,6 +113,50 @@ function KanbanBoard() {
     });
     setExpandedSections(initialExpanded);
   }, []);
+
+  const handleAddTask = async (formData) => {
+    try {
+      setLoading(true);
+      let payload = {};
+      if (formData.assignedTo === "") {
+        payload = {
+          taskTitle: formData.title,
+          taskDescription: formData.description,
+          taskPriority: formData.priority,
+          taskAssignedTo: "",
+          backlog: true,
+          taskCreatedBy: user._id,
+          taskAssignedBy: "",
+          deadline: formData.deadline,
+          assignedDate: "",
+        };
+      } else {
+        payload = {
+          taskTitle: formData.title,
+          taskDescription: formData.description,
+          taskPriority: formData.priority,
+          taskAssignedTo: formData.assignedTo,
+          backlog: false,
+          taskCreatedBy: user._id,
+          taskAssignedBy: "",
+          deadline: formData.deadline,
+          assignedDate: "",
+        };
+      }
+
+      const response = await taskAPI.create(payload);
+      if (response.error === false) {
+        fetchUsers();
+        toast.success("Task Created Sir !!");
+        setShowCreateTask(false);
+        setLoading(false);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log("Create Task Failed", error);
+      setLoading(false);
+    }
+  };
 
   const toggleSection = (userId, status) => {
     const key = `${userId}-${status}`;
@@ -88,6 +172,7 @@ function KanbanBoard() {
         toast.success("User created successfully!");
         setShowCreateUser(false);
         setLoading(false);
+        fetchUsers();
       } else {
         toast.error(response.message || "Failed to create user");
         setLoading(false);
@@ -100,93 +185,99 @@ function KanbanBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-800">
-      <Header
-        filterOptions={filterOptions}
-        attendanceOptions={attendanceOptions}
-        roleOptions={roleOptions}
-        priorityOptions={priorityOptions}
-        statusOptions={statusOptions}
-        setShowCreateTask={setShowCreateTask}
-        setSelectedUserForCreate={setSelectedUserForCreate}
-      />
+    <>
+      {user && (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-800">
+          <Header
+            filterOptions={filterOptions}
+            attendanceOptions={attendanceOptions}
+            roleOptions={roleOptions}
+            priorityOptions={priorityOptions}
+            statusOptions={statusOptions}
+            setShowCreateTask={setShowCreateTask}
+            setSelectedUserForCreate={setSelectedUserForCreate}
+          />
 
-      <div className="flex h-[calc(100vh-78px)]">
-        <BacklogSection
-          showBacklog={showBacklog}
-          setShowBacklog={setShowBacklog}
-          backlogTasks={backlogTasks}
-          setSelectedTask={setSelectedTask}
-        />
+          <div className="flex h-[calc(100vh-78px)]">
+            <BacklogSection
+              showBacklog={showBacklog}
+              setShowBacklog={setShowBacklog}
+              backlogTasks={backlogTasks}
+              setSelectedTask={setSelectedTask}
+            />
 
-        <UserColumns
-          users={users}
-          userTasks={userTasks}
-          sections={sections}
-          sectionTitles={sectionTitles}
-          expandedSections={expandedSections}
-          toggleSection={toggleSection}
-          timers={timers}
-          formatSecondsToTime={formatSecondsToTime}
-          handleStart={handleStart}
-          handlePause={handlePause}
-          handleResume={handleResume}
-          handleEnd={handleEnd}
-          moveTask={moveTask}
-          setSelectedTask={setSelectedTask}
-          setSelectedUserForCreate={setSelectedUserForCreate}
-          setShowCreateTask={setShowCreateTask}
-        />
+            <UserColumns
+              users={users}
+              userTasks={userTasks}
+              sections={sections}
+              sectionTitles={sectionTitles}
+              expandedSections={expandedSections}
+              toggleSection={toggleSection}
+              timers={timers}
+              formatSecondsToTime={formatSecondsToTime}
+              handleStart={handleStart}
+              handlePause={handlePause}
+              handleResume={handleResume}
+              handleEnd={handleEnd}
+              moveTask={moveTask}
+              setSelectedTask={setSelectedTask}
+              setSelectedUserForCreate={setSelectedUserForCreate}
+              setShowCreateTask={setShowCreateTask}
+            />
 
-        <QuickCreateColumn
-          showRightColumn={showRightColumn}
-          setShowRightColumn={setShowRightColumn}
-          users={users}
-          setSelectedUserForCreate={setSelectedUserForCreate}
-          setShowCreateTask={setShowCreateTask}
-          setShowCreateUser={setShowCreateUser}
-        />
+            <QuickCreateColumn
+              showRightColumn={showRightColumn}
+              setShowRightColumn={setShowRightColumn}
+              users={users}
+              setSelectedUserForCreate={setSelectedUserForCreate}
+              setShowCreateTask={setShowCreateTask}
+              setShowCreateUser={setShowCreateUser}
+              handleLogoutButton={handleLogoutButton}
+            />
 
-        <FloatingButtons
-          showRightColumn={showRightColumn}
-          setShowRightColumn={setShowRightColumn}
-          showBacklog={showBacklog}
-          setShowBacklog={setShowBacklog}
-          isMobileView={isMobileView}
-          setSelectedUserForCreate={setSelectedUserForCreate}
-          setShowCreateTask={setShowCreateTask}
-        />
-      </div>
+            <FloatingButtons
+              showRightColumn={showRightColumn}
+              setShowRightColumn={setShowRightColumn}
+              showBacklog={showBacklog}
+              setShowBacklog={setShowBacklog}
+              isMobileView={isMobileView}
+              setSelectedUserForCreate={setSelectedUserForCreate}
+              setShowCreateTask={setShowCreateTask}
+            />
+          </div>
 
-      {selectedTask && (
-        <TaskModal
-          data={selectedTask}
-          onClose={() => setSelectedTask(null)}
-          users={users}
-          sections={sections}
-          sectionTitles={sectionTitles}
-          moveTask={moveTask}
-          updateTask={updateTask}
-        />
+          {selectedTask && (
+            <TaskModal
+              data={selectedTask}
+              onClose={() => setSelectedTask(null)}
+              users={users}
+              sections={sections}
+              sectionTitles={sectionTitles}
+              moveTask={moveTask}
+              updateTask={updateTask}
+            />
+          )}
+
+          {showCreateTask && (
+            <CreateTaskForm
+              onClose={() => setShowCreateTask(false)}
+              defaultUserId={selectedUserForCreate}
+              users={users}
+              handleAddTask={handleAddTask}
+              loading={loading}
+            />
+          )}
+
+          {showCreateUser && (
+            <CreateUserForm
+              onClose={() => setShowCreateUser(false)}
+              onCreateUser={handleCreateUser}
+              loading={loading}
+            />
+          )}
+        </div>
       )}
-
-      {showCreateTask && (
-        <CreateTaskForm
-          onClose={() => setShowCreateTask(false)}
-          defaultUserId={selectedUserForCreate}
-          users={users}
-          handleAddTask={handleAddTask}
-        />
-      )}
-
-      {showCreateUser && (
-        <CreateUserForm
-          onClose={() => setShowCreateUser(false)}
-          onCreateUser={handleCreateUser}
-          loading={loading}
-        />
-      )}
-    </div>
+    </>
   );
 }
 

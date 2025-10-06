@@ -17,6 +17,7 @@ const QuickCreateColumn = ({
   setSelectedUserForCreate,
   setShowCreateTask,
   setShowCreateUser,
+  handleLogoutButton,
 }) => {
   const navigate = useNavigate();
 
@@ -24,11 +25,6 @@ const QuickCreateColumn = ({
 
   const handleNavigation = (path) => {
     navigate(path);
-  };
-
-  const handleLogout = () => {
-    // Add logout logic here
-    navigate("/login");
   };
 
   return (
@@ -176,7 +172,7 @@ const QuickCreateColumn = ({
         </button>
 
         <button
-          onClick={handleLogout}
+          onClick={handleLogoutButton}
           className="w-full flex items-center justify-start gap-x-2 md:gap-x-3 bg-red-800/80 hover:bg-red-800/70 text-red-300 hover:text-red-200 py-2 px-3 rounded-lg font-medium text-sm md:text-base transition-all duration-200 transform hover:scale-105 border border-red-400/20 hover:border-red-400/30"
         >
           <LogOut className="w-4 h-4 md:w-5 md:h-5" />

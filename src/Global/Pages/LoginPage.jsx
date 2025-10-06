@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Eye,
   EyeOff,
@@ -11,14 +11,24 @@ import {
   Rocket,
 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router";
+import { userAPI } from "../../api/endpoints/user.api";
+import { AuthContext } from "../../provider/AuthProvider";
+import toast from "react-hot-toast";
+import Spinner from "../components/Spinner/Spinner";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isShaking, setIsShaking] = useState(false);
+  const { user, handleLoginData } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [floatingIcons, setFloatingIcons] = useState([]);
   const navigate = useNavigate();
+
+  if (user) {
+    navigate("/");
+  }
 
   // Generate floating icons
   useEffect(() => {
@@ -34,11 +44,23 @@ export default function LoginPage() {
     setFloatingIcons(newFloatingIcons);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsShaking(true);
-    setTimeout(() => setIsShaking(false), 500);
-    navigate("/");
+    setLoading(true);
+    const payload = {
+      email,
+      password,
+    };
+    const response = await handleLoginData(payload);
+    toast.success("Logged In Successfully");
+
+    if (response) {
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      setLoading(false);
+      navigate("/");
+    }
+    setLoading(false);
   };
 
   return (
@@ -136,10 +158,14 @@ export default function LoginPage() {
                 onClick={handleSubmit}
                 className="w-full bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold py-4 px-6 rounded-2xl hover:from-pink-600 hover:to-violet-600 transform transition-all duration-300 hover:scale-110 hover:rotate-1 focus:outline-none focus:ring-4 focus:ring-pink-500/50 shadow-lg hover:shadow-pink-500/50 active:animate-pulse"
               >
-                <span className="flex items-center justify-center space-x-2">
-                  <Rocket className="w-5 h-5 animate-pulse" />
-                  <span>Launch Into TraBun! 🌟</span>
-                </span>
+                {loading ? (
+                  <Spinner />
+                ) : (
+                  <span className="flex items-center justify-center space-x-2">
+                    <Rocket className="w-5 h-5 animate-pulse" />
+                    <span>Launch Into TraBun! 🌟</span>
+                  </span>
+                )}
               </button>
             </div>
 
@@ -160,14 +186,14 @@ export default function LoginPage() {
             </div>
 
             {/* Social login buttons */}
-            <div className="mt-8 space-y-3">
+            {/* <div className="mt-8 space-y-3">
               <button className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 hover:scale-105 hover:-rotate-1 border border-white/20">
                 Continue with Google 🎨
               </button>
               <button className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 hover:scale-105 hover:rotate-1 border border-white/20">
                 Continue with GitHub 🐙
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Fun footer message */}

@@ -30,24 +30,32 @@ const UserColumn = ({
                 user.status === "Present" ? "bg-green-500" : "bg-red-500"
               } text-white font-bold text-xs md:text-sm`}
             >
-              {user.name
+              {user.username
                 .split(" ")
                 .map((n) => n[0])
                 .join("")}
             </div>
             <div>
               <h3 className="font-bold text-white text-sm md:text-base">
-                {user.name}
+                {user.username}
               </h3>
-              <p className="text-xs md:text-sm text-white/70">{user.role}</p>
+              <p className="text-xs md:text-sm text-white/70">
+                {user.userType === 1
+                  ? "Admin"
+                  : user.userType === 2
+                  ? "Developer"
+                  : user.userType === 3
+                  ? "Management"
+                  : null}
+              </p>
             </div>
           </div>
           <div>
-            <div className="flex text-sm md:text-lg text-white flex-col items-center justify-between">
+            <div className="flex text-sm md:text-lg text-white flex-col items-end justify-between">
               <div className="flex items-center gap-x-1">
                 <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
                 <span className="font-bold text-orange-400 text-xs md:text-sm">
-                  {user.storyPoints}
+                  {user.storyPoints || "0.00"}
                 </span>
                 <span className="text-red-400 font-semibold text-xs md:text-sm">
                   PTS
@@ -56,7 +64,7 @@ const UserColumn = ({
               <div className="mt-1 flex items-center font-semibold space-x-1">
                 <Timer className="w-3 h-3 md:w-4 md:h-4" />
                 <span className="font-medium text-xs md:text-sm">
-                  {user.totalTime}
+                  {user.totalTime || "00:00"}
                 </span>
               </div>
             </div>

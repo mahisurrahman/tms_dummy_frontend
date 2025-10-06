@@ -9,13 +9,19 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
     password: "",
     traId: "",
     designation: "",
-    userType: 2,
+    userType: "2", // default as string for select compatibility
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreateUser(formData);
-    // onClose();
+
+    // Convert userType to number if your backend expects an integer
+    const payload = {
+      ...formData,
+      userType: Number(formData.userType),
+    };
+
+    onCreateUser(payload);
   };
 
   const handleChange = (e) => {
@@ -36,6 +42,7 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {/* Username */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Username
@@ -51,6 +58,7 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
             />
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -66,6 +74,7 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
             />
           </div>
 
+          {/* Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -81,6 +90,7 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
             />
           </div>
 
+          {/* TRA ID */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               TRA ID
@@ -96,6 +106,7 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
             />
           </div>
 
+          {/* Designation */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Designation
@@ -111,6 +122,26 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
             />
           </div>
 
+          {/* User Type Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              User Type
+            </label>
+            <select
+              name="userType"
+              value={formData.userType}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="1">Admin</option>
+              <option value="2">Developer</option>
+              <option value="3">Manager</option>
+              {/* <option value="4">Viewer</option> */}
+            </select>
+          </div>
+
+          {/* Buttons */}
           <div className="flex gap-2 pt-2">
             <button
               type="button"
@@ -121,7 +152,7 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
             >
               {loading ? <Spinner /> : "Create User"}
             </button>
