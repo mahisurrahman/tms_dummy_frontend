@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Plus, Timer, Star } from "lucide-react";
 import TaskSection from "../TaskSection/TaskSection";
 
@@ -20,6 +20,8 @@ const UserColumn = ({
   setSelectedUserForCreate,
   setShowCreateTask,
 }) => {
+  // console.log(userTasks, " user tasks ");
+  // console.log(user, " user ");
   return (
     <div className="w-[45vw] md:w-[40vw] lg:w-[20vw] bg-transparent p-2 md:p-4">
       <div className="mb-2 md:mb-4 border rounded-lg pt-2 px-4 border-white/20 bg-white/20 backdrop-blur-3xl">
@@ -76,12 +78,12 @@ const UserColumn = ({
         {sections.map((status) => (
           <TaskSection
             key={status}
-            userId={user.id}
+            userId={user._id}
             status={status}
             title={sectionTitles[status]}
-            tasks={userTasks.filter((task) => task.status === status)}
-            isExpanded={expandedSections[`${user.id}-${status}`]}
-            onToggle={() => toggleSection(user.id, status)}
+            tasks={userTasks?.filter((task) => task?.taskStatus === status)}
+            isExpanded={expandedSections[`${user._id}-${status}`]}
+            onToggle={() => toggleSection(user._id, status)}
             timers={timers}
             formatSecondsToTime={formatSecondsToTime}
             handleStart={handleStart}

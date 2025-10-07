@@ -12,6 +12,12 @@ export const taskLogAPI = {
   getAllTask: () =>
     handleRequest(
       apiClient.get(`${baseMiddlePoint}/get/all`),
-      "Failed to Fetch all the Tasks"
+      "Failed to Fetch all the Tasks log"
+    ),
+
+  getTaskLogFilter: (payload) =>
+    handleRequest(
+      apiClient.post(`${baseMiddlePoint}/filterTasks/all`, payload),
+      "FAiled to fetch all the task log filters. "
     ),
 };

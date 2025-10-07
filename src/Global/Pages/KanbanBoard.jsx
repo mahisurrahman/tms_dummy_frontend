@@ -28,6 +28,7 @@ import Spinner from "../components/Spinner/Spinner";
 import { AuthContext } from "../../provider/AuthProvider";
 import { useNavigate } from "react-router";
 import { taskAPI } from "../../api/endpoints/task.api";
+import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -39,7 +40,9 @@ function KanbanBoard() {
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
-  const [tasks, setTasks] = useState([]);
+  const [userTaskLogs, setUserTaskLogs] = useState({});
+
+  // const [tasks, setTasks] = useState([]);
   const { user, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -56,20 +59,69 @@ function KanbanBoard() {
     }
   };
 
-  const fetchTasks = async () => {
+  // const fetchTasks = async () => {
+  //   try {
+  //     const response = await taskAPI.getAllTask();
+  //     setTasks(response.data);
+  //   } catch (error) {
+  //     console.error(error.message);
+  //   }
+  // };
+
+  const fetchTaskLogFilter = async () => {
     try {
-      const response = await taskAPI.getAllTask();
-      console.log(response, "response");
-      setTasks(response.data);
+      setLoading(true);
+
+      const startDate = new Date("2025-01-01").toISOString();
+      const endDate = new Date("2025-12-31").toISOString();
+
+      if (users && users.length > 0) {
+        const promises = users.map((user) => {
+          const payload = {
+            assignedToId: user._id,
+            taskStatus: "pending",
+            startDate,
+            endDate,
+          };
+          return taskLogAPI.getTaskLogFilter(payload);
+        });
+
+        const responses = await Promise.all(promises);
+        const allData = responses.map((r) => r.data);
+
+        const groupedByUser = {};
+        users.forEach((user) => {
+          const tasksForUser = allData
+            .flat()
+            .filter((task) => task.assignedToId === user._id)
+            .map((task) => ({
+              ...task,
+            }));
+          groupedByUser[user._id] = tasksForUser;
+        });
+
+        setUserTaskLogs(groupedByUser);
+        setLoading(false);
+      }
     } catch (error) {
-      console.error(error.message);
+      console.error("Fetch Task Log Filter Error", error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
-    fetchTasks();
+    const loadData = async () => {
+      await fetchUsers();
+      // await fetchTasks();
+    };
+    loadData();
   }, []);
+
+  useEffect(() => {
+    if (users && users.length > 0) {
+      fetchTaskLogFilter();
+    }
+  }, [users]);
 
   const handleLogoutButton = async () => {
     try {
@@ -128,7 +180,7 @@ function KanbanBoard() {
           taskCreatedBy: user._id,
           taskAssignedBy: "",
           deadline: formData.deadline,
-          assignedDate: "",
+          assignedDate: null,
         };
       } else {
         payload = {
@@ -140,15 +192,31 @@ function KanbanBoard() {
           taskCreatedBy: user._id,
           taskAssignedBy: "",
           deadline: formData.deadline,
-          assignedDate: "",
+          assignedDate: new Date(),
         };
       }
 
       const response = await taskAPI.create(payload);
       if (response.error === false) {
-        fetchUsers();
-        toast.success("Task Created Sir !!");
-        setShowCreateTask(false);
+        if (formData.assignedTo !== "") {
+          const taskLogPayload = {
+            startTime: new Date(),
+            assignedDate: new Date(),
+            expectedDuration: formData.deadline,
+            taskStatus: "pending",
+            taskId: response?.data?._id,
+            assignedToId: formData.assignedTo,
+            creatorId: user._id,
+          };
+          const taskLogResponse = await taskLogAPI.create(taskLogPayload);
+          if (taskLogResponse.error === false) {
+            fetchUsers();
+            toast.success("Task Created Sir !!");
+            setShowCreateTask(false);
+            setLoading(false);
+          }
+          setLoading(false);
+        }
         setLoading(false);
       }
       setLoading(false);
@@ -184,6 +252,18 @@ function KanbanBoard() {
     }
   };
 
+  useEffect(() => {
+    if (Object.keys(userTaskLogs).length > 0) {
+      setUserTaskLogs(userTaskLogs);
+    }
+  }, [userTaskLogs]);
+
+  useEffect(() => {
+    if (Object.keys(users).length > 0) {
+      setUsers(users);
+    }
+  }, [users]);
+
   return (
     <>
       {user && (
@@ -206,24 +286,30 @@ function KanbanBoard() {
               setSelectedTask={setSelectedTask}
             />
 
-            <UserColumns
-              users={users}
-              userTasks={userTasks}
-              sections={sections}
-              sectionTitles={sectionTitles}
-              expandedSections={expandedSections}
-              toggleSection={toggleSection}
-              timers={timers}
-              formatSecondsToTime={formatSecondsToTime}
-              handleStart={handleStart}
-              handlePause={handlePause}
-              handleResume={handleResume}
-              handleEnd={handleEnd}
-              moveTask={moveTask}
-              setSelectedTask={setSelectedTask}
-              setSelectedUserForCreate={setSelectedUserForCreate}
-              setShowCreateTask={setShowCreateTask}
-            />
+            {loading === true ? (
+              <div className="w-full h-full text-center flex items-center justify-center text-4xl font-extrabold text-white">
+                <h1>Loading ....</h1>
+              </div>
+            ) : (
+              <UserColumns
+                users={users}
+                userTasks={userTaskLogs}
+                sections={sections}
+                sectionTitles={sectionTitles}
+                expandedSections={expandedSections}
+                toggleSection={toggleSection}
+                timers={timers}
+                formatSecondsToTime={formatSecondsToTime}
+                handleStart={handleStart}
+                handlePause={handlePause}
+                handleResume={handleResume}
+                handleEnd={handleEnd}
+                moveTask={moveTask}
+                setSelectedTask={setSelectedTask}
+                setSelectedUserForCreate={setSelectedUserForCreate}
+                setShowCreateTask={setShowCreateTask}
+              />
+            )}
 
             <QuickCreateColumn
               showRightColumn={showRightColumn}

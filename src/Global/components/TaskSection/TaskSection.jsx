@@ -18,6 +18,7 @@ const TaskSection = ({
   moveTask,
   setSelectedTask,
 }) => {
+  // console.log(tasks, "tasks");
   return (
     <div key={status}>
       <div
@@ -41,6 +42,7 @@ const TaskSection = ({
                 key={task.id}
                 index={index + 1}
                 task={task}
+                userTask={task}
                 userId={userId}
                 timers={timers}
                 formatSecondsToTime={formatSecondsToTime}

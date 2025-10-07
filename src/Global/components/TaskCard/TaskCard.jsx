@@ -19,6 +19,7 @@ import {
 const TaskCard = ({
   index,
   task,
+  userTask,
   isBacklog = false,
   userId,
   timers,
@@ -30,11 +31,13 @@ const TaskCard = ({
   moveTask,
   onClick,
 }) => {
-  const timer = task[task?.id];
-  const isRunning = timer ? timer.isRunning : false;
-  const displayTime = timer
-    ? formatSecondsToTime(timer.accumulated)
-    : task.timeSpent;
+  // console.log(userTask, "task");
+
+  // const timer = task[task?._id];
+  // const isRunning = timer ? timer.isRunning : false;
+  // const displayTime = timer
+  //   ? formatSecondsToTime(timer.accumulated)
+  //   : task.timeSpent;
 
   return (
     <div
