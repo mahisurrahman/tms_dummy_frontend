@@ -18,7 +18,7 @@ const TaskSection = ({
   moveTask,
   setSelectedTask,
 }) => {
-  // console.log(tasks, "tasks");
+
   return (
     <div key={status}>
       <div
@@ -36,10 +36,10 @@ const TaskSection = ({
       </div>
       {isExpanded && (
         <div className="space-y-3">
-          {tasks.length > 0 ? (
+          {tasks?.length > 0 ? (
             tasks.map((task, index) => (
               <TaskCard
-                key={task.id}
+                key={task?._id}
                 index={index + 1}
                 task={task}
                 userTask={task}

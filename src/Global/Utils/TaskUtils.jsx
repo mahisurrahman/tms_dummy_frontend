@@ -33,7 +33,7 @@ export const getStatusColor = (status) => {
 };
 
 export const getStatusIcon = (status) => {
-  switch (status.toLowerCase()) {
+  switch (status) {
     case "pending":
       return <Clock className="w-4 h-4 text-yellow-500" />;
     case "in-queue":

@@ -20,8 +20,9 @@ const UserColumn = ({
   setSelectedUserForCreate,
   setShowCreateTask,
 }) => {
-  // console.log(userTasks, " user tasks ");
-  // console.log(user, " user ");
+// console.log(user, "User data");
+//   console.log(userTasks, "User Tasks Logs");
+
   return (
     <div className="w-[45vw] md:w-[40vw] lg:w-[20vw] bg-transparent p-2 md:p-4">
       <div className="mb-2 md:mb-4 border rounded-lg pt-2 px-4 border-white/20 bg-white/20 backdrop-blur-3xl">

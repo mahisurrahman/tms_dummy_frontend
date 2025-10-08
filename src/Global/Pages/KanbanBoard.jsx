@@ -112,7 +112,6 @@ function KanbanBoard() {
   useEffect(() => {
     const loadData = async () => {
       await fetchUsers();
-      // await fetchTasks();
     };
     loadData();
   }, []);
@@ -252,17 +251,20 @@ function KanbanBoard() {
     }
   };
 
-  useEffect(() => {
-    if (Object.keys(userTaskLogs).length > 0) {
-      setUserTaskLogs(userTaskLogs);
-    }
-  }, [userTaskLogs]);
+  // useEffect(() => {
+  //   if (Object.keys(userTaskLogs).length > 0) {
+  //     setUserTaskLogs(userTaskLogs);
+  //   }
+  // }, [userTaskLogs]);
 
-  useEffect(() => {
-    if (Object.keys(users).length > 0) {
-      setUsers(users);
-    }
-  }, [users]);
+  // useEffect(() => {
+  //   if (Object.keys(users).length > 0) {
+  //     setUsers(users);
+  //   }
+  // }, [users]);
+
+  // console.log(users, "Users List");
+  // console.log(userTaskLogs, "User Tasks Logs");
 
   return (
     <>

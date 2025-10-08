@@ -15,6 +15,7 @@ import {
   getStatusColor,
   getStatusIcon,
 } from "../../Utils/TaskUtils";
+import { formatReadableDateTime } from "../../Utils/formatReadableDateTime";
 
 const TaskCard = ({
   index,
@@ -31,14 +32,7 @@ const TaskCard = ({
   moveTask,
   onClick,
 }) => {
-  // console.log(userTask, "task");
-
-  // const timer = task[task?._id];
-  // const isRunning = timer ? timer.isRunning : false;
-  // const displayTime = timer
-  //   ? formatSecondsToTime(timer.accumulated)
-  //   : task.timeSpent;
-
+  console.log(task, "task");
   return (
     <div
       className={`bg-white rounded-xl p-4 mb-3 transition-all duration-300 transform cursor-pointer border-4 ${
@@ -53,21 +47,21 @@ const TaskCard = ({
       <div className="flex items-center justify-between mb-2 relative">
         {isBacklog ? (
           <h4 className="font-bold text-gray-800 truncate flex-1">
-            {task.title}
+            {task?.taskDetails?.taskTitle}
           </h4>
         ) : (
           <h4 className="font-bold text-gray-800 truncate flex-1">
-            {index}. {task.title}
+            {index}. {task?.taskDetails?.taskTitle}
           </h4>
         )}
         {!isBacklog && (
           <span
             className={`inline-flex items-center px-2 py-1 rounded animate-pulse text-xs font-medium bg-gradient-to-r ${getStatusColor(
-              task.status
+              task?.taskStatus
             )} text-white`}
           >
-            {getStatusIcon(task.status)}
-            <span className="ml-1 capitalize">{task.status}</span>
+            {getStatusIcon(task.taskStatus)}
+            <span className="ml-1 capitalize">{task?.taskStatus}</span>
           </span>
         )}
       </div>
@@ -91,36 +85,36 @@ const TaskCard = ({
           <div className="flex items-center justify-between text-sm">
             <span
               className={`inline-flex items-center px-2 py-1  rounded text-xs font-medium bg-gradient-to-r ${getPriorityColor(
-                task.priority
+                task?.taskDetails?.taskPriority
               )} text-white`}
             >
               <Flag className="w-3 h-3 mr-1" />
-              {task.priority}
+              {task?.taskDetails?.taskPriority}
             </span>
-            <span
+            {/* <span
               className={`text-yellow-600 text-xl font-bold ${
                 isRunning ? "animate-pulse" : ""
               }`}
             >
               {displayTime}
-            </span>
+            </span> */}
           </div>
 
           <div className="flex flex-col items-start text-xs text-gray-900">
             <span>
               <span className="font-semibold">Assigned By:</span>{" "}
-              {task.assignedBy}
+              {task?.creatorDetails?.username}
             </span>
             <span>
               <span className="font-semibold">Assigned Date:</span>{" "}
-              {task.assignedDate}, 11:00 AM
+              {formatReadableDateTime(task?.assignedDate)}
             </span>
-            <span>
+            {/* <span>
               <span className="font-semibold">Project Title:</span> DOL
-            </span>
+            </span> */}
             <span>
               <span className="font-semibold">Expected Deadline:</span>{" "}
-              2025-01-20, 12:00 PM
+              {formatReadableDateTime(task?.taskDetails?.expectedDeadline)}
             </span>
           </div>
 
