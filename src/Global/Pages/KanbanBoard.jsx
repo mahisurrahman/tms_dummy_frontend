@@ -6,7 +6,6 @@ import { useScreenSize } from "../Utils/useScreenSize";
 import useTimers from "../Utils/useTimers";
 import useTask from "../Utils/useTask";
 import {
-  // users,
   backlogTasks,
   filterOptions,
   attendanceOptions,
@@ -20,10 +19,9 @@ import Header from "../components/Header/Header";
 import BacklogSection from "../components/BacklogSection/BacklogSection";
 import UserColumns from "../components/UserColumns/UserColumns";
 import QuickCreateColumn from "../components/QuickCreateColumn/QuickCreateColumn";
-// import Spinner from "../components/Spinner/Spinner";
 import { userAPI } from "../../api/endpoints/user.api";
 import CreateUserForm from "../components/CreateUserForm/CreateUserForm";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Spinner from "../components/Spinner/Spinner";
 import { AuthContext } from "../../provider/AuthProvider";
 import { useNavigate } from "react-router";
@@ -41,8 +39,8 @@ function KanbanBoard() {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [userTaskLogs, setUserTaskLogs] = useState({});
+  const [backlogs, setBacklogs] = useState([]);
 
-  // const [tasks, setTasks] = useState([]);
   const { user, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -50,60 +48,66 @@ function KanbanBoard() {
     navigate("/login");
   }
 
+  // Fetch all users
   const fetchUsers = async () => {
     try {
       const response = await userAPI.getAll();
       setUsers(response.data);
     } catch (error) {
-      console.error(error.message);
+      console.error("Fetch Users Error:", error.message);
     }
   };
 
+  const fetchBacklogs = async () => {
+    try {
+      const response = await taskAPI.getAllTask();
+      // Filter tasks with backlog === true
+      const backlogTasksFiltered = response.data.filter(
+        (task) => task.backlog === true
+      );
+      setBacklogs(backlogTasksFiltered);
+    } catch (error) {
+      console.error("Fetch Backlogs Error:", error.message);
+    }
+  };
+
+  // Updated fetchTaskLogFilter — only filters by startDate and endDate now
   const fetchTaskLogFilter = async () => {
     try {
       setLoading(true);
 
-      const startDate = new Date("2025-01-01").toISOString();
-      const endDate = new Date("2025-12-31").toISOString();
-      const statuses = ["pending", "ongoing", "inqueue", "review", "complete"];
+      const startDate = new Date("2025-01-01T00:00:00.000Z").toISOString();
+      const endDate = new Date("2025-12-31T23:59:59.999Z").toISOString();
 
-      if (users && users.length > 0) {
-        const allPromises = [];
+      // Single API call with start and end date only
+      const payload = { startDate, endDate };
+      const response = await taskLogAPI.getTaskLogFilter(payload);
 
-        users.forEach((user) => {
-          statuses.forEach((status) => {
-            const payload = {
-              assignedToId: user._id,
-              taskStatus: status,
-              startDate,
-              endDate,
-            };
-            allPromises.push(taskLogAPI.getTaskLogFilter(payload));
-          });
-        });
+      if (response && response.data) {
+        const allData = response.data;
 
-        const responses = await Promise.all(allPromises);
-        const allData = responses.map((r) => r.data).flat();
-
+        // Group fetched tasks by assignedToId for Kanban board display
         const groupedByUser = {};
         users.forEach((user) => {
-          const tasksForUser = allData.filter(
+          groupedByUser[user._id] = allData.filter(
             (task) => task.assignedToId === user._id
           );
-          groupedByUser[user._id] = tasksForUser;
         });
-        console.log(groupedByUser, "groupedByUser");
+
         setUserTaskLogs(groupedByUser);
-        setLoading(false);
       }
+
+      setLoading(false);
     } catch (error) {
       console.error("Fetch Task Log Filter Error", error);
       setLoading(false);
     }
   };
+
   useEffect(() => {
     const loadData = async () => {
       await fetchUsers();
+      await fetchBacklogs();
     };
     loadData();
   }, []);
@@ -114,38 +118,76 @@ function KanbanBoard() {
     }
   }, [users]);
 
-  const changeStatusTask = async (taskId, status) => {
+  // Change status of a task
+  const changeStatusTask = async (
+    taskLogId,
+    taskId,
+    newStatus,
+    startTime,
+    endTime
+  ) => {
     try {
-      const response = await taskLogAPI.updateTaskStatus(taskId, {
-        taskStatus: status.toLowerCase(),
+      // 1️⃣ Update the task status
+      const updateResponse = await taskLogAPI.updateTaskStatus(taskId, {
+        startTime,
+        endTime,
       });
 
-      // Update local state without refetching
-      if (response.error === false) {
-        setUserTaskLogs((prev) => {
-          const updated = { ...prev };
+      if (updateResponse.error === false) {
+        // 2️⃣ Find the original task log from current state
+        const originalTaskLog = Object.values(userTaskLogs)
+          .flat()
+          .find((task) => task._id === taskLogId || task.taskId === taskId);
 
-          // Find and update the task in userTaskLogs
-          Object.keys(updated).forEach((userId) => {
-            updated[userId] = updated[userId].map((task) => {
-              if (task._id === taskId || task.taskId === taskId) {
-                return {
-                  ...task,
-                  taskStatus: status.toLowerCase(),
-                };
-              }
-              return task;
+        if (originalTaskLog) {
+          // 3️⃣ Prepare new task log payload
+          const newTaskLogPayload = {
+            startTime: new Date(),
+            assignedDate: originalTaskLog.assignedDate,
+            expectedDuration: originalTaskLog.expectedDuration || null,
+            taskStatus: newStatus.toLowerCase(),
+            taskId: originalTaskLog.taskId || taskId,
+            assignedToId: originalTaskLog.assignedToId,
+            creatorId: originalTaskLog.creatorId,
+          };
+
+          // 4️⃣ Create new task log
+          const createTaskLogResponse = await taskLogAPI.create(
+            newTaskLogPayload
+          );
+
+          if (createTaskLogResponse.error === false) {
+            // 5️⃣ Update state
+            setUserTaskLogs((prev) => {
+              const updated = { ...prev };
+              Object.keys(updated).forEach((userId) => {
+                updated[userId] = updated[userId].map((task) => {
+                  if (task._id === taskId || task.taskId === taskId) {
+                    return {
+                      ...task,
+                      taskStatus: newStatus.toLowerCase(),
+                      startTime: new Date().toISOString(), // Add this line!
+                    };
+                  }
+                  return task;
+                });
+              });
+              return updated;
             });
-          });
-
-          toast.success("Task Status Updated");
-          return updated;
-        });
+          } else {
+            toast.error(
+              "Task Status updated but failed to create new Task Log"
+            );
+          }
+        }
       }
     } catch (error) {
       console.log("Status Change of Task Failed", error);
+      toast.error("Failed to change task status");
     }
   };
+
+  // Logout handler
   const handleLogoutButton = async () => {
     try {
       const logoutData = await handleLogout();
@@ -154,7 +196,6 @@ function KanbanBoard() {
           duration: 2000,
           position: "top-center",
         });
-
         navigate("/login");
       }
     } catch (error) {
@@ -172,11 +213,9 @@ function KanbanBoard() {
     handlePause,
     handleResume,
     handleEnd,
-    parseTimeToSeconds,
     formatSecondsToTime,
-    pauseAllOtherTasks,
   } = useTimers();
-  const { userTasks, moveTask, updateTask } = useTask();
+  const { moveTask, updateTask } = useTask();
 
   useEffect(() => {
     const initialExpanded = {};
@@ -193,6 +232,7 @@ function KanbanBoard() {
     try {
       setLoading(true);
       let payload = {};
+
       if (formData.assignedTo === "") {
         payload = {
           taskTitle: formData.title,
@@ -236,11 +276,8 @@ function KanbanBoard() {
             fetchUsers();
             toast.success("Task Created Sir !!");
             setShowCreateTask(false);
-            setLoading(false);
           }
-          setLoading(false);
         }
-        setLoading(false);
       }
       setLoading(false);
     } catch (error) {
@@ -262,12 +299,11 @@ function KanbanBoard() {
       if (response.error === false) {
         toast.success("User created successfully!");
         setShowCreateUser(false);
-        setLoading(false);
         fetchUsers();
       } else {
         toast.error(response.message || "Failed to create user");
-        setLoading(false);
       }
+      setLoading(false);
     } catch (error) {
       console.error(error.message);
       toast.error("Something went wrong while creating the user");
@@ -293,11 +329,11 @@ function KanbanBoard() {
             <BacklogSection
               showBacklog={showBacklog}
               setShowBacklog={setShowBacklog}
-              backlogTasks={backlogTasks}
+              backlogTasks={backlogs} // updated from backlogTasks
               setSelectedTask={setSelectedTask}
             />
 
-            {loading === true ? (
+            {loading ? (
               <div className="w-full h-full text-center flex items-center justify-center text-4xl font-extrabold text-white">
                 <h1>Loading ....</h1>
               </div>

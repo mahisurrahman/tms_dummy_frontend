@@ -36,9 +36,14 @@ const TaskCard = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState("");
+  const [elapsedTime, setElapsedTime] = useState(""); // Since Assigned
+  const [statusElapsedTime, setStatusElapsedTime] = useState(""); // Status Duration
 
   const statuses = ["Pending", "InQueue", "Ongoing", "Review", "Complete"];
+
+  if (isBacklog) {
+    console.log(task, "backlog task");
+  }
 
   useEffect(() => {
     if (!task?.assignedDate) return;
@@ -64,9 +69,34 @@ const TaskCard = ({
     return () => clearInterval(interval);
   }, [task?.assignedDate]);
 
+  useEffect(() => {
+    if (!task?.startTime) return;
+
+    const updateStatusElapsed = () => {
+      const start = new Date(task.startTime);
+      const now = new Date();
+      const diff = Math.floor((now - start) / 1000);
+
+      const hours = Math.floor(diff / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = diff % 60;
+
+      setStatusElapsedTime(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+    };
+
+    updateStatusElapsed();
+    const interval = setInterval(updateStatusElapsed, 1000);
+    return () => clearInterval(interval);
+  }, [task?.startTime]);
+
   const handleStatusChange = (newStatus) => {
-    changeStatusTask(task?.taskId, newStatus);
-    // moveTask(userId, task.id, newStatus.toLowerCase());
+    const startTime = task?.startTime;
+    const endTime = new Date().toISOString();
+    changeStatusTask(task._id, task?.taskId, newStatus, startTime, endTime);
     setShowModal(false);
   };
 
@@ -79,91 +109,115 @@ const TaskCard = ({
   return (
     <>
       <div
-        className={`bg-white rounded-2xl p-5 mb-4 transition-all duration-300 cursor-pointer border-l-4 hover:-translate-y-1 ${
+        className={`${
+          task?.taskDetails?.taskPriority === "High"
+            ? "bg-red-200"
+            : task?.taskDetails?.taskPriority === "Medium"
+            ? "bg-orange-200"
+            : task?.taskDetails?.taskPriority === "Low"
+            ? "bg-green-200"
+            : "bg-white"
+        } rounded-2xl p-5 mb-4 transition-all duration-300 cursor-pointer border-l-4 hover:-translate-y-1 ${
           priorityStyles[task?.taskDetails?.taskPriority] ||
           "border-l-gray-500 shadow-gray-100"
         }`}
         onClick={onClick}
       >
         {/* HEADER */}
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+        {!isBacklog && (
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                {/* <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
                 #{index}
-              </span>
+              </span> */}
+                <span
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 rounded text-xs font-semibold bg-gradient-to-r ${getPriorityColor(
+                    task?.taskDetails?.taskPriority
+                  )} text-white shadow-sm`}
+                >
+                  <Flag className="w-3 h-3" />
+                  {task?.taskDetails?.taskPriority}
+                </span>
+              </div>
+            </div>
+
+            <div className="animate-pulse flex flex-col items-end gap-2">
               <span
-                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded text-xs font-semibold bg-gradient-to-r ${getPriorityColor(
-                  task?.taskDetails?.taskPriority
-                )} text-white shadow-sm`}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-gradient-to-r ${getStatusColor(
+                  task?.taskStatus
+                )} text-white shadow-md`}
               >
-                <Flag className="w-3 h-3" />
-                {task?.taskDetails?.taskPriority}
+                {/* <span className="text-sm">{getStatusIcon(task?.taskStatus)}</span> */}
+                <span className="capitalize">{task?.taskStatus}</span>
               </span>
             </div>
           </div>
-
-          <div className="animate-pulse flex flex-col items-end gap-2">
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-gradient-to-r ${getStatusColor(
-                task?.taskStatus
-              )} text-white shadow-md`}
-            >
-              {/* <span className="text-sm">{getStatusIcon(task?.taskStatus)}</span> */}
-              <span className="capitalize">{task?.taskStatus}</span>
-            </span>
-          </div>
-        </div>
+        )}
 
         <div>
-          <h4 className="font-bold text-lg mb-4 text-gray-900 leading-tight">
-            {task?.taskDetails?.taskTitle}
-          </h4>
-          <div className="grid grid-cols-3 gap-x-2 items-center text-center">
+          {!isBacklog ? (
+            <h4 className="font-bold text-lg mb-4 text-gray-900 leading-tight">
+              {task?.taskDetails?.taskTitle}
+            </h4>
+          ) : (
+            <h4 className="font-bold text-lg mb-4 text-gray-900 leading-tight">
+              {task?.taskTitle}
+            </h4>
+          )}
+          {!isBacklog && (
+            <div className="grid grid-cols-3 gap-x-2 items-center text-center">
+              {/* Since Assigned */}
               {task?.assignedDate && (
-            <div className="mb-4 ">
-              <div className="flex items-center justify-center gap-1.5 text-blue-700">
-                {/* <Clock className="w-3.5 h-3.5" /> */}
-                <span className="text-sm text-center font-semibold">Since Assigned</span>
+                <div className="mb-4">
+                  <div className="flex items-center justify-center gap-1.5 text-blue-700">
+                    <span className="text-sm text-center font-semibold">
+                      Since Assigned
+                    </span>
+                  </div>
+                  <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
+                    {elapsedTime}
+                  </span>
+                </div>
+              )}
+
+              {/* Status Duration */}
+              {task?.startTime && (
+                <div className="mb-4">
+                  <div className="flex items-center justify-center gap-1.5 text-blue-700">
+                    <span className="text-sm text-center font-semibold capitalize">
+                      {task?.taskStatus} For
+                    </span>
+                  </div>
+                  <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
+                    {statusElapsedTime}
+                  </span>
+                </div>
+              )}
+
+              {/* Pause Time (currently placeholder) */}
+              <div className="mb-4">
+                <div className="flex items-center justify-center gap-1.5 text-blue-700">
+                  <span className="text-sm text-center font-semibold">
+                    Pause Time
+                  </span>
+                </div>
+                <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
+                  00:00:00
+                </span>
               </div>
-              <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
-                {elapsedTime}
-              </span>
             </div>
           )}
-          {task?.assignedDate && (
-            <div className="mb-4 ">
-              <div className="flex items-center justify-center gap-1.5 text-blue-700">
-                {/* <Clock className="w-3.5 h-3.5" /> */}
-                <span className="text-sm text-center font-semibold capitalize">{task?.taskStatus} For</span>
-              </div>
-              <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
-                {elapsedTime}
-              </span>
-            </div>
-          )}
-           {task?.assignedDate && (
-            <div className="mb-4 ">
-              <div className="flex items-center justify-center gap-1.5 text-blue-700">
-                {/* <Clock className="w-3.5 h-3.5" /> */}
-                <span className="text-sm text-center font-semibold">Pause Time</span>
-              </div>
-              <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
-                00:00:00
-              </span>
-            </div>
-          )}
-          </div>
         </div>
 
         {/* DESCRIPTION */}
-        {task?.taskDetails?.taskDescription && (
+        {/* {task?.taskDetails?.taskDescription && (
           <div className="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100">
             <p className="text-sm text-gray-700 leading-relaxed">
               {truncateText(task?.taskDetails?.taskDescription, 150)}
             </p>
           </div>
-        )}
+        )} */}
 
         {/* INFO GRID */}
         <div className="grid grid-cols-1 gap-3 mb-4">
@@ -171,12 +225,21 @@ const TaskCard = ({
             <div className="bg-emerald-100 p-2 rounded-lg">
               <User className="w-4 h-4 text-emerald-700" />
             </div>
-            <div className="flex-1">
-              <span className="text-xs text-gray-500 block">Assigned By</span>
-              <span className="font-semibold text-gray-900">
-                {task?.creatorDetails?.username}
-              </span>
-            </div>
+            {!isBacklog ? (
+              <div className="flex-1">
+                <span className="text-xs text-gray-500 block">Assigned By</span>
+                <span className="font-semibold text-gray-900">
+                  {task?.creatorDetails?.username}
+                </span>
+              </div>
+            ) : (
+              <div className="flex-1">
+                <span className="text-xs text-gray-500 block">Assigned By</span>
+                <span className="font-semibold text-gray-900">
+                  {task?.taskCreatedBy?.username}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 text-sm">
@@ -195,12 +258,21 @@ const TaskCard = ({
             <div className="bg-orange-100 p-2 rounded-lg">
               <Target className="w-4 h-4 text-orange-700" />
             </div>
-            <div className="flex-1">
-              <span className="text-xs text-gray-500 block">Deadline</span>
-              <span className="font-semibold text-gray-900">
-                {formatReadableDateTime(task?.taskDetails?.expectedDeadline)}
-              </span>
-            </div>
+            {!isBacklog ? (
+              <div className="flex-1">
+                <span className="text-xs text-gray-500 block">Deadline</span>
+                <span className="font-semibold text-gray-900">
+                  {formatReadableDateTime(task?.taskDetails?.expectedDeadline)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex-1">
+                <span className="text-xs text-gray-500 block">Deadline</span>
+                <span className="font-semibold text-gray-900">
+                  {formatReadableDateTime(task?.expectedDeadline)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -280,29 +352,37 @@ const TaskCard = ({
                   task?.taskStatus?.toLowerCase() === status.toLowerCase();
 
                 const gradientMap = {
-                  complete: "from-green-500 to-green-600",
-                  ongoing: "from-blue-500 to-blue-600",
-                  pending: "from-pink-600 to-orange-500",
-                  inqueue: "from-purple-500 to-violet-600",
-                  review: "from-red-600 to-rose-600",
+                  complete: "bg-green-600",
+                  ongoing: "bg-blue-600",
+                  pending: "bg-orange-500",
+                  inqueue: "bg-violet-600",
+                  review: "bg-rose-600",
                 };
 
-                const gradient =
-                  gradientMap[status.toLowerCase()] ||
-                  "from-gray-400 to-gray-500";
+                const hoverGradientMap = {
+                  complete: "hover:bg-green-600",
+                  ongoing: "hover:bg-blue-600",
+                  pending: "hover:bg-orange-500",
+                  inqueue: "hover:bg-violet-600",
+                  review: "hover:bg-rose-600",
+                };
+
+                const gradient = gradientMap[status.toLowerCase()];
+                const hoverGradient = hoverGradientMap[status.toLowerCase()];
 
                 return (
                   <button
                     key={status}
                     onClick={() => handleStatusChange(status)}
-                    className={`px-4 py-3.5 cursor-pointer rounded-xl text-sm font-semibold text-left transition-all duration-200 ${
-                      isSelected
-                        ? `bg-gradient-to-r ${gradient} text-white shadow-lg scale-105`
-                        : `bg-gray-50 hover:bg-gradient-to-r hover:${gradient} hover:text-white hover:shadow-md text-gray-700 border-2 border-transparent hover:border-transparent`
-                    }`}
+                    className={`px-4 py-3.5 cursor-pointer rounded-xl text-sm font-semibold text-left transition-all duration-200
+                ${
+                  isSelected
+                    ? `${gradient} text-white shadow-lg scale-105`
+                    : `bg-gray-50 text-gray-700 border-2 border-transparent hover:text-white hover:shadow-md ${hoverGradient}`
+                }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span>{status}</span>
+                      <span className="capitalize">{status}</span>
                       {isSelected && <span className="text-lg">✓</span>}
                     </div>
                   </button>

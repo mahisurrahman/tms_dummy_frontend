@@ -4,7 +4,7 @@ const TaskCard = ({ index, task, isBacklog = false, onClick }) => (
       task.priority === "High"
         ? "border-red-500 shadow-red-100"
         : task.priority === "Medium"
-        ? "border-yellow-500 shadow-yellow-100"
+        ? "border-orange-500 shadow-orange-100"
         : "border-green-500 shadow-green-100"
     }`}
     onClick={onClick}

@@ -97,11 +97,11 @@ export const roleOptions = ["All", "DEVELOPER", "HR", "ADMIN"];
 export const priorityOptions = ["All", "High", "Medium", "Low"];
 export const statusOptions = [
   "All",
-  "completed",
+  "complete",
   "ongoing",
   "pending",
-  "in-queue",
-  "finished",
+  "inqueue",
+  // "finished",
   "review",
 ];
 
@@ -111,16 +111,16 @@ export const sections = [
   "pending",
   // "finished",
   "review",
-  "completed",
+  "complete",
 ];
 
 export const sectionTitles = {
   ongoing: "Ongoing",
   inqueue: "In Queue",
   pending: "Pending",
-  finished: "Finished",
+  // finished: "Finished",
   review: "Under Review",
-  completed: "Completed",
+  complete: "Complete",
 };
 
 // Initial tasks data would go here, but it's quite long so I've omitted it for brevity
