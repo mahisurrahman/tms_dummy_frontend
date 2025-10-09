@@ -20,4 +20,10 @@ export const taskLogAPI = {
       apiClient.post(`${baseMiddlePoint}/filterTasks/all`, payload),
       "FAiled to fetch all the task log filters. "
     ),
+
+  updateTaskStatus:(params, payload)=>
+    handleRequest(
+      apiClient.post(`${baseMiddlePoint}/updateStatus/${params}`, payload),
+      "Failed to Update task status",
+    )
 };

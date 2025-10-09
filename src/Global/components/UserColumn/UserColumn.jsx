@@ -19,10 +19,8 @@ const UserColumn = ({
   setSelectedTask,
   setSelectedUserForCreate,
   setShowCreateTask,
+  changeStatusTask,
 }) => {
-// console.log(user, "User data");
-//   console.log(userTasks, "User Tasks Logs");
-
   return (
     <div className="w-[45vw] md:w-[40vw] lg:w-[20vw] bg-transparent p-2 md:p-4">
       <div className="mb-2 md:mb-4 border rounded-lg pt-2 px-4 border-white/20 bg-white/20 backdrop-blur-3xl">
@@ -30,7 +28,7 @@ const UserColumn = ({
           <div className="flex items-center space-x-2 md:space-x-3">
             <div
               className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center ${
-                user.status === "Present" ? "bg-green-500" : "bg-red-500"
+                user.status === true ? "bg-green-500" : "bg-red-500"
               } text-white font-bold text-xs md:text-sm`}
             >
               {user.username
@@ -93,6 +91,7 @@ const UserColumn = ({
             handleEnd={handleEnd}
             moveTask={moveTask}
             setSelectedTask={setSelectedTask}
+            changeStatusTask={changeStatusTask}
           />
         ))}
       </div>

@@ -59,47 +59,40 @@ function KanbanBoard() {
     }
   };
 
-  // const fetchTasks = async () => {
-  //   try {
-  //     const response = await taskAPI.getAllTask();
-  //     setTasks(response.data);
-  //   } catch (error) {
-  //     console.error(error.message);
-  //   }
-  // };
-
   const fetchTaskLogFilter = async () => {
     try {
       setLoading(true);
 
       const startDate = new Date("2025-01-01").toISOString();
       const endDate = new Date("2025-12-31").toISOString();
+      const statuses = ["pending", "ongoing", "inqueue", "review", "complete"];
 
       if (users && users.length > 0) {
-        const promises = users.map((user) => {
-          const payload = {
-            assignedToId: user._id,
-            taskStatus: "pending",
-            startDate,
-            endDate,
-          };
-          return taskLogAPI.getTaskLogFilter(payload);
+        const allPromises = [];
+
+        users.forEach((user) => {
+          statuses.forEach((status) => {
+            const payload = {
+              assignedToId: user._id,
+              taskStatus: status,
+              startDate,
+              endDate,
+            };
+            allPromises.push(taskLogAPI.getTaskLogFilter(payload));
+          });
         });
 
-        const responses = await Promise.all(promises);
-        const allData = responses.map((r) => r.data);
+        const responses = await Promise.all(allPromises);
+        const allData = responses.map((r) => r.data).flat();
 
         const groupedByUser = {};
         users.forEach((user) => {
-          const tasksForUser = allData
-            .flat()
-            .filter((task) => task.assignedToId === user._id)
-            .map((task) => ({
-              ...task,
-            }));
+          const tasksForUser = allData.filter(
+            (task) => task.assignedToId === user._id
+          );
           groupedByUser[user._id] = tasksForUser;
         });
-
+        console.log(groupedByUser, "groupedByUser");
         setUserTaskLogs(groupedByUser);
         setLoading(false);
       }
@@ -108,7 +101,6 @@ function KanbanBoard() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     const loadData = async () => {
       await fetchUsers();
@@ -122,6 +114,38 @@ function KanbanBoard() {
     }
   }, [users]);
 
+  const changeStatusTask = async (taskId, status) => {
+    try {
+      const response = await taskLogAPI.updateTaskStatus(taskId, {
+        taskStatus: status.toLowerCase(),
+      });
+
+      // Update local state without refetching
+      if (response.error === false) {
+        setUserTaskLogs((prev) => {
+          const updated = { ...prev };
+
+          // Find and update the task in userTaskLogs
+          Object.keys(updated).forEach((userId) => {
+            updated[userId] = updated[userId].map((task) => {
+              if (task._id === taskId || task.taskId === taskId) {
+                return {
+                  ...task,
+                  taskStatus: status.toLowerCase(),
+                };
+              }
+              return task;
+            });
+          });
+
+          toast.success("Task Status Updated");
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.log("Status Change of Task Failed", error);
+    }
+  };
   const handleLogoutButton = async () => {
     try {
       const logoutData = await handleLogout();
@@ -251,21 +275,6 @@ function KanbanBoard() {
     }
   };
 
-  // useEffect(() => {
-  //   if (Object.keys(userTaskLogs).length > 0) {
-  //     setUserTaskLogs(userTaskLogs);
-  //   }
-  // }, [userTaskLogs]);
-
-  // useEffect(() => {
-  //   if (Object.keys(users).length > 0) {
-  //     setUsers(users);
-  //   }
-  // }, [users]);
-
-  // console.log(users, "Users List");
-  // console.log(userTaskLogs, "User Tasks Logs");
-
   return (
     <>
       {user && (
@@ -310,6 +319,7 @@ function KanbanBoard() {
                 setSelectedTask={setSelectedTask}
                 setSelectedUserForCreate={setSelectedUserForCreate}
                 setShowCreateTask={setShowCreateTask}
+                changeStatusTask={changeStatusTask}
               />
             )}
 

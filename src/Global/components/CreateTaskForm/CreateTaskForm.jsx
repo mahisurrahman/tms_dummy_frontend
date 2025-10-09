@@ -95,7 +95,7 @@ const CreateTaskForm = ({
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Project
               </label>
@@ -110,10 +110,7 @@ const CreateTaskForm = ({
                 <option>MOL</option>
                 <option>PRET-A-MED</option>
               </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div> */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Assign To
@@ -133,7 +130,9 @@ const CreateTaskForm = ({
                 <option value="">Backlog</option>
               </select>
             </div>
+          </div>
 
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Deadline

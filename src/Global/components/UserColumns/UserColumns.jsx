@@ -19,9 +19,8 @@ const UserColumns = ({
   setSelectedTask,
   setSelectedUserForCreate,
   setShowCreateTask,
+  changeStatusTask,
 }) => {
-
-
 
   return (
     <div className="p-2 md:p-4 overflow-x-auto transition-all duration-300 ease-in-out w-full">
@@ -47,6 +46,7 @@ const UserColumns = ({
                 setSelectedTask={setSelectedTask}
                 setSelectedUserForCreate={setSelectedUserForCreate}
                 setShowCreateTask={setShowCreateTask}
+                changeStatusTask={changeStatusTask}
               />
             );
           })}

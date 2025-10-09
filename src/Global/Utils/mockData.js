@@ -107,7 +107,7 @@ export const statusOptions = [
 
 export const sections = [
   "ongoing",
-  "in-queue",
+  "inqueue",
   "pending",
   // "finished",
   "review",
@@ -116,7 +116,7 @@ export const sections = [
 
 export const sectionTitles = {
   ongoing: "Ongoing",
-  "in-queue": "In Queue",
+  inqueue: "In Queue",
   pending: "Pending",
   finished: "Finished",
   review: "Under Review",

@@ -17,6 +17,7 @@ const TaskSection = ({
   handleEnd,
   moveTask,
   setSelectedTask,
+  changeStatusTask,
 }) => {
 
   return (
@@ -52,6 +53,7 @@ const TaskSection = ({
                 handleEnd={handleEnd}
                 moveTask={moveTask}
                 onClick={() => setSelectedTask({ task, userId })}
+                changeStatusTask={changeStatusTask}
               />
             ))
           ) : (

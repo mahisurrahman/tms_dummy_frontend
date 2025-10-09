@@ -23,7 +23,3 @@ export function formatReadableDateTime(isoString) {
 
   return `${day}${ordinal} ${month}, ${year}, ${time}`;
 }
-
-// Example:
-console.log(formatReadableDateTime("2025-10-08T21:06:00.500Z"));
-// Output: "8th Oct, 2025, 9:06 PM"
