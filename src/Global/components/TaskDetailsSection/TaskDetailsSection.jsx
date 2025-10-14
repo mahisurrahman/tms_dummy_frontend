@@ -1,20 +1,45 @@
-import { Play, Square, Bell, Download, Pin } from "lucide-react";
-import { useState } from "react";
+import { Play, Square, Bell, Download, Pin, PauseCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import PriorityModal from "../PriorityModa/PriorityModal";
+import { formatReadableDateTime } from "../../Utils/formatReadableDateTime";
+import { getPriorityColor, getStatusColor } from "../../Utils/TaskUtils";
 
 export default function TaskDetailsSection({
+  data,
   onStatusChange,
   onPriorityChange,
 }) {
   const [showPriorityModal, setShowPriorityModal] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState("00:00:00");
 
-  // Define priorities with colors
+  useEffect(() => {
+    if (!data?.createdAt) return;
+
+    const updateTimer = () => {
+      const createdAt = new Date(data.createdAt);
+      const now = new Date();
+      const diffMs = now - createdAt;
+
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+      setElapsedTime(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [data?.createdAt, data.taskStatus]);
+
   const priorities = [
-    { value: "extreme", label: "Extreme", color: "#dc2626" },
     { value: "high", label: "High", color: "#ea580c" },
     { value: "medium", label: "Medium", color: "#d97706" },
     { value: "low", label: "Low", color: "#16a34a" },
-    { value: "extra", label: "Extra", color: "#9333ea" },
   ];
 
   const handlePriorityChange = (priority) => {
@@ -24,132 +49,127 @@ export default function TaskDetailsSection({
     setShowPriorityModal(false);
   };
 
-  const handleAddCustomPriority = () => {
-    // You can implement custom priority logic here
-    const customPriority = prompt("Enter custom priority name:");
-    if (customPriority && onPriorityChange) {
-      onPriorityChange(customPriority.toLowerCase());
-    }
-    setShowPriorityModal(false);
+  const getCurrentPriority = () => {
+    const priorityValue = data.taskDetails.taskPriority;
+    return {
+      label: priorityValue,
+      value: priorityValue.toLowerCase(),
+    };
   };
 
-  // Get current priority info
-  const currentPriority = priorities.find((p) => p.value === "low") || {
-    label: "Low",
-    color: "#16a34a",
+  const currentPriority = getCurrentPriority();
+
+  const getStatusInfo = () => {
+    const status = data.taskStatus.toLowerCase();
+    const gradient = getStatusColor(status);
+
+    switch (status) {
+      case "ongoing":
+        return {
+          text: "Ongoing",
+          gradient: gradient,
+          hover: "from-blue-700 to-sky-500",
+        };
+      case "completed":
+        return {
+          text: "Completed",
+          gradient: gradient,
+          hover: "from-green-700 to-emerald-500",
+        };
+      case "pending":
+      default:
+        return {
+          text: "Pending",
+          gradient: gradient,
+          hover: "from-gray-700 to-gray-500",
+        };
+    }
   };
+
+  const statusInfo = getStatusInfo();
 
   return (
     <>
       <div className="bg-white border-4 border-green-500 rounded-2xl p-4 w-full">
-        {/* Header with title and status */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              Task Title:{" "}
-              <span className="text-orange-600">Ongoing Task 1</span>
-            </h2>
-          </div>
-          <div className="flex flex-col items-end gap-1">
+        <div className="grid grid-cols-2 gap-x-2 mb-2 w-full items-center">
+          <div className="w-full bg-orange-100 p-2 rounded-lg flex justify-center items-center">
+            <span className="font-semibold">Priority:</span>
             <button
-              onClick={onStatusChange}
-              className="bg-gradient-to-r from-blue-600 to-sky-400 text-white px-3 py-1 rounded cursor-pointer text-xs font-medium"
+              className={`ml-2 bg-gradient-to-r ${getPriorityColor(
+                currentPriority.label
+              )} text-white px-3 py-0.5 rounded text-sm font-medium cursor-pointer transition-all`}
             >
-              Ongoing
+              {currentPriority.label}
             </button>
-            <span className="text-yellow-600 text-2xl font-bold">00:45:00</span>
+          </div>
+
+          <div className="w-full bg-blue-100 p-2 rounded-lg flex justify-center gap-x-2">
+            <span className="font-bold">Task Status:</span>
+            <button
+              className={`bg-gradient-to-r ${statusInfo.gradient} capitalize animate-pulse text-white px-4 py-1 rounded text-xs font-medium transition-all`}
+            >
+              {data?.taskStatus}
+            </button>
           </div>
         </div>
+        {data?.taskStatus === "ongoing" && (
+          <div className="bg-red-50 px-2 grid grid-cols-2 gap-x-4 py-2 border-t border-b justify-between items-center mb-5">
+            <div>
+              <h1 className="flex items-center font-extrabold text-3xl gap-x-2">
+                <span className="capitalize">{data?.taskStatus}: </span>
+                {elapsedTime}
+              </h1>
+            </div>
 
-        {/* Priority badge - Now clickable */}
-        <div className="-mt-10 mb-4">
-          <span className="font-semibold">Priority:</span>
-          <button
-            onClick={() => setShowPriorityModal(true)}
-            className="ml-2 bg-gradient-to-r from-green-500 to-lime-600 text-white px-3 py-1 rounded text-sm font-medium cursor-pointer hover:from-green-600 hover:to-lime-700 transition-all"
-            style={{
-              background:
-                currentPriority.value === "low"
-                  ? "linear-gradient(to right, #16a34a, #22c55e)"
-                  : `linear-gradient(to right, ${currentPriority.color}, ${currentPriority.color})`,
-            }}
-          >
-            {currentPriority.label}
-          </button>
+            <div className="flex gap-1 ">
+              <button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center">
+                <Play className="w-3 h-3 mr-1" />
+                Start
+              </button>
+              <button className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center">
+                <PauseCircle className="w-3 h-3 mr-1" />
+                Pause
+              </button>
+            </div>
+          </div>
+        )}
+        <div className="space-y-0.5 text-sm text-gray-700 mb-8">
+          <div>
+            <span className="font-bold">Assigned By:</span>{" "}
+            {data?.creatorDetails?.username}
+          </div>
+          <div>
+            <span className="font-bold">Assigned Date:</span>{" "}
+            {formatReadableDateTime(data?.taskDetails?.assignedDate)}
+          </div>
+          <div className="text-red-600 text-3xl">
+            <span className="font-bold">Expected Deadline:</span>{" "}
+            {formatReadableDateTime(data?.taskDetails?.expectedDeadline)}
+          </div>
         </div>
-
-        {/* Rest of your component remains the same */}
-        <div className="space-y-1 text-sm text-gray-700 mb-4">
-          <div>
-            <span className="font-bold">Assigned By:</span> Admin
-          </div>
-          <div>
-            <span className="font-bold">Assigned Date:</span> 2025-09-11, 11:00
-            AM
-          </div>
-          <div>
-            <span className="font-bold">Project Title:</span> DOL
-          </div>
-          <div className="text-red-600">
-            <span className="font-bold">Expected Deadline:</span> 2025-01-20,
-            12:00 PM
-          </div>
-        </div>
-
-        {/* Task Description */}
         <div className="mb-4">
           <h3 className="font-bold text-gray-800 mb-1">Task Description:</h3>
-          <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
-            Complete the user authentication module with login, registration,
-            and password recovery features. Ensure all security protocols are
-            implemented according to company standards.
-          </p>
-        </div>
-
-        {/* Task Attachments */}
-        <div className="mb-4">
-          <h3 className="font-bold text-gray-800 mb-2">Task Attachments:</h3>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center mr-2">
-                  <span className="text-xs font-bold text-blue-600">PDF</span>
-                </div>
-                <span className="text-sm text-gray-700">requirements.pdf</span>
-              </div>
-              <button className="text-blue-600 hover:text-blue-800 p-1">
-                <Download className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center mr-2">
-                  <span className="text-xs font-bold text-green-600">DOC</span>
-                </div>
-                <span className="text-sm text-gray-700">guidelines.docx</span>
-              </div>
-              <button className="text-blue-600 hover:text-blue-800 p-1">
-                <Download className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200 whitespace-pre-wrap">
+            {data?.taskDetails?.taskDescription}
           </div>
         </div>
-
-        {/* Assigned To Section */}
         <div className="mb-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-bold text-gray-800 mb-1">Assigned To:</h3>
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2">
-                  JS
+                  {data?.assignedToDetails?.username
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </div>
                 <div>
                   <span className="text-sm font-medium text-gray-800">
-                    John Smith
+                    {data?.assignedToDetails?.username}
                   </span>
                   <span className="text-xs text-gray-600 ml-2">
-                    (Senior Developer)
+                    ({data?.assignedToDetails?.designation})
                   </span>
                 </div>
               </div>
@@ -160,16 +180,43 @@ export default function TaskDetailsSection({
             </button>
           </div>
         </div>
+        {/* Action buttons - conditionally render based on status */}
+        {/* <div className="w-full grid grid-cols-2 gap-2">
+          {data.taskStatus.toLowerCase() !== "completed" && (
+            <>
+              <button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-sm py-2 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center">
+                <Play className="w-3 h-3 mr-1" />
+                {data.taskStatus.toLowerCase() === "ongoing"
+                  ? "Resume"
+                  : "Start"}
+              </button>
+              <button className="w-full bg-gradient-to-r from-red-700 to-pink-700 text-white text-sm py-2 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center">
+                <Square className="w-3 h-3 mr-1" />
+                {data.taskStatus.toLowerCase() === "ongoing" ? "Pause" : "End"}
+              </button>
+            </>
+          )}
+          {data.taskStatus.toLowerCase() === "completed" && (
+            <button className="col-span-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm py-2 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-gray-700 hover:to-gray-800 transition-all flex items-center justify-center">
+              <Play className="w-3 h-3 mr-1" />
+              Reopen Task
+            </button>
+          )}
+        </div> */}
 
-        {/* Action buttons */}
-        <div className="w-full grid grid-cols-2 gap-2">
-          <button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-sm py-2 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center">
-            <Play className="w-3 h-3 mr-1" />
-            Start
+        <div className="w-full flex items-center gap-x-2">
+          <button
+            onClick={onStatusChange}
+            className="w-full py-3 bg-blue-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-blue-800"
+          >
+            Change Status
           </button>
-          <button className="w-full bg-gradient-to-r from-red-700 to-pink-700 text-white text-sm py-2 px-1 rounded shadow-sm shadow-black cursor-pointer hover:from-red-600 hover:to-pink-600 transition-all flex items-center justify-center">
-            <Square className="w-3 h-3 mr-1" />
-            End
+
+          <button
+            onClick={() => setShowPriorityModal(true)}
+            className="w-full py-3 bg-orange-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-orange-800"
+          >
+            Change Priority
           </button>
         </div>
       </div>
@@ -179,7 +226,7 @@ export default function TaskDetailsSection({
         <PriorityModal
           priorities={priorities}
           onPriorityChange={handlePriorityChange}
-          onAddCustom={handleAddCustomPriority}
+          // onAddCustom={handleAddCustomPriority}
           onClose={() => setShowPriorityModal(false)}
         />
       )}

@@ -1,11 +1,6 @@
 import React from "react";
 
-const PriorityModal = ({
-  priorities,
-  onPriorityChange,
-  onClose,
-  onAddCustom,
-}) => {
+const PriorityModal = ({ priorities, onPriorityChange, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60 p-4">
       <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
@@ -29,12 +24,12 @@ const PriorityModal = ({
             </button>
           ))}
         </div>
-        <button
+        {/* <button
           onClick={onAddCustom}
           className="mt-4 w-full py-3 bg-blue-100 hover:bg-blue-200 rounded-lg text-blue-700 font-medium transition-all"
         >
           Add Custom Priority
-        </button>
+        </button> */}
         <button
           onClick={onClose}
           className="mt-2 w-full py-3 bg-red-100 hover:bg-red-200 rounded-lg text-red-700 font-medium transition-all"

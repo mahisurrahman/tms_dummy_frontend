@@ -22,14 +22,14 @@ const UserColumn = ({
   changeStatusTask,
 }) => {
   return (
-    <div className="w-[45vw] md:w-[40vw] lg:w-[20vw] bg-transparent p-2 md:p-4">
+    <div className="w-[45vw] md:w-[19vw] bg-transparent p-2 md:p-4">
       <div className="mb-2 md:mb-4 border rounded-lg pt-2 px-4 border-white/20 bg-white/20 backdrop-blur-3xl">
         <div className="flex items-center justify-between mb-1 md:mb-2">
           <div className="flex items-center space-x-2 md:space-x-3">
             <div
               className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center ${
                 user.status === true ? "bg-green-500" : "bg-red-500"
-              } text-white font-bold text-xs md:text-sm`}
+              } text-white font-bold text-xs md:text-xs`}
             >
               {user.username
                 .split(" ")
@@ -37,7 +37,7 @@ const UserColumn = ({
                 .join("")}
             </div>
             <div>
-              <h3 className="font-bold text-white text-sm md:text-base">
+              <h3 className="font-bold text-white text-sm md:text-xs">
                 {user.username}
               </h3>
               <p className="text-xs md:text-sm text-white/70">

@@ -5,6 +5,7 @@ import StatusModal from "../StatusModal/StatusModal.jsx";
 import CommentsSection from "../CommentsSection/CommentsSection.jsx";
 import TaskModalHeader from "../TaskModalHeader/TaskModalHeader.jsx";
 import PriorityModal from "../PriorityModa/PriorityModal.jsx";
+import { formatReadableDateTime } from "../../Utils/formatReadableDateTime.js";
 
 const TaskModal = ({
   data,
@@ -14,9 +15,12 @@ const TaskModal = ({
   sectionTitles,
   moveTask,
   updateTask,
+  changeStatusTask,
 }) => {
   const { task, userId } = data;
+
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
   const [newReply, setNewReply] = useState("");
@@ -102,21 +106,30 @@ const TaskModal = ({
     setReplyingTo(null);
   };
 
-  const handleStatusChange = (status) => {
-    const newStat = status;
-    moveTask(userId, task.id, newStat);
-    updateTask(userId, task.id, {
-      history: [
-        ...task.history,
-        {
-          status: newStat,
-          date: new Date().toISOString().split("T")[0],
-        },
-      ],
-    });
-    setShowStatusModal(false);
-  };
+  const handleStatusChange = async (newStatus) => {
+    try {
+      setStatusLoading(true);
+      const startTime = task?.startTime;
+      const endTime = new Date().toISOString();
 
+      if (changeStatusTask) {
+        await changeStatusTask(
+          task._id,
+          task?.taskId,
+          newStatus,
+          startTime,
+          endTime
+        );
+      }
+
+      setShowStatusModal(false);
+      // Remove onClose() to keep modal open
+    } catch (error) {
+      console.error("Failed to change status:", error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
   const handlePriorityChange = (priority) => {
     updateTask(userId, task.id, {
       priority: priority,
@@ -124,21 +137,11 @@ const TaskModal = ({
     setShowPriorityModal(false);
   };
 
-  const handleAddCustomPriority = () => {
-    const customPriority = prompt("Enter custom priority name:");
-    if (customPriority) {
-      updateTask(userId, task.id, {
-        priority: customPriority.toLowerCase(),
-      });
-    }
-    setShowPriorityModal(false);
-  };
-
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-xl flex items-center justify-center z-50 p-4">
       <div className="bg-transparent rounded-2xl max-w-4xl w-full max-h-[100vh] overflow-y-auto">
         <TaskModalHeader
-          title={task.title}
+          title={task?.taskDetails?.taskTitle}
           onClose={onClose}
           onStatusChange={() => setShowStatusModal(true)}
         />
@@ -146,6 +149,7 @@ const TaskModal = ({
         <div className="space-y-6">
           <div className="mt-5">
             <TaskDetailsSection
+              data={task}
               onStatusChange={() => setShowStatusModal(true)}
             />
           </div>
@@ -171,8 +175,10 @@ const TaskModal = ({
           <StatusModal
             sections={sections}
             sectionTitles={sectionTitles}
+            currentStatus={task?.taskStatus}
             onStatusChange={handleStatusChange}
             onClose={() => setShowStatusModal(false)}
+            loading={statusLoading} // Pass loading state
           />
         )}
 
@@ -186,7 +192,6 @@ const TaskModal = ({
               { value: "extra", label: "Extra", color: "#9333ea" },
             ]}
             onPriorityChange={handlePriorityChange}
-            onAddCustom={handleAddCustomPriority}
             onClose={() => setShowPriorityModal(false)}
           />
         )}

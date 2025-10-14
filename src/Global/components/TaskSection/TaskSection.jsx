@@ -19,7 +19,6 @@ const TaskSection = ({
   setSelectedTask,
   changeStatusTask,
 }) => {
-
   return (
     <div key={status}>
       <div
@@ -36,12 +35,12 @@ const TaskSection = ({
         />
       </div>
       {isExpanded && (
-        <div className="space-y-3">
+        <div className="gap-y-1">
           {tasks?.length > 0 ? (
             tasks.map((task, index) => (
               <TaskCard
                 key={task?._id}
-                index={index + 1}
+                index={index}
                 task={task}
                 userTask={task}
                 userId={userId}

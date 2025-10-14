@@ -166,7 +166,7 @@ function KanbanBoard() {
                     return {
                       ...task,
                       taskStatus: newStatus.toLowerCase(),
-                      startTime: new Date().toISOString(), // Add this line!
+                      startTime: new Date().toISOString(),
                     };
                   }
                   return task;
@@ -174,6 +174,8 @@ function KanbanBoard() {
               });
               return updated;
             });
+
+            toast.success("Status Changed"); // MOVE THIS HERE - only show once
           } else {
             toast.error(
               "Task Status updated but failed to create new Task Log"
@@ -334,7 +336,7 @@ function KanbanBoard() {
             />
 
             {loading ? (
-              <div className="w-full h-full text-center flex items-center justify-center text-4xl font-extrabold text-white">
+              <div className="w-full text-center flex items-center justify-center text-4xl font-extrabold text-white">
                 <h1>Loading ....</h1>
               </div>
             ) : (
@@ -389,6 +391,7 @@ function KanbanBoard() {
               sectionTitles={sectionTitles}
               moveTask={moveTask}
               updateTask={updateTask}
+              changeStatusTask={changeStatusTask} // Add this line
             />
           )}
 
