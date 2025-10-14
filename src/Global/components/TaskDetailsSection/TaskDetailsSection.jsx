@@ -12,6 +12,8 @@ export default function TaskDetailsSection({
   const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
 
+  console.log(data, "Data files");
+
   useEffect(() => {
     if (!data?.createdAt) return;
 
@@ -112,37 +114,40 @@ export default function TaskDetailsSection({
             </button>
           </div>
         </div>
-        {data?.taskStatus === "ongoing" ||
-          (data?.taskStatus === "review" && (
-            <div className="bg-red-50 px-2 grid grid-cols-2 gap-x-4 py-2 border-t border-b justify-between items-center mb-5">
-              <div>
-                <h1 className="flex items-center font-extrabold text-3xl gap-x-2">
-                  <span className="capitalize">
-                    {data?.taskStatus === "review" ? (
-                      "Task Time"
-                    ) : (
-                      <>{data?.taskStatus}</>
-                    )}
-                    :{" "}
-                  </span>
-                  {elapsedTime}
-                </h1>
-              </div>
-
-              {data?.taskStatus === "ongoing" && (
-                <div className="flex gap-1 ">
-                  <button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center">
-                    <Play className="w-3 h-3 mr-1" />
-                    Start
-                  </button>
-                  <button className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center">
-                    <PauseCircle className="w-3 h-3 mr-1" />
-                    Pause
-                  </button>
-                </div>
-              )}
+        {data?.taskStatus === "ongoing" && (
+          <div className="bg-red-50 px-2 grid grid-cols-2 gap-x-4 py-2 border-t border-b justify-between items-center mb-5">
+            <div>
+              <h1 className="flex items-center font-extrabold text-3xl gap-x-2">
+                <span className="capitalize">{data?.taskStatus}:</span>
+                {elapsedTime}
+              </h1>
             </div>
-          ))}
+
+            {data?.taskStatus === "ongoing" && (
+              <div className="flex gap-1 ">
+                <button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center">
+                  <Play className="w-3 h-3 mr-1" />
+                  Start
+                </button>
+                <button className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center">
+                  <PauseCircle className="w-3 h-3 mr-1" />
+                  Pause
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {data?.taskStatus === "review" && (
+          <div className="bg-red-50 px-2 grid grid-cols-2 gap-x-4 py-2 border-t border-b justify-between items-center mb-5">
+            <div>
+              <h1 className="flex items-center font-extrabold text-3xl gap-x-2">
+                <span className="capitalize">Task Time :</span>
+                {elapsedTime}
+              </h1>
+            </div>
+          </div>
+        )}
         <div className="space-y-0.5 text-sm text-gray-700 mb-8">
           <div>
             <span className="font-bold">Assigned By:</span>{" "}
@@ -214,7 +219,7 @@ export default function TaskDetailsSection({
           )}
         </div> */}
 
-        {/* <div className="w-full flex items-center gap-x-2">
+        <div className="w-full flex items-center gap-x-2">
           <button
             onClick={onStatusChange}
             className="w-full py-3 bg-blue-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-blue-800"
@@ -228,7 +233,7 @@ export default function TaskDetailsSection({
           >
             Change Priority
           </button>
-        </div> */}
+        </div>
       </div>
 
       {/* Priority Modal */}

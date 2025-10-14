@@ -279,18 +279,18 @@ const TaskCard = ({
 
         {/* TIMER BUTTONS */}
         {task?.taskStatus?.toLowerCase() === "ongoing" && (
-          <div className="grid grid-cols-2 gap-x-2">
-            <button className="text-sm w-full text-[10px] py-1 bg-green-600 text-white rounded flex items-center gap-x-2 justify-center">
-              <PlayCircle size={12} /> Start
+          <div className="grid grid-cols-2 gap-x-2 mt-2">
+            <button className=" w-full text-[12px] py-1 bg-green-700 cursor-pointer hover:bg-green-800 text-white rounded flex items-center gap-x-1 justify-center">
+              <PlayCircle size={13} /> Start
             </button>
-            <button className="text-sm w-full  text-[10px] py-1 bg-yellow-600 text-white rounded flex items-center gap-x-2 justify-center">
-              <PauseCircle size={12} /> Pause
+            <button className=" w-full  text-[12px] py-1 bg-yellow-700 cursor-pointer hover:bg-yellow-800 text-white rounded flex items-center gap-x-1 justify-center">
+              <PauseCircle size={13} /> Pause
             </button>
           </div>
         )}
 
         {/* CHANGE STATUS BUTTON */}
-        {task?.taskDetails?.backlog === false && (
+        {/* {task?.taskDetails?.backlog === false && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -301,7 +301,7 @@ const TaskCard = ({
             <ClipboardList className="w-4 h-4" />
             Change Status
           </button>
-        )}
+        )} */}
       </div>
 
       {/* STATUS MODAL */}
