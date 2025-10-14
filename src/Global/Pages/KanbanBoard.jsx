@@ -127,11 +127,22 @@ function KanbanBoard() {
     endTime
   ) => {
     try {
-      // 1️⃣ Update the task status
-      const updateResponse = await taskLogAPI.updateTaskStatus(taskId, {
-        startTime,
-        endTime,
-      });
+      let updateResponse = null;
+      if (!newStatus === "ongoing") {
+        updateResponse = await taskLogAPI.updateTaskStatus(taskId, {
+          startTime,
+          endTime,
+          newStatus,
+          isStateComplete: true,
+        });
+      } else {
+        updateResponse = await taskLogAPI.updateTaskStatus(taskId, {
+          startTime,
+          endTime,
+          newStatus,
+          isStateComplete: false,
+        });
+      }
 
       if (updateResponse.error === false) {
         // 2️⃣ Find the original task log from current state
@@ -176,6 +187,7 @@ function KanbanBoard() {
             });
 
             toast.success("Status Changed"); // MOVE THIS HERE - only show once
+            setSelectedTask(null);
           } else {
             toast.error(
               "Task Status updated but failed to create new Task Log"

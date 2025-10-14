@@ -290,7 +290,7 @@ const TaskCard = ({
         )}
 
         {/* CHANGE STATUS BUTTON */}
-        {/* {task?.taskDetails?.backlog === false && (
+        {task?.taskDetails?.backlog === false && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -301,7 +301,7 @@ const TaskCard = ({
             <ClipboardList className="w-4 h-4" />
             Change Status
           </button>
-        )} */}
+        )}
       </div>
 
       {/* STATUS MODAL */}

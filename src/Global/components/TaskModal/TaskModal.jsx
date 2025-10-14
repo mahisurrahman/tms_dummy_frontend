@@ -155,7 +155,7 @@ const TaskModal = ({
           </div>
 
           <div>
-            <HorizontalTimeline />
+            <HorizontalTimeline task={task} />
           </div>
 
           <CommentsSection
