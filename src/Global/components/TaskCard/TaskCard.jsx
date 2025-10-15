@@ -44,10 +44,10 @@ const TaskCard = ({
   const statuses = ["Pending", "InQueue", "Ongoing", "Review", "Complete"];
 
   useEffect(() => {
-    if (!task?.assignedDate) return;
+    if (!task?.startTime) return;
 
     const updateElapsed = () => {
-      const assigned = new Date(task.assignedDate);
+      const assigned = new Date(task.startTime);
       const now = new Date();
       const diff = Math.floor((now - assigned) / 1000);
 
@@ -65,13 +65,13 @@ const TaskCard = ({
     updateElapsed();
     const interval = setInterval(updateElapsed, 1000);
     return () => clearInterval(interval);
-  }, [task?.assignedDate]);
+  }, [task?.startTime]);
 
   useEffect(() => {
     if (!task?.startTime) return;
 
     const updateStatusElapsed = () => {
-      const start = new Date(task.startTime);
+      const start = new Date(task?.startTime);
       const now = new Date();
       const diff = Math.floor((now - start) / 1000);
 
@@ -135,7 +135,7 @@ const TaskCard = ({
           {!isBacklog && task?.taskStatus === "ongoing" && (
             <div className="w-full flex items-center justify-center">
               {/* Status Duration */}
-              {task?.startTime && (
+              {task?.startTime !== 0 && (
                 <div className="mb-2 flex items-center gap-x-2 justify-center">
                   <div className="flex items-center justify-center gap-1.5 text-blue-700">
                     <span className="text-sm text-center font-semibold capitalize">

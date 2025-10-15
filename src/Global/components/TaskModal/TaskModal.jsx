@@ -8,7 +8,7 @@ import PriorityModal from "../PriorityModa/PriorityModal.jsx";
 import { formatReadableDateTime } from "../../Utils/formatReadableDateTime.js";
 
 const TaskModal = ({
-  data,
+  task,
   onClose,
   users,
   sections,
@@ -17,7 +17,9 @@ const TaskModal = ({
   updateTask,
   changeStatusTask,
 }) => {
-  const { task, userId } = data;
+  // console.log(data, "DAta");
+  console.log(task, "task");
+  // const { task, userId } = data;
 
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
@@ -158,7 +160,7 @@ const TaskModal = ({
             <HorizontalTimeline task={task} />
           </div>
 
-          <CommentsSection
+          {/* <CommentsSection
             comments={task.comments}
             replyingTo={replyingTo}
             newComment={newComment}
@@ -168,7 +170,7 @@ const TaskModal = ({
             onAddReply={handleAddReply}
             editorRef={commentEditorRef}
             onClose={onClose}
-          />
+          /> */}
         </div>
 
         {showStatusModal && (

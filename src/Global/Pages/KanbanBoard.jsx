@@ -27,6 +27,7 @@ import { AuthContext } from "../../provider/AuthProvider";
 import { useNavigate } from "react-router";
 import { taskAPI } from "../../api/endpoints/task.api";
 import { taskLogAPI } from "../../api/endpoints/taskLog.api";
+import TaskModalWrapper from "../Wrapper/TaskModalWrapper";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -177,7 +178,6 @@ function KanbanBoard() {
                     return {
                       ...task,
                       taskStatus: newStatus.toLowerCase(),
-                      startTime: new Date().toISOString(),
                     };
                   }
                   return task;
@@ -395,7 +395,7 @@ function KanbanBoard() {
           </div>
 
           {selectedTask && (
-            <TaskModal
+            <TaskModalWrapper
               data={selectedTask}
               onClose={() => setSelectedTask(null)}
               users={users}
@@ -403,7 +403,9 @@ function KanbanBoard() {
               sectionTitles={sectionTitles}
               moveTask={moveTask}
               updateTask={updateTask}
-              changeStatusTask={changeStatusTask} // Add this line
+              changeStatusTask={changeStatusTask}
+              selectedTask={selectedTask}
+              setSelectedTask={setSelectedTask}
             />
           )}
 

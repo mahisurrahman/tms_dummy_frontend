@@ -15,15 +15,39 @@ export const taskLogAPI = {
       "Failed to Fetch all the Tasks log"
     ),
 
+  startTask: (id) =>
+    handleRequest(
+      apiClient.get(`${baseMiddlePoint}/start/${id}`),
+      "Failed to Start Tasks"
+    ),
+
+  pauseTask: (id) =>
+    handleRequest(
+      apiClient.get(`${baseMiddlePoint}/pause/${id}`),
+      "Failed to Pause Tasks "
+    ),
+
+  resumeTask: (id) =>
+    handleRequest(
+      apiClient.get(`${baseMiddlePoint}/resume/${id}`),
+      "Failed to Resume Tasks "
+    ),
+
   getTaskLogFilter: (payload) =>
     handleRequest(
       apiClient.post(`${baseMiddlePoint}/filterTasks/all`, payload),
       "FAiled to fetch all the task log filters. "
     ),
 
-  updateTaskStatus:(params, payload)=>
+  getTaskLogById: (id) =>
+    handleRequest(
+      apiClient.get(`${baseMiddlePoint}/srcById/${id}`),
+      "FAiled to fetch the task log by id. "
+    ),
+
+  updateTaskStatus: (params, payload) =>
     handleRequest(
       apiClient.post(`${baseMiddlePoint}/updateStatus/${params}`, payload),
-      "Failed to Update task status",
-    )
+      "Failed to Update task status"
+    ),
 };
