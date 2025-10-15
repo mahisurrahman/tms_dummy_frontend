@@ -21,24 +21,13 @@ export default function TaskDetailsSection({
   const startTask = async () => {
     try {
       const response = await taskLogAPI.startTask(data?._id);
-      const totalOnGoing = response.data.totalOnGoingTime;
-      if (totalOnGoing === 0) {
-        setStartClicked(true);
-        setLocalStartTime(new Date());
-        setIsPaused(false);
-      } else {
-        // const elapsedTime = totalOnGoing; // your elapsed time
-        // const [hours, minutes, seconds] = elapsedTime.split(":").map(Number);
-        // const elapsedMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
-        // const futureDate = new Date(Date.now() + elapsedMs);
-        // console.log(futureDate, "future date");
-        // console.log(new Date());
-        // console.log(new Date(totalOnGoing), "NEw DAte");
-        // console.log(totalOnGoing, "totalOnGoing");
-        setLocalStartTime(totalOnGoing);
-        setStartClicked(true);
-        setIsPaused(false);
-      }
+      const totalOnGoing = response.data.totalOnGoingTime || 0;
+
+      data.totalOnGoingTime = totalOnGoing;
+
+      setStartClicked(true);
+      setLocalStartTime(new Date());
+      setIsPaused(false);
     } catch (error) {
       console.log(error, "Failed to start Task");
     }
@@ -47,20 +36,41 @@ export default function TaskDetailsSection({
   const pauseTask = async () => {
     try {
       const response = await taskLogAPI.pauseTask(data?._id);
+      const updatedTotal = response.data.totalOnGoingTime;
+
       setIsPaused(true);
       if (timerInterval) {
         clearInterval(timerInterval);
         setTimerInterval(null);
-        // setElapsedTime(timerInterval);
-        // Remove this line - don't set elapsedTime from response
-        // setElapsedTime(response?.data?.totalOnGoingTime);
       }
-      // The elapsed time will be updated automatically in the useEffect
-      // because isPaused and data?.totalOnGoingTime will change
+
+      // ✅ Update elapsed time & local data
+      if (updatedTotal) {
+        let totalMs;
+        if (typeof updatedTotal === "string") {
+          const [h, m, s] = updatedTotal.split(":").map(Number);
+          totalMs = (h * 3600 + m * 60 + s) * 1000;
+        } else {
+          totalMs = updatedTotal;
+        }
+
+        const hours = Math.floor(totalMs / (1000 * 60 * 60));
+        const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+        setElapsedTime(
+          `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+        );
+      }
+
+      // ✅ Most important: update `data` with new totalOnGoingTime
+      data.totalOnGoingTime = updatedTotal;
     } catch (error) {
       console.log(error, "Failed to pause Task");
     }
   };
+
   // First useEffect - Sync with backend data
   useEffect(() => {
     if (data?.isPause !== undefined) {

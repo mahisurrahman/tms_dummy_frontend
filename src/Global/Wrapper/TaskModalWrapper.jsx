@@ -16,17 +16,14 @@ function TaskModalWrapper({
   selectedTask,
   setSelectedTask,
 }) {
-  console.log(data, "Data on WRapper");
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
   const { userId } = useContext(AuthContext);
 
   const fetchTaskLogByTaskLogId = async () => {
-    console.log("hit");
     try {
       setLoading(true);
       const response = await taskLogAPI.getTaskLogById(data?.task?._id);
-      console.log(response, "Task Log Data");
       setTask(response.data);
       setLoading(false);
     } catch (error) {
@@ -40,9 +37,6 @@ function TaskModalWrapper({
       fetchTaskLogByTaskLogId();
     }
   }, [data]);
-
-  console.log(task, "TAsk from wrapper");
-
   return (
     <div>
       {loading === false && task ? (
