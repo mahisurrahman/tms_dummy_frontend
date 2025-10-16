@@ -274,7 +274,7 @@ function KanbanBoard() {
       }
 
       const response = await taskAPI.create(payload);
-      if (response.error === false) {
+      if (response.data) {
         if (formData.assignedTo !== "") {
           const taskLogPayload = {
             startTime: new Date(),
@@ -286,7 +286,7 @@ function KanbanBoard() {
             creatorId: user._id,
           };
           const taskLogResponse = await taskLogAPI.create(taskLogPayload);
-          if (taskLogResponse.error === false) {
+          if (taskLogResponse.data) {
             fetchUsers();
             toast.success("Task Created Sir !!");
             setShowCreateTask(false);
