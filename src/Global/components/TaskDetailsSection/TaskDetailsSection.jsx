@@ -10,7 +10,6 @@ export default function TaskDetailsSection({
   onStatusChange,
   onPriorityChange,
 }) {
-  console.log(data, "dataaaa");
   const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [startClicked, setStartClicked] = useState(false);

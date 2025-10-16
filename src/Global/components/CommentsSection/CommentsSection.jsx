@@ -5,14 +5,12 @@ import SimpleTextEditor from "../SimpleTextEditor/SimpleTextEditor";
 
 const CommentsSection = ({
   comments,
-  replyingTo,
   newComment,
   onCommentChange,
   onAddComment,
-  onReply,
-  onAddReply,
   editorRef,
   onClose,
+  commentDelete,
 }) => {
   return (
     <div className="bg-white rounded-2xl p-6 border-4 border-blue-600">
@@ -21,12 +19,7 @@ const CommentsSection = ({
         Comments & Updates
       </h3>
 
-      <CommentList
-        comments={comments}
-        replyingTo={replyingTo}
-        onReply={onReply}
-        onAddReply={onAddReply}
-      />
+      <CommentList comments={comments} commentDelete={commentDelete} />
 
       <div className="mt-4">
         <SimpleTextEditor

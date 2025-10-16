@@ -1,7 +1,7 @@
 import React from "react";
 import Comment from "../Comment/Comment";
 
-const CommentList = ({ comments, replyingTo, onReply, onAddReply }) => {
+const CommentList = ({ comments, commentDelete }) => {
   if (!comments || comments.length === 0) {
     return <p className="text-gray-500 text-center">No comments yet</p>;
   }
@@ -12,9 +12,7 @@ const CommentList = ({ comments, replyingTo, onReply, onAddReply }) => {
         <Comment
           key={comment.id}
           comment={comment}
-          onReply={onReply}
-          replyingTo={replyingTo}
-          onAddReply={onAddReply}
+          commentDelete={commentDelete}
         />
       ))}
     </div>

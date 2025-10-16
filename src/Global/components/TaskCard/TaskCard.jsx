@@ -1,24 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
   Flag,
-  Play,
-  Pause,
-  Square,
+  PlayCircle,
+  PauseCircle,
   ClipboardList,
   Calendar,
   User,
-  Clock,
-  Target,
-  PlayCircle,
-  PauseCircle,
 } from "lucide-react";
-import {
-  getPriorityColor,
-  getStatusColor,
-  getStatusIcon,
-} from "../../Utils/TaskUtils";
+import { getPriorityColor, getStatusColor } from "../../Utils/TaskUtils";
 import { formatReadableDateTime } from "../../Utils/formatReadableDateTime";
 import { truncateText } from "../../Utils/truncateText";
+import { taskLogAPI } from "../../../api/endpoints/taskLog.api";
 
 const TaskCard = ({
   index,
@@ -26,34 +18,98 @@ const TaskCard = ({
   userTask,
   isBacklog = false,
   userId,
-  timers,
-  formatSecondsToTime,
-  handleStart,
-  handlePause,
-  handleResume,
-  handleEnd,
   moveTask,
   onClick,
   changeStatusTask,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(""); // Since Assigned
-  const [statusElapsedTime, setStatusElapsedTime] = useState(""); // Status Duration
+  const [isPaused, setIsPaused] = useState(task?.isPause || false);
+  const [elapsedTime, setElapsedTime] = useState("00:00:00");
+  const [startClicked, setStartClicked] = useState(false);
+  const [localStartTime, setLocalStartTime] = useState(null);
+  const [timerInterval, setTimerInterval] = useState(null);
 
   const statuses = ["Pending", "InQueue", "Ongoing", "Review", "Complete"];
 
+  // First useEffect - Sync with backend data
   useEffect(() => {
-    if (!task?.startTime) return;
+    if (task?.isPause !== undefined) {
+      setIsPaused(task.isPause);
+    }
 
-    const updateElapsed = () => {
-      const assigned = new Date(task.startTime);
+    if (task?.startTime && task.startTime !== 0) {
+      setStartClicked(true);
+    }
+
+    if (!task?.startTime || task.startTime === 0) {
+      setStartClicked(false);
+      setLocalStartTime(null);
+      setElapsedTime("00:00:00");
+    }
+  }, [task?.startTime, task?.isPause]);
+
+  // Second useEffect - Timer logic
+  useEffect(() => {
+    if (isPaused && task?.totalOnGoingTime) {
+      let totalMs;
+      if (typeof task.totalOnGoingTime === "string") {
+        const [hours, minutes, seconds] = task.totalOnGoingTime
+          .split(":")
+          .map(Number);
+        totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
+      } else {
+        totalMs = task.totalOnGoingTime;
+      }
+
+      const hours = Math.floor(totalMs / (1000 * 60 * 60));
+      const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+
+      setElapsedTime(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+      return;
+    }
+
+    if ((!task?.startTime || task.startTime === 0) && !startClicked) {
+      setElapsedTime("00:00:00");
+      return;
+    }
+
+    const startTime = startClicked
+      ? localStartTime
+      : task?.startTime
+      ? new Date(task.startTime)
+      : null;
+
+    if (!startTime) return;
+
+    const updateTimer = () => {
       const now = new Date();
-      const diff = Math.floor((now - assigned) / 1000);
+      const currentSessionMs = now - startTime;
 
-      const hours = Math.floor(diff / 3600);
-      const minutes = Math.floor((diff % 3600) / 60);
-      const seconds = diff % 60;
+      let existingTotalMs = 0;
+      if (task?.totalOnGoingTime) {
+        if (typeof task.totalOnGoingTime === "string") {
+          const [hours, minutes, seconds] = task.totalOnGoingTime
+            .split(":")
+            .map(Number);
+          existingTotalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
+        } else {
+          existingTotalMs = task.totalOnGoingTime;
+        }
+      }
+
+      const totalDiffMs = currentSessionMs + existingTotalMs;
+
+      const hours = Math.floor(totalDiffMs / (1000 * 60 * 60));
+      const minutes = Math.floor(
+        (totalDiffMs % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      const seconds = Math.floor((totalDiffMs % (1000 * 60)) / 1000);
 
       setElapsedTime(
         `${hours.toString().padStart(2, "0")}:${minutes
@@ -62,34 +118,112 @@ const TaskCard = ({
       );
     };
 
-    updateElapsed();
-    const interval = setInterval(updateElapsed, 1000);
-    return () => clearInterval(interval);
-  }, [task?.startTime]);
+    updateTimer();
 
-  useEffect(() => {
-    if (!task?.startTime) return;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
 
-    const updateStatusElapsed = () => {
-      const start = new Date(task?.startTime);
-      const now = new Date();
-      const diff = Math.floor((now - start) / 1000);
+    const interval = setInterval(updateTimer, 1000);
+    setTimerInterval(interval);
 
-      const hours = Math.floor(diff / 3600);
-      const minutes = Math.floor((diff % 3600) / 60);
-      const seconds = diff % 60;
-
-      setStatusElapsedTime(
-        `${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-      );
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
     };
+  }, [
+    task?.startTime,
+    task?.totalOnGoingTime,
+    localStartTime,
+    startClicked,
+    isPaused,
+  ]);
 
-    updateStatusElapsed();
-    const interval = setInterval(updateStatusElapsed, 1000);
-    return () => clearInterval(interval);
-  }, [task?.startTime]);
+  // Third useEffect - Additional sync with backend data
+  useEffect(() => {
+    if (task?.isPause !== undefined) {
+      setIsPaused(task.isPause);
+    }
+
+    if (task?.isPause && task?.totalOnGoingTime) {
+      if (typeof task.totalOnGoingTime === "string") {
+        setElapsedTime(task.totalOnGoingTime);
+      } else {
+        const totalMs = task.totalOnGoingTime;
+        const hours = Math.floor(totalMs / (1000 * 60 * 60));
+        const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+
+        setElapsedTime(
+          `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+        );
+      }
+    }
+
+    if (task?.startTime === 0 && !startClicked) {
+      setElapsedTime("00:00:00");
+    }
+  }, [task?.totalOnGoingTime, task?.startTime, startClicked]);
+
+  const startTask = async () => {
+    try {
+      const response = await taskLogAPI.startTask(task?._id);
+      const totalOnGoing = response.data.totalOnGoingTime || 0;
+
+      task.totalOnGoingTime = totalOnGoing;
+
+      if (task?.taskStatus === "pending") {
+        moveTask(userId, task._id, "ongoing");
+      }
+
+      setStartClicked(true);
+      setLocalStartTime(new Date());
+      setIsPaused(false);
+      setIsRunning(true);
+    } catch (error) {
+      console.log(error, "Failed to start Task");
+    }
+  };
+
+  const pauseTask = async () => {
+    try {
+      const response = await taskLogAPI.pauseTask(task?._id);
+      const updatedTotal = response.data.totalOnGoingTime;
+
+      setIsPaused(true);
+      setIsRunning(false);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        setTimerInterval(null);
+      }
+
+      if (updatedTotal) {
+        let totalMs;
+        if (typeof updatedTotal === "string") {
+          const [h, m, s] = updatedTotal.split(":").map(Number);
+          totalMs = (h * 3600 + m * 60 + s) * 1000;
+        } else {
+          totalMs = updatedTotal;
+        }
+
+        const hours = Math.floor(totalMs / (1000 * 60 * 60));
+        const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+        setElapsedTime(
+          `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+        );
+      }
+
+      task.totalOnGoingTime = updatedTotal;
+    } catch (error) {
+      console.log(error, "Failed to pause Task");
+    }
+  };
 
   const handleStatusChange = (newStatus) => {
     const startTime = task?.startTime;
@@ -100,8 +234,8 @@ const TaskCard = ({
 
   const priorityStyles = {
     High: "shadow-red-100 hover:shadow-red-200",
-    Medium: " shadow-amber-100 hover:shadow-amber-200",
-    Low: " shadow-emerald-100 hover:shadow-emerald-200",
+    Medium: "shadow-amber-100 hover:shadow-amber-200",
+    Low: "shadow-emerald-100 hover:shadow-emerald-200",
   };
 
   return (
@@ -134,24 +268,26 @@ const TaskCard = ({
           )}
           {!isBacklog && task?.taskStatus === "ongoing" && (
             <div className="w-full flex items-center justify-center">
-              {/* Status Duration */}
-              {task?.startTime !== 0 && (
-                <div className="mb-2 flex items-center gap-x-2 justify-center">
-                  <div className="flex items-center justify-center gap-1.5 text-blue-700">
-                    <span className="text-sm text-center font-semibold capitalize">
-                      <PlayCircle />
-                    </span>
-                  </div>
-                  <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
-                    {statusElapsedTime}
+              <div className="mb-2 flex items-center gap-x-2 justify-center">
+                <div className="flex items-center justify-center gap-1.5 text-blue-700">
+                  <span className="text-sm text-center font-semibold capitalize">
+                    <PlayCircle />
                   </span>
                 </div>
-              )}
+                <span className="text-md font-mono font-bold text-indigo-900 block mt-0.5">
+                  {elapsedTime}
+                  {isPaused && (
+                    <span className="text-yellow-600 text-sm ml-2">
+                      (Paused)
+                    </span>
+                  )}
+                </span>
+              </div>
             </div>
           )}
 
           {!isBacklog && (
-            <div className="grid grid-cols-2 items-start gap-x-2 ">
+            <div className="grid grid-cols-2 items-start gap-x-2">
               <div className="flex-1 w-full">
                 <div className="w-full flex items-center gap-2 mb-1">
                   <span
@@ -172,7 +308,6 @@ const TaskCard = ({
                     task?.taskStatus
                   )} text-white shadow-md`}
                 >
-                  {" "}
                   Status:
                   <span className="capitalize">{task?.taskStatus}</span>
                 </span>
@@ -181,22 +316,13 @@ const TaskCard = ({
           )}
         </div>
 
-        {/* DESCRIPTION */}
-        {/* {task?.taskDetails?.taskDescription && (
-          <div className="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100">
-            <p className="text-sm text-gray-700 leading-relaxed">
-              {truncateText(task?.taskDetails?.taskDescription, 150)}
-            </p>
-          </div>
-        )} */}
-
         {/* INFO GRID */}
         <div className="grid grid-cols-1 mb-1">
           <div className="flex items-center gap-2 text-sm">
             {!isBacklog ? (
               <div className="flex items-center gap-x-2">
                 <span className="text-[10px] font-semibold text-black block">
-                  Assigned By :
+                  Assigned By:
                 </span>
                 <span className="text-[10px] text-gray-900">
                   {task?.creatorDetails?.username}
@@ -205,7 +331,7 @@ const TaskCard = ({
             ) : (
               <div className="flex items-center gap-x-2">
                 <span className="text-[10px] font-semibold text-black block">
-                  Assigned By:{" "}
+                  Assigned By:
                 </span>
                 <span className="text-[10px] text-gray-900">
                   {task?.taskCreatedBy?.username}
@@ -217,7 +343,7 @@ const TaskCard = ({
           <div className="flex items-center gap-2 text-sm">
             <div className="flex items-center gap-x-2">
               <span className="text-[10px] font-semibold text-black block">
-                Assigned Date:{" "}
+                Assigned Date:
               </span>
               <span className="text-[10px] text-gray-900">
                 {formatReadableDateTime(task?.assignedDate)}
@@ -237,7 +363,7 @@ const TaskCard = ({
               </div>
             ) : (
               <div className="flex items-center gap-x-2">
-                <span className="text-[10px]font-semibold text-black block">
+                <span className="text-[10px] font-semibold text-black block">
                   Deadline
                 </span>
                 <span className="text-[10px] text-gray-900">
@@ -250,7 +376,7 @@ const TaskCard = ({
           <div className="flex items-center gap-2 text-sm">
             <div className="flex items-center flex-wrap gap-x-1 gap-y-1">
               <span className="text-[10px] font-semibold text-black block">
-                Label/Project :
+                Label/Project:
               </span>
               <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
                 DOL
@@ -280,28 +406,20 @@ const TaskCard = ({
         {/* TIMER BUTTONS */}
         {task?.taskStatus?.toLowerCase() === "ongoing" && (
           <div className="grid grid-cols-2 gap-x-2 mt-2">
-            <button className=" w-full text-[12px] py-1 bg-green-700 cursor-pointer hover:bg-green-800 text-white rounded flex items-center gap-x-1 justify-center">
+            <button
+              onClick={startTask}
+              className="w-full text-[12px] py-1 bg-green-700 cursor-pointer hover:bg-green-800 text-white rounded flex items-center gap-x-1 justify-center"
+            >
               <PlayCircle size={13} /> Start
             </button>
-            <button className=" w-full  text-[12px] py-1 bg-yellow-700 cursor-pointer hover:bg-yellow-800 text-white rounded flex items-center gap-x-1 justify-center">
+            <button
+              onClick={pauseTask}
+              className="w-full text-[12px] py-1 bg-yellow-700 cursor-pointer hover:bg-yellow-800 text-white rounded flex items-center gap-x-1 justify-center"
+            >
               <PauseCircle size={13} /> Pause
             </button>
           </div>
         )}
-
-        {/* CHANGE STATUS BUTTON */}
-        {/* {task?.taskDetails?.backlog === false && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowModal(true);
-            }}
-            className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-sm font-semibold py-3 shadow-md hover:shadow-lg hover:from-blue-700 hover:to-indigo-800 transition-all flex items-center justify-center gap-2"
-          >
-            <ClipboardList className="w-4 h-4" />
-            Change Status
-          </button>
-        )} */}
       </div>
 
       {/* STATUS MODAL */}

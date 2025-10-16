@@ -8,7 +8,6 @@ export default function HorizontalTimeline({ task }) {
   const fetchTimeLine = async () => {
     try {
       const response = await timelineApi.getAllTimeLine(task?.taskId);
-      console.log(response.data, "Timeline Response");
 
       // Safely transform backend data to a timeline-friendly format
       const formatted = response.data.map((item) => {

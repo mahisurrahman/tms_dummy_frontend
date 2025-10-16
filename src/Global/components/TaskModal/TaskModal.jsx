@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import TaskDetailsSection from "../TaskDetailsSection/TaskDetailsSection.jsx";
 import HorizontalTimeline from "../HorizontalTimeline/HorizontalTimeline.jsx";
 import StatusModal from "../StatusModal/StatusModal.jsx";
@@ -6,6 +6,9 @@ import CommentsSection from "../CommentsSection/CommentsSection.jsx";
 import TaskModalHeader from "../TaskModalHeader/TaskModalHeader.jsx";
 import PriorityModal from "../PriorityModa/PriorityModal.jsx";
 import { formatReadableDateTime } from "../../Utils/formatReadableDateTime.js";
+import { AuthContext } from "../../../provider/AuthProvider.jsx";
+import { commentsApi } from "../../../api/endpoints/comments.api.js";
+import toast from "react-hot-toast";
 
 const TaskModal = ({
   task,
@@ -17,95 +20,65 @@ const TaskModal = ({
   updateTask,
   changeStatusTask,
 }) => {
-  // console.log(data, "DAta");
-  console.log(task, "task");
-  // const { task, userId } = data;
-
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [replyingTo, setReplyingTo] = useState(null);
-  const [newReply, setNewReply] = useState("");
   const [showPriorityModal, setShowPriorityModal] = useState(false);
+  const [allComments, setAllComments] = useState([]);
   const commentEditorRef = useRef(null);
+  const { user } = useContext(AuthContext);
+  const userId = user?._id;
 
-  const calculateTotalTaskTime = () => {
-    if (!task.history || task.history.length === 0) return "0h 0m";
-    const startDate = new Date(task.history[0].date);
-    const endDate = new Date(task.history[task.history.length - 1].date);
-    const diffMs = endDate - startDate;
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
+  const fetchComments = async () => {
+    try {
+      const response = await commentsApi.getAllCommentByTaskId(task?.taskId);
+      setAllComments(response.data);
+    } catch (error) {
+      console.log(error, "Fetch Comments Failed");
+    }
   };
 
-  const handleAddComment = () => {
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
-    const newCom = {
-      id: `c${Date.now()}`,
-      author: "Current User",
-      text: newComment,
-      date: new Date().toISOString().split("T")[0],
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      status: task.status,
-      totalTime: calculateTotalTaskTime(),
-      replies: [],
+    // Create new comment object
+    const newCommentObj = {
+      taskLogId: task?._id,
+      taskId: task?.taskId,
+      userId: userId,
+      author: user?.username,
+      comment: newComment,
+      taskStatus: task?.taskStatus,
+      commentedOnTime: task?.totalOnGoingTime,
     };
 
-    updateTask(userId, task.id, {
-      comments: [...(task.comments || []), newCom],
-    });
+    const response = await commentsApi.create(newCommentObj);
+
+    if (response.data) {
+      toast.success("Comments Created");
+      fetchComments();
+    }
+
     setNewComment("");
     if (commentEditorRef.current) {
       commentEditorRef.current.clear();
     }
   };
 
-  const handleReply = (commentId) => {
-    setReplyingTo(replyingTo === commentId ? null : commentId);
-  };
-
-  const handleAddReply = (parentId) => {
-    if (!newReply.trim()) return;
-
-    const updateComments = (comments) =>
-      comments.map((c) => {
-        if (c.id === parentId) {
-          return {
-            ...c,
-            replies: [
-              ...(c.replies || []),
-              {
-                id: `r${Date.now()}`,
-                author: "Current User",
-                text: newReply,
-                date: new Date().toISOString().split("T")[0],
-                time: new Date().toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
-                status: task.status,
-                totalTime: calculateTotalTaskTime(),
-                replies: [],
-              },
-            ],
-          };
-        }
-        if (c.replies) {
-          return { ...c, replies: updateComments(c.replies) };
-        }
-        return c;
-      });
-
-    updateTask(userId, task.id, {
-      comments: updateComments(task.comments || []),
-    });
-    setNewReply("");
-    setReplyingTo(null);
+  const handleDeleteComment = async (id) => {
+    try {
+      const response = await commentsApi.removeComment(id);
+      if (response.data) {
+        toast.success("Comments Removed");
+        fetchComments();
+      }
+    } catch (error) {
+      console.log(error, "Remove Comment Failed");
+    }
   };
 
   const handleStatusChange = async (newStatus) => {
@@ -125,7 +98,6 @@ const TaskModal = ({
       }
 
       setShowStatusModal(false);
-      // Remove onClose() to keep modal open
     } catch (error) {
       console.error("Failed to change status:", error);
     } finally {
@@ -160,17 +132,15 @@ const TaskModal = ({
             <HorizontalTimeline task={task} />
           </div>
 
-          {/* <CommentsSection
-            comments={task.comments}
-            replyingTo={replyingTo}
+          <CommentsSection
+            comments={allComments}
             newComment={newComment}
             onCommentChange={setNewComment}
             onAddComment={handleAddComment}
-            onReply={handleReply}
-            onAddReply={handleAddReply}
             editorRef={commentEditorRef}
             onClose={onClose}
-          /> */}
+            commentDelete={handleDeleteComment}
+          />
         </div>
 
         {showStatusModal && (
