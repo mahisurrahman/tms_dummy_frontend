@@ -29,7 +29,7 @@ const UserColumns = ({
             return (
               <UserColumn
                 key={user._id}
-                user={user}
+                userCol={user}
                 userTasks={userTasks[user?._id] || []}
                 sections={sections}
                 sectionTitles={sectionTitles}

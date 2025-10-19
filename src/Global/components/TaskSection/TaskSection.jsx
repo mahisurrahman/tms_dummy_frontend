@@ -4,6 +4,7 @@ import TaskCard from "../TaskCard/TaskCard";
 
 const TaskSection = ({
   userId,
+  user,
   status,
   title,
   tasks,
@@ -43,6 +44,7 @@ const TaskSection = ({
                 index={index}
                 task={task}
                 userTask={task}
+                user={user}
                 userId={userId}
                 timers={timers}
                 formatSecondsToTime={formatSecondsToTime}

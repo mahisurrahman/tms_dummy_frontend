@@ -93,7 +93,7 @@ const Header = ({
             </button>
           </div>
 
-          <div>
+          {/* <div>
             <button
               onClick={() => {
                 setSelectedUserForCreate(null);
@@ -104,7 +104,7 @@ const Header = ({
               <Plus className="w-3 h-3 md:w-4 md:h-4" />
               Add New Task
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

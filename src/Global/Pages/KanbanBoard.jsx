@@ -28,6 +28,7 @@ import { useNavigate } from "react-router";
 import { taskAPI } from "../../api/endpoints/task.api";
 import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 import TaskModalWrapper from "../Wrapper/TaskModalWrapper";
+import { notificationControll } from "../../api/endpoints/notificationControll.api";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -287,9 +288,21 @@ function KanbanBoard() {
           };
           const taskLogResponse = await taskLogAPI.create(taskLogPayload);
           if (taskLogResponse.data) {
-            fetchUsers();
-            toast.success("Task Created Sir !!");
-            setShowCreateTask(false);
+            const data = {
+              taskId: response.data._id,
+              taskTitle: payload.taskTitle,
+              taskActive: response.data.isActive,
+              assignedById: payload.taskCreatedBy,
+              assignedToId: payload.taskAssignedTo,
+            };
+
+            const notificationControllCreate =
+              await notificationControll.create(data);
+            if (notificationControllCreate.data) {
+              fetchUsers();
+              toast.success("Task Created Sir !!");
+              setShowCreateTask(false);
+            }
           }
         }
       }
@@ -340,12 +353,14 @@ function KanbanBoard() {
           />
 
           <div className="flex h-[calc(100vh-78px)]">
-            <BacklogSection
-              showBacklog={showBacklog}
-              setShowBacklog={setShowBacklog}
-              backlogTasks={backlogs} // updated from backlogTasks
-              setSelectedTask={setSelectedTask}
-            />
+            {user && user?.userType === 1 && (
+              <BacklogSection
+                showBacklog={showBacklog}
+                setShowBacklog={setShowBacklog}
+                backlogTasks={backlogs} // updated from backlogTasks
+                setSelectedTask={setSelectedTask}
+              />
+            )}
 
             {loading ? (
               <div className="w-full text-center flex items-center justify-center text-4xl font-extrabold text-white">
@@ -416,6 +431,7 @@ function KanbanBoard() {
               users={users}
               handleAddTask={handleAddTask}
               loading={loading}
+              user={user}
             />
           )}
 

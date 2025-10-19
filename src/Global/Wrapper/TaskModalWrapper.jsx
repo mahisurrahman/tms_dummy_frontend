@@ -17,7 +17,7 @@ function TaskModalWrapper({
 }) {
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { userId } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const fetchTaskLogByTaskLogId = async () => {
     try {
@@ -48,6 +48,7 @@ function TaskModalWrapper({
         </div>
       ) : task ? (
         <TaskModal
+          user={user}
           task={task}
           onClose={() => setSelectedTask(null)}
           users={users}

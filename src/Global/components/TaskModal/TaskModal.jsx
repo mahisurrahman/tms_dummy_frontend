@@ -124,6 +124,7 @@ const TaskModal = ({
           <div className="mt-5">
             <TaskDetailsSection
               data={task}
+              user={user}
               onStatusChange={() => setShowStatusModal(true)}
             />
           </div>

@@ -16,6 +16,7 @@ const TaskCard = ({
   index,
   task,
   userTask,
+  user,
   isBacklog = false,
   userId,
   moveTask,
@@ -32,7 +33,6 @@ const TaskCard = ({
 
   const statuses = ["Pending", "InQueue", "Ongoing", "Review", "Complete"];
 
-  // First useEffect - Sync with backend data
   useEffect(() => {
     if (task?.isPause !== undefined) {
       setIsPaused(task.isPause);
@@ -49,7 +49,6 @@ const TaskCard = ({
     }
   }, [task?.startTime, task?.isPause]);
 
-  // Second useEffect - Timer logic
   useEffect(() => {
     if (isPaused && task?.totalOnGoingTime) {
       let totalMs;
@@ -140,7 +139,6 @@ const TaskCard = ({
     isPaused,
   ]);
 
-  // Third useEffect - Additional sync with backend data
   useEffect(() => {
     if (task?.isPause !== undefined) {
       setIsPaused(task.isPause);
@@ -237,6 +235,8 @@ const TaskCard = ({
     Medium: "shadow-amber-100 hover:shadow-amber-200",
     Low: "shadow-emerald-100 hover:shadow-emerald-200",
   };
+
+  console.log(task, "task data");
 
   return (
     <>
@@ -404,21 +404,26 @@ const TaskCard = ({
         </div>
 
         {/* TIMER BUTTONS */}
-        {task?.taskStatus?.toLowerCase() === "ongoing" && (
-          <div className="grid grid-cols-2 gap-x-2 mt-2">
-            <button
-              onClick={startTask}
-              className="w-full text-[12px] py-1 bg-green-700 cursor-pointer hover:bg-green-800 text-white rounded flex items-center gap-x-1 justify-center"
-            >
-              <PlayCircle size={13} /> Start
-            </button>
-            <button
-              onClick={pauseTask}
-              className="w-full text-[12px] py-1 bg-yellow-700 cursor-pointer hover:bg-yellow-800 text-white rounded flex items-center gap-x-1 justify-center"
-            >
-              <PauseCircle size={13} /> Pause
-            </button>
-          </div>
+        {user && user?._id === task?.assignedToId && (
+          <>
+            {" "}
+            {task?.taskStatus?.toLowerCase() === "ongoing" && (
+              <div className="grid grid-cols-2 gap-x-2 mt-2">
+                <button
+                  onClick={startTask}
+                  className="w-full text-[12px] py-1 bg-green-700 cursor-pointer hover:bg-green-800 text-white rounded flex items-center gap-x-1 justify-center"
+                >
+                  <PlayCircle size={13} /> Start
+                </button>
+                <button
+                  onClick={pauseTask}
+                  className="w-full text-[12px] py-1 bg-yellow-700 cursor-pointer hover:bg-yellow-800 text-white rounded flex items-center gap-x-1 justify-center"
+                >
+                  <PauseCircle size={13} /> Pause
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 

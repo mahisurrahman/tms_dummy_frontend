@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   ChevronRight,
   Plus,
@@ -9,6 +9,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router";
+import { AuthContext } from "../../../provider/AuthProvider";
 
 const QuickCreateColumn = ({
   showRightColumn,
@@ -20,6 +21,7 @@ const QuickCreateColumn = ({
   handleLogoutButton,
 }) => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   if (!showRightColumn) return null;
 
@@ -29,7 +31,7 @@ const QuickCreateColumn = ({
 
   return (
     <div className="w-1/6 bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out shrink-0">
-      <div className="flex items-center justify-between mb-4">
+      {/* <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
           <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-2">
             <Plus className="w-3 h-3 md:w-4 md:h-4 text-white" />
@@ -42,31 +44,35 @@ const QuickCreateColumn = ({
         >
           <ChevronRight className="w-4 h-4" />
         </button>
-      </div>
+      </div> */}
 
-      <button
-        onClick={() => {
-          setSelectedUserForCreate(null);
-          setShowCreateTask(true);
-        }}
-        className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 rounded font-semibold text-sm md:text-base hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
-      >
-        <Plus className="w-3 h-3 md:w-4 md:h-4" />
-        New Task
-      </button>
-      <button
-        onClick={() => {
-          setSelectedUserForCreate(null);
-          setShowCreateUser(true);
-        }}
-        className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 rounded font-semibold text-sm md:text-base hover:from-blue-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
-      >
-        <User className="w-3 h-3 md:w-4 md:h-4" />
-        Add User
-      </button>
+      {user && user.userType === 1 && (
+        <div>
+          <button
+            onClick={() => {
+              setSelectedUserForCreate(null);
+              setShowCreateTask(true);
+            }}
+            className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 rounded font-semibold text-sm md:text-base hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
+          >
+            <Plus className="w-3 h-3 md:w-4 md:h-4" />
+            New Task
+          </button>
+          <button
+            onClick={() => {
+              setSelectedUserForCreate(null);
+              setShowCreateUser(true);
+            }}
+            className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 rounded font-semibold text-sm md:text-base hover:from-blue-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
+          >
+            <User className="w-3 h-3 md:w-4 md:h-4" />
+            Add User
+          </button>
+        </div>
+      )}
 
       <div className="space-y-2 md:space-y-3 mt-3 md:mt-5">
-        <div className="flex items-center justify-start gap-x-1 md:gap-x-2">
+        <div className="flex flex-col items-center justify-start gap-x-1 md:gap-x-2">
           <h1 className="text-sm md:text-md font-bold text-white">
             Mahisur Rahman
           </h1>
@@ -108,8 +114,26 @@ const QuickCreateColumn = ({
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
             <span className="text-white/80 text-xs md:text-sm">Overdue</span>
-            <span className="text-red-400 font-bold text-base md:text-lg animate-pulse">
+            <span className="text-white font-bold text-base md:text-lg animate-pulse">
               4
+            </span>
+          </div>
+        </div>
+
+        <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
+          <div className="flex items-center justify-between">
+            <span className="text-white/80 text-xs md:text-sm">Cancelled</span>
+            <span className="text-red-500 font-bold text-base md:text-lg animate-pulse">
+              5
+            </span>
+          </div>
+        </div>
+
+        <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
+          <div className="flex items-center justify-between">
+            <span className="text-white/80 text-xs md:text-sm">Review</span>
+            <span className="text-purple-400 font-bold text-base md:text-lg animate-pulse">
+              10
             </span>
           </div>
         </div>

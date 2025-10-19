@@ -8,13 +8,14 @@ const CreateTaskForm = ({
   users,
   handleAddTask,
   loading,
+  user,
 }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     priority: "Medium",
     project: "DNCRP",
-    assignedTo: defaultUserId || "",
+    assignedTo: user && user?.userType === 1 ? defaultUserId || "" : user?._id,
     deadline: "",
     assignedBy: "Current User",
     assignedDate: new Date().toISOString(),
@@ -78,24 +79,25 @@ const CreateTaskForm = ({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
-              </label>
-              <select
-                name="priority"
-                value={formData.priority}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </div>
+          {user && user?.userType === 1 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Priority
+                </label>
+                <select
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                >
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+              </div>
 
-            {/* <div>
+              {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Project
               </label>
@@ -111,26 +113,85 @@ const CreateTaskForm = ({
                 <option>PRET-A-MED</option>
               </select>
             </div> */}
-            <div>
+              {user && user?.userType === 1 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Assign To
+                  </label>
+                  <select
+                    name="assignedTo"
+                    value={formData.assignedTo}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Select Developer / Backlog</option>
+                    {users?.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.username}
+                      </option>
+                    ))}
+                    <option value="">Backlog</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Priority
+                </label>
+                <select
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                >
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+              </div>
+
+              {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Assign To
+                Project
               </label>
               <select
-                name="assignedTo"
-                value={formData.assignedTo}
+                name="project"
+                value={formData.project}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
-                <option value="">Select Developer / Backlog</option>
-                {users?.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.username}
-                  </option>
-                ))}
-                <option value="">Backlog</option>
+                <option>DNCRP</option>
+                <option>DOLE</option>
+                <option>MOL</option>
+                <option>PRET-A-MED</option>
               </select>
+            </div> */}
+              {user && user?.userType === 1 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Assign To
+                  </label>
+                  <select
+                    name="assignedTo"
+                    value={formData.assignedTo}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Select Developer / Backlog</option>
+                    {users?.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.username}
+                      </option>
+                    ))}
+                    <option value="">Backlog</option>
+                  </select>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           <div className="grid grid-cols-1 gap-4">
             <div>

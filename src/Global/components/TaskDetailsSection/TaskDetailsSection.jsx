@@ -7,6 +7,7 @@ import { taskLogAPI } from "../../../api/endpoints/taskLog.api";
 
 export default function TaskDetailsSection({
   data,
+  user,
   onStatusChange,
   onPriorityChange,
 }) {
@@ -42,8 +43,6 @@ export default function TaskDetailsSection({
         clearInterval(timerInterval);
         setTimerInterval(null);
       }
-
-      // ✅ Update elapsed time & local data
       if (updatedTotal) {
         let totalMs;
         if (typeof updatedTotal === "string") {
@@ -62,51 +61,35 @@ export default function TaskDetailsSection({
             .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
         );
       }
-
-      // ✅ Most important: update `data` with new totalOnGoingTime
       data.totalOnGoingTime = updatedTotal;
     } catch (error) {
       console.log(error, "Failed to pause Task");
     }
   };
 
-  // First useEffect - Sync with backend data
   useEffect(() => {
     if (data?.isPause !== undefined) {
       setIsPaused(data.isPause);
     }
-
-    // Reset startClicked if we're getting fresh data from backend
     if (data?.startTime && data.startTime !== 0) {
       setStartClicked(true);
     }
-
-    // If not started, reset everything
     if (!data?.startTime || data.startTime === 0) {
       setStartClicked(false);
       setLocalStartTime(null);
     }
-
-    // if (data?.startTime) {
-    //   setLocalStartTime(elapsedTime);
-    // }
   }, [data?.totalOnGoingTime, data?.startTime]);
 
-  // Second useEffect - Timer logic (main changes here)
   useEffect(() => {
-    // If task is paused, show formatted totalOnGoingTime and don't start timer
     if (isPaused && data?.totalOnGoingTime) {
-      // Handle both string format "00:02:15" and number format (milliseconds)
       let totalMs;
 
       if (typeof data.totalOnGoingTime === "string") {
-        // Parse "HH:MM:SS" format to milliseconds
         const [hours, minutes, seconds] = data.totalOnGoingTime
           .split(":")
           .map(Number);
         totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
       } else {
-        // It's already in milliseconds
         totalMs = data.totalOnGoingTime;
       }
 
@@ -122,13 +105,11 @@ export default function TaskDetailsSection({
       return;
     }
 
-    // If not started yet, reset to 00:00:00
     if ((!data?.startTime || data.startTime === 0) && !startClicked) {
       setElapsedTime("00:00:00");
       return;
     }
 
-    // Calculate running time: current time - start time + existing totalOnGoingTime
     const startTime = startClicked
       ? localStartTime
       : data?.startTime
@@ -140,12 +121,9 @@ export default function TaskDetailsSection({
     const updateTimer = () => {
       const now = new Date();
       const currentSessionMs = now - startTime;
-
-      // Add existing totalOnGoingTime if it exists (handle both string and number formats)
       let existingTotalMs = 0;
       if (data?.totalOnGoingTime) {
         if (typeof data.totalOnGoingTime === "string") {
-          // Parse "HH:MM:SS" format to milliseconds
           const [hours, minutes, seconds] = data.totalOnGoingTime
             .split(":")
             .map(Number);
@@ -184,26 +162,17 @@ export default function TaskDetailsSection({
         clearInterval(interval);
       }
     };
-  }, [
-    data?.startTime,
-    data?.totalOnGoingTime,
-    localStartTime,
-    // startClicked,
-    // isPaused,
-  ]);
+  }, [data?.startTime, data?.totalOnGoingTime, localStartTime]);
 
-  // Third useEffect - Additional sync with backend data
   useEffect(() => {
     if (data?.isPause !== undefined) {
       setIsPaused(data.isPause);
     }
 
-    // If paused, handle totalOnGoingTime format properly
     if (data?.isPause && data?.totalOnGoingTime) {
       if (typeof data.totalOnGoingTime === "string") {
         setElapsedTime(data.totalOnGoingTime);
       } else {
-        // Convert milliseconds to "HH:MM:SS" format
         const totalMs = data.totalOnGoingTime;
         const hours = Math.floor(totalMs / (1000 * 60 * 60));
         const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -216,8 +185,6 @@ export default function TaskDetailsSection({
         );
       }
     }
-
-    // If not started yet, reset to 00:00:00
     if (data?.startTime === 0 && !startClicked) {
       setElapsedTime("00:00:00");
     }
@@ -311,23 +278,28 @@ export default function TaskDetailsSection({
               </h1>
             </div>
 
-            {data?.taskStatus === "ongoing" && (
-              <div className="flex gap-1 ">
-                <button
-                  onClick={startTask}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
-                >
-                  <Play className="w-3 h-3 mr-1" />
-                  Start
-                </button>
-                <button
-                  onClick={pauseTask}
-                  className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center"
-                >
-                  <PauseCircle className="w-3 h-3 mr-1" />
-                  Pause
-                </button>
-              </div>
+            {user && user?._id === data?.assignedToId && (
+              <>
+                {" "}
+                {data?.taskStatus === "ongoing" && (
+                  <div className="flex gap-1 ">
+                    <button
+                      onClick={startTask}
+                      className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                    >
+                      <Play className="w-3 h-3 mr-1" />
+                      Start
+                    </button>
+                    <button
+                      onClick={pauseTask}
+                      className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center"
+                    >
+                      <PauseCircle className="w-3 h-3 mr-1" />
+                      Pause
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -390,21 +362,23 @@ export default function TaskDetailsSection({
           </div>
         </div>
 
-        <div className="w-full flex items-center gap-x-2">
-          <button
-            onClick={onStatusChange}
-            className="w-full py-3 bg-blue-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-blue-800"
-          >
-            Change Status
-          </button>
+        {user && user?._id === data?.assignedToId && (
+          <div className="w-full flex items-center gap-x-2">
+            <button
+              onClick={onStatusChange}
+              className="w-full py-3 bg-blue-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-blue-800"
+            >
+              Change Status
+            </button>
 
-          <button
-            onClick={() => setShowPriorityModal(true)}
-            className="w-full py-3 bg-orange-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-orange-800"
-          >
-            Change Priority
-          </button>
-        </div>
+            <button
+              onClick={() => setShowPriorityModal(true)}
+              className="w-full py-3 bg-orange-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-orange-800"
+            >
+              Change Priority
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Priority Modal */}
