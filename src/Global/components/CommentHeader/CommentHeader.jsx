@@ -1,7 +1,9 @@
-import { Delete, Trash } from "lucide-react";
+import { Delete, Eye, Trash } from "lucide-react";
 import React from "react";
 
 const CommentHeader = ({
+  comments,
+  index,
   author,
   status,
   date,
@@ -54,6 +56,13 @@ const CommentHeader = ({
             className="text-red-600 cursor-pointer hover:scale-110 duration-300"
           />
         </span>
+      </div>
+
+      <div>
+        <button className="px-2 py-1 rounded bg-gradient-to-br from-purple-700 to-blue-700 hover:from-purple-800 hover:to-blue-800 cursor-pointer text-xs duration-500 flex items-center gap-x-1 justify-center text-white">
+          <Eye size={10} />
+          Seen
+        </button>
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ const TaskModal = ({
   changeStatusTask,
 }) => {
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [showPriorityModal, setShowPriorityModal] = useState(false);
@@ -42,10 +43,13 @@ const TaskModal = ({
 
   const notificationControll = async () => {
     try {
+      setLoading(true);
       const response = await notiFyCntrlAPI.getByTaskId(task?.taskId);
       setNotifyControll(response?.data);
+      setLoading(false);
     } catch (error) {
       console.log(console.log("Notification Controll Fetch error", error));
+      setLoading(false);
     }
   };
 
@@ -56,8 +60,6 @@ const TaskModal = ({
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
-
-    // Extract tagged users from the comment HTML
     const taggedUserIds = [];
     const parser = new DOMParser();
     const doc = parser.parseFromString(newComment, "text/html");
@@ -156,6 +158,8 @@ const TaskModal = ({
         <div className="space-y-6">
           <div className="mt-5">
             <TaskDetailsSection
+              setLoading={setLoading}
+              loading={loading}
               notifyControll={notifyControll}
               allComments={allComments}
               data={task}

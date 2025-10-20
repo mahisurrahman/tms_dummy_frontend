@@ -1,4 +1,13 @@
-import { Play, Square, Bell, Download, Pin, PauseCircle } from "lucide-react";
+import {
+  Play,
+  Square,
+  Bell,
+  Download,
+  Pin,
+  PauseCircle,
+  LoaderIcon,
+  BellDot,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import PriorityModal from "../PriorityModa/PriorityModal";
 import { formatReadableDateTime } from "../../Utils/formatReadableDateTime";
@@ -8,6 +17,8 @@ import { notiFyCntrlAPI } from "../../../api/endpoints/notificationControll.api"
 import toast from "react-hot-toast";
 
 export default function TaskDetailsSection({
+  setLoading,
+  loading,
   notifyControll,
   allComments,
   data,
@@ -24,10 +35,12 @@ export default function TaskDetailsSection({
   const [mentionChecked, setMentionChecked] = useState(false);
   const [commentChecked, setCommentChecked] = useState(false);
   const [everythingChecked, setEverythingChecked] = useState(false);
+  const [seen, isSeen] = useState(false);
 
   useEffect(() => {
     if (!notifyControll || !notifyControll.followers || !user?._id) return;
 
+    setLoading(true);
     const follower = notifyControll.followers.find(
       (f) => f.receiverId === user._id
     );
@@ -36,7 +49,9 @@ export default function TaskDetailsSection({
       setMentionChecked(follower.controlType.includes(1));
       setCommentChecked(follower.controlType.includes(2));
       setEverythingChecked(follower.controlType.includes(3));
+      setLoading(false);
     }
+    setLoading(false);
   }, [notifyControll, user?._id]);
 
   const startTask = async () => {
@@ -216,6 +231,7 @@ export default function TaskDetailsSection({
       (f) => f.receiverId === user?._id
     );
     if (!follower) return;
+    setLoading(true);
 
     const payload = {
       taskId: data?.taskId,
@@ -244,7 +260,9 @@ export default function TaskDetailsSection({
       }
 
       toast.success("Notification Control Updated");
+      setLoading(false);
     }
+    setLoading(false);
   };
 
   const priorities = [
@@ -371,18 +389,38 @@ export default function TaskDetailsSection({
             </div>
           </div>
         )}
-        <div className="space-y-0.5 text-sm text-gray-700 mb-8">
+        <div className="space-y-0.5 text-sm text-gray-700 mb-8 flex items-start justify-between">
           <div>
-            <span className="font-bold">Assigned By:</span>{" "}
-            {data?.creatorDetails?.username}
+            <div>
+              <span className="font-bold">Assigned By:</span>{" "}
+              {data?.creatorDetails?.username}
+            </div>
+            <div>
+              <span className="font-bold">Assigned Date:</span>{" "}
+              {formatReadableDateTime(data?.taskDetails?.assignedDate)}
+            </div>
+            <div className="text-red-600 text-3xl">
+              <span className="font-bold">Expected Deadline:</span>{" "}
+              {formatReadableDateTime(data?.taskDetails?.expectedDeadline)}
+            </div>
           </div>
           <div>
-            <span className="font-bold">Assigned Date:</span>{" "}
-            {formatReadableDateTime(data?.taskDetails?.assignedDate)}
-          </div>
-          <div className="text-red-600 text-3xl">
-            <span className="font-bold">Expected Deadline:</span>{" "}
-            {formatReadableDateTime(data?.taskDetails?.expectedDeadline)}
+            <h1 className="font-bold">Status Changed</h1>
+            {!seen ? (
+              <button
+                onClick={() => {
+                  isSeen(!seen);
+                  toast.success("Change Status Notification Seen");
+                }}
+                className="px-2 py-1 rounded text-xs font-semibold bg-gradient-to-br from-purple-700 to-blue-700 text-white w-full hover:from-purple-800 hover:to-from-blue-800 duration-500 hover:scale-110 cursor-pointer flex items-center justify-center  gap-x-1"
+              >
+                <BellDot size={13} /> Notified
+              </button>
+            ) : (
+              <button className="px-2 py-1 rounded text-xs font-semibold bg-gray-400 text-white w-full text-center">
+                Seen
+              </button>
+            )}
           </div>
         </div>
         <div className="mb-4">
@@ -414,36 +452,40 @@ export default function TaskDetailsSection({
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-x-5">
-              <h1 className="font-semibold">Get Notifications For:</h1>
+            {loading === true ? (
+              <LoaderIcon />
+            ) : (
+              <div className="flex items-center gap-x-5">
+                <h1 className="font-semibold">Get Notifications For:</h1>
 
-              <label>
-                <input
-                  type="checkbox"
-                  checked={mentionChecked}
-                  onChange={(e) => handleCheckboxChange(1, e.target.checked)}
-                />{" "}
-                Mentions
-              </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={mentionChecked}
+                    onChange={(e) => handleCheckboxChange(1, e.target.checked)}
+                  />{" "}
+                  Mentions
+                </label>
 
-              <label>
-                <input
-                  type="checkbox"
-                  checked={commentChecked}
-                  onChange={(e) => handleCheckboxChange(2, e.target.checked)}
-                />{" "}
-                Comments
-              </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={commentChecked}
+                    onChange={(e) => handleCheckboxChange(2, e.target.checked)}
+                  />{" "}
+                  Comments
+                </label>
 
-              <label>
-                <input
-                  type="checkbox"
-                  checked={everythingChecked}
-                  onChange={(e) => handleCheckboxChange(3, e.target.checked)}
-                />{" "}
-                Everything
-              </label>
-            </div>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={everythingChecked}
+                    onChange={(e) => handleCheckboxChange(3, e.target.checked)}
+                  />{" "}
+                  Everything
+                </label>
+              </div>
+            )}
 
             {/* <button className="flex items-center bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm py-2 px-3 rounded-lg shadow-sm cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all">
               <Pin className="w-4 h-4 mr-1" />

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import TaskModal from "../components/TaskModal/TaskModal";
 import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 import { AuthContext } from "../../provider/AuthProvider";
+import { notificationAPI } from "../../api/endpoints/notification.api";
 
 function TaskModalWrapper({
   data,
@@ -15,8 +16,10 @@ function TaskModalWrapper({
   selectedTask,
   setSelectedTask,
 }) {
+  console.log(data, "data datadata data data ");
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [taskNotification, setTaskNotification] = useState([]);
   const { user } = useContext(AuthContext);
 
   const fetchTaskLogByTaskLogId = async () => {
@@ -31,9 +34,20 @@ function TaskModalWrapper({
     }
   };
 
+  const fetchTaskStatusByTaskIdandUserId = async () => {
+    try {
+      const body = { taskId: data?.task?.taskId, userId: user?._id };
+      const response = await notificationAPI.getByTaskIdAndUserId(body);
+      console.log(response.data, "TAsk status change notifcation response");
+    } catch (error) {
+      console.log(error, "Fetch Task STatus Notification error");
+    }
+  };
+
   useEffect(() => {
     if (data) {
       fetchTaskLogByTaskLogId();
+      fetchTaskStatusByTaskIdandUserId();
     }
   }, [data]);
 

@@ -8,8 +8,10 @@ const CommentList = ({ comments, commentDelete }) => {
 
   return (
     <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
-      {comments.map((comment) => (
+      {comments.map((comment, index) => (
         <Comment
+          comments={comments}
+          index={index}
           key={comment.id}
           comment={comment}
           commentDelete={commentDelete}

@@ -99,7 +99,7 @@ const UserColumn = ({
         ))}
       </div>
 
-      {user && user._id === userCol?._id && (
+      {user && user.userType === 2 && user._id === userCol?._id && (
         <button
           onClick={() => {
             setSelectedUserForCreate(user.id);

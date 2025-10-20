@@ -2,10 +2,12 @@ import React from "react";
 import CommentHeader from "../CommentHeader/CommentHeader";
 import { formatReadableDateTime } from "../../Utils/formatReadableDateTime";
 
-const Comment = ({ comment, commentDelete }) => {
+const Comment = ({ comments, index, comment, commentDelete }) => {
   return (
-    <div className="bg-gray-50 p-3 rounded-lg mb-10">
+    <div className={`p-3 rounded-lg border-2 border-purple-400 mb-10`}>
       <CommentHeader
+        comments={comments}
+        index={index}
         author={comment.commentBy}
         status={comment.taskStatus}
         date={formatReadableDateTime(comment.createdAt)}
