@@ -15,19 +15,6 @@ const CommentsSection = ({
   onClose,
   commentDelete,
 }) => {
-  console.log(users, "Users");
-  const notificationControll = async () => {
-    try {
-      const response = await notiFyCntrlAPI.getByTaskId(taskId);
-      console.log(response.data, "Notification data");
-    } catch (error) {
-      console.log(console.log("Notification Controll Fetch error", error));
-    }
-  };
-
-  useEffect(() => {
-    notificationControll();
-  }, []);
   return (
     <div className="bg-white rounded-2xl p-6 border-4 border-blue-600">
       <h3 className="text-lg font-semibold mb-4 flex items-center">

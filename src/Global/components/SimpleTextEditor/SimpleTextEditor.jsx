@@ -148,7 +148,7 @@ const SimpleTextEditor = forwardRef(({ users, onChange, placeholder }, ref) => {
       />
 
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto">
+        <div className="absolute top-30 z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto">
           {suggestions.map((user) => (
             <div
               key={user._id}

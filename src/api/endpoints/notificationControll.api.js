@@ -14,4 +14,16 @@ export const notiFyCntrlAPI = {
       apiClient.get(`${baseMiddlePoint}/byTask/${id}`),
       "Failed to fetch Notification Controll with task ID"
     ),
+
+  removeControllTypes: (payload) =>
+    handleRequest(
+      apiClient.post(`${baseMiddlePoint}/removeControlTypes`, payload),
+      "Failed to remove controll types. "
+    ),
+
+  addControllTypes: (payload) =>
+    handleRequest(
+      apiClient.post(`${baseMiddlePoint}/addFollower`, payload),
+      "Failed to add controll types"
+    ),
 };

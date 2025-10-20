@@ -296,8 +296,9 @@ function KanbanBoard() {
               assignedToId: payload.taskAssignedTo,
             };
 
-            const notificationControllCreate =
-              await notificationControll.create(data);
+            const notificationControllCreate = await notiFyCntrlAPI.create(
+              data
+            );
             if (notificationControllCreate.data) {
               fetchUsers();
               toast.success("Task Created Sir !!");

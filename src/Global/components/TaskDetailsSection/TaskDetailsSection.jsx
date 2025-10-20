@@ -4,21 +4,40 @@ import PriorityModal from "../PriorityModa/PriorityModal";
 import { formatReadableDateTime } from "../../Utils/formatReadableDateTime";
 import { getPriorityColor, getStatusColor } from "../../Utils/TaskUtils";
 import { taskLogAPI } from "../../../api/endpoints/taskLog.api";
+import { notiFyCntrlAPI } from "../../../api/endpoints/notificationControll.api";
+import toast from "react-hot-toast";
 
 export default function TaskDetailsSection({
+  notifyControll,
   allComments,
   data,
   user,
   onStatusChange,
   onPriorityChange,
 }) {
-  console.log(allComments, "allComments");
   const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [startClicked, setStartClicked] = useState(false);
   const [localStartTime, setLocalStartTime] = useState(null);
   const [isPaused, setIsPaused] = useState(data?.isPause || false);
   const [timerInterval, setTimerInterval] = useState(null);
+  const [mentionChecked, setMentionChecked] = useState(false);
+  const [commentChecked, setCommentChecked] = useState(false);
+  const [everythingChecked, setEverythingChecked] = useState(false);
+
+  useEffect(() => {
+    if (!notifyControll || !notifyControll.followers || !user?._id) return;
+
+    const follower = notifyControll.followers.find(
+      (f) => f.receiverId === user._id
+    );
+
+    if (follower && Array.isArray(follower.controlType)) {
+      setMentionChecked(follower.controlType.includes(1));
+      setCommentChecked(follower.controlType.includes(2));
+      setEverythingChecked(follower.controlType.includes(3));
+    }
+  }, [notifyControll, user?._id]);
 
   const startTask = async () => {
     try {
@@ -192,6 +211,42 @@ export default function TaskDetailsSection({
     }
   }, [data?.totalOnGoingTime, data?.startTime]);
 
+  const handleCheckboxChange = async (type, checked) => {
+    const follower = notifyControll?.followers?.find(
+      (f) => f.receiverId === user?._id
+    );
+    if (!follower) return;
+
+    const payload = {
+      taskId: data?.taskId,
+      receiverId: follower.receiverId,
+      controlTypes: [type], // ✅ always send array
+    };
+
+    const response = checked
+      ? await notiFyCntrlAPI.addControllTypes(payload)
+      : await notiFyCntrlAPI.removeControllTypes(payload);
+
+    if (response?.data) {
+      // ✅ update local UI state based on type
+      switch (type) {
+        case 1:
+          setMentionChecked(checked);
+          break;
+        case 2:
+          setCommentChecked(checked);
+          break;
+        case 3:
+          setEverythingChecked(checked);
+          break;
+        default:
+          break;
+      }
+
+      toast.success("Notification Control Updated");
+    }
+  };
+
   const priorities = [
     { value: "high", label: "High", color: "#ea580c" },
     { value: "medium", label: "Medium", color: "#d97706" },
@@ -337,9 +392,11 @@ export default function TaskDetailsSection({
           </div>
         </div>
         <div className="mb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-bold text-gray-800 mb-1">Assigned To:</h3>
+              <h3 className="font-bold text-gray-800 mb-1 -mt-1">
+                Assigned To:
+              </h3>
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2">
                   {data?.assignedToDetails?.username
@@ -357,10 +414,41 @@ export default function TaskDetailsSection({
                 </div>
               </div>
             </div>
-            <button className="flex items-center bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm py-2 px-3 rounded-lg shadow-sm cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all">
+            <div className="flex items-center gap-x-5">
+              <h1 className="font-semibold">Get Notifications For:</h1>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={mentionChecked}
+                  onChange={(e) => handleCheckboxChange(1, e.target.checked)}
+                />{" "}
+                Mentions
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={commentChecked}
+                  onChange={(e) => handleCheckboxChange(2, e.target.checked)}
+                />{" "}
+                Comments
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={everythingChecked}
+                  onChange={(e) => handleCheckboxChange(3, e.target.checked)}
+                />{" "}
+                Everything
+              </label>
+            </div>
+
+            {/* <button className="flex items-center bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm py-2 px-3 rounded-lg shadow-sm cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all">
               <Pin className="w-4 h-4 mr-1" />
               Poke
-            </button>
+            </button> */}
           </div>
         </div>
 
