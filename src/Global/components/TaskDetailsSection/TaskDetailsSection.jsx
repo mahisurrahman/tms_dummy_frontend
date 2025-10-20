@@ -6,11 +6,13 @@ import { getPriorityColor, getStatusColor } from "../../Utils/TaskUtils";
 import { taskLogAPI } from "../../../api/endpoints/taskLog.api";
 
 export default function TaskDetailsSection({
+  allComments,
   data,
   user,
   onStatusChange,
   onPriorityChange,
 }) {
+  console.log(allComments, "allComments");
   const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [startClicked, setStartClicked] = useState(false);

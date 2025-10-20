@@ -28,7 +28,7 @@ import { useNavigate } from "react-router";
 import { taskAPI } from "../../api/endpoints/task.api";
 import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 import TaskModalWrapper from "../Wrapper/TaskModalWrapper";
-import { notificationControll } from "../../api/endpoints/notificationControll.api";
+import { notiFyCntrlAPI } from "../../api/endpoints/notificationControll.api";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);

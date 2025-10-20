@@ -10,3 +10,19 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.user-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin: 0 2px;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.user-tag:hover {
+  background-color: #bfdbfe;
+}

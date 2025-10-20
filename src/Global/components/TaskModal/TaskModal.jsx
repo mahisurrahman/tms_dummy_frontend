@@ -45,6 +45,23 @@ const TaskModal = ({
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
+    // Extract tagged users from the comment HTML
+    const taggedUserIds = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(newComment, "text/html");
+    const spans = doc.querySelectorAll('span[contenteditable="false"]');
+    spans.forEach((span) => {
+      const username = span.textContent.slice(1); // Remove '@' from username
+      const taggedUser = users.find((u) => u.username === username);
+      if (
+        taggedUser &&
+        taggedUser._id &&
+        !taggedUserIds.includes(taggedUser._id)
+      ) {
+        taggedUserIds.push(taggedUser._id);
+      }
+    });
+
     // Create new comment object
     const newCommentObj = {
       taskLogId: task?._id,
@@ -54,13 +71,17 @@ const TaskModal = ({
       comment: newComment,
       taskStatus: task?.taskStatus,
       commentedOnTime: task?.totalOnGoingTime,
+      taggedUsers: taggedUserIds, // Add tagged user IDs
     };
 
-    const response = await commentsApi.create(newCommentObj);
-
-    if (response.data) {
-      toast.success("Comments Created");
-      fetchComments();
+    try {
+      const response = await commentsApi.create(newCommentObj);
+      if (response.data) {
+        toast.success("Comment Created");
+        fetchComments();
+      }
+    } catch (error) {
+      console.log(error, "Create Comment Failed");
     }
 
     setNewComment("");
@@ -73,7 +94,7 @@ const TaskModal = ({
     try {
       const response = await commentsApi.removeComment(id);
       if (response.data) {
-        toast.success("Comments Removed");
+        toast.success("Comment Removed");
         fetchComments();
       }
     } catch (error) {
@@ -104,6 +125,7 @@ const TaskModal = ({
       setStatusLoading(false);
     }
   };
+
   const handlePriorityChange = (priority) => {
     updateTask(userId, task.id, {
       priority: priority,
@@ -123,6 +145,7 @@ const TaskModal = ({
         <div className="space-y-6">
           <div className="mt-5">
             <TaskDetailsSection
+              allComments={allComments}
               data={task}
               user={user}
               onStatusChange={() => setShowStatusModal(true)}
@@ -134,6 +157,8 @@ const TaskModal = ({
           </div>
 
           <CommentsSection
+            users={users}
+            taskId={task?.taskId}
             comments={allComments}
             newComment={newComment}
             onCommentChange={setNewComment}
@@ -151,7 +176,7 @@ const TaskModal = ({
             currentStatus={task?.taskStatus}
             onStatusChange={handleStatusChange}
             onClose={() => setShowStatusModal(false)}
-            loading={statusLoading} // Pass loading state
+            loading={statusLoading}
           />
         )}
 

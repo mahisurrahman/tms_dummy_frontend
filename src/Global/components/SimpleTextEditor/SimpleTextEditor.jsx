@@ -5,18 +5,81 @@ import React, {
   forwardRef,
 } from "react";
 
-const SimpleTextEditor = forwardRef(({ onChange, placeholder }, ref) => {
+const SimpleTextEditor = forwardRef(({ users, onChange, placeholder }, ref) => {
   const editorRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
 
   useImperativeHandle(ref, () => ({
     clear: () => {
       if (editorRef.current) {
         editorRef.current.innerHTML = "";
         onChange("");
+        setSuggestions([]);
+        setShowSuggestions(false);
       }
     },
   }));
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      const content = editorRef.current.innerHTML;
+      onChange(content);
+
+      // Handle tag suggestions
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const cursorPos = range.startOffset;
+        setCursorPosition(cursorPos);
+
+        const text = editorRef.current.textContent;
+        const lastWord = text.slice(0, cursorPos).split(/\s+/).pop();
+
+        if (lastWord.startsWith("@")) {
+          const searchTerm = lastWord.slice(1).toLowerCase();
+          const filteredUsers = users.filter((user) =>
+            user.username.toLowerCase().includes(searchTerm)
+          );
+          setSuggestions(filteredUsers);
+          setShowSuggestions(true);
+        } else {
+          setShowSuggestions(false);
+        }
+      }
+    }
+  };
+
+  const handleTagSelect = (user) => {
+    if (editorRef.current) {
+      const content = editorRef.current.innerHTML;
+      const text = editorRef.current.textContent;
+      const words = text.slice(0, cursorPosition).split(/\s+/);
+      const lastWord = words.pop();
+      const wordStart = text.lastIndexOf(lastWord, cursorPosition - 1);
+
+      const beforeTag = content.slice(0, wordStart);
+      const afterTag = content.slice(wordStart + lastWord.length);
+
+      const tagSpan = `<span class="bg-blue-100 text-blue-800 px-1 rounded-sm" contenteditable="false">@${user.username}</span>&nbsp;`;
+      editorRef.current.innerHTML = beforeTag + tagSpan + afterTag;
+
+      onChange(editorRef.current.innerHTML);
+      setShowSuggestions(false);
+
+      // Restore cursor position after tag
+      const range = document.createRange();
+      const sel = window.getSelection();
+      const newNode = editorRef.current.lastChild;
+      range.setStart(newNode, 1);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      editorRef.current.focus();
+    }
+  };
 
   const formatText = (command, value = null) => {
     if (editorRef.current) {
@@ -69,14 +132,8 @@ const SimpleTextEditor = forwardRef(({ onChange, placeholder }, ref) => {
     }
   };
 
-  const handleInput = () => {
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-
   return (
-    <div className="border border-gray-200 rounded-lg">
+    <div className="border border-gray-200 rounded-lg relative">
       <Toolbar
         formatText={formatText}
         onFileAttach={() => fileInputRef.current?.click()}
@@ -85,10 +142,27 @@ const SimpleTextEditor = forwardRef(({ onChange, placeholder }, ref) => {
       <div
         ref={editorRef}
         contentEditable
-        className="w-full p-3 min-h-[100px] focus:outline-none"
+        className="w-full p-3 min-h-[100px] focus:outline-none text-gray-800"
         onInput={handleInput}
         placeholder={placeholder}
       />
+
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto">
+          {suggestions.map((user) => (
+            <div
+              key={user._id}
+              className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm"
+              onClick={() => handleTagSelect(user)}
+            >
+              <span className="font-medium">@{user.username}</span>
+              {user.name && (
+                <span className="text-gray-500 ml-2">{user.name}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <input
         type="file"
@@ -103,67 +177,66 @@ const SimpleTextEditor = forwardRef(({ onChange, placeholder }, ref) => {
 });
 
 const Toolbar = ({ formatText, onFileAttach }) => (
-  <div className="flex flex-wrap gap-2 p-2 bg-gray-100">
+  <div className="flex flex-wrap gap-2 p-2 bg-gray-100 border-b border-gray-200">
     <button
       onClick={() => formatText("bold")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Bold"
     >
       <strong>B</strong>
     </button>
     <button
       onClick={() => formatText("italic")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Italic"
     >
       <em>I</em>
     </button>
     <button
       onClick={() => formatText("underline")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Underline"
     >
       <u>U</u>
     </button>
     <button
       onClick={() => formatText("strikethrough")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Strikethrough"
     >
       <s>S</s>
     </button>
-
     <button
       onClick={() => formatText("formatBlock", "BLOCKQUOTE")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Blockquote"
     >
       Quote
     </button>
     <button
       onClick={() => formatText("formatBlock", "PRE")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Code"
     >
       Code
     </button>
     <button
       onClick={() => formatText("createLink", prompt("Enter URL"))}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Insert Link"
     >
       Link
     </button>
     <button
       onClick={onFileAttach}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Attach file"
     >
       Attach
     </button>
     <select
       onChange={(e) => formatText("fontSize", e.target.value)}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       defaultValue=""
       title="Font Size"
     >
@@ -176,7 +249,7 @@ const Toolbar = ({ formatText, onFileAttach }) => (
     </select>
     <select
       onChange={(e) => formatText("foreColor", e.target.value)}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       defaultValue=""
       title="Text Color"
     >
@@ -190,7 +263,7 @@ const Toolbar = ({ formatText, onFileAttach }) => (
     </select>
     <select
       onChange={(e) => formatText("backColor", e.target.value)}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       defaultValue=""
       title="Background Color"
     >
@@ -203,13 +276,13 @@ const Toolbar = ({ formatText, onFileAttach }) => (
     </select>
     <button
       onClick={() => formatText("justifyLeft")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Align Left"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
+        width="16"
+        height="16"
         viewBox="0 0 29 24"
       >
         <path
@@ -220,13 +293,13 @@ const Toolbar = ({ formatText, onFileAttach }) => (
     </button>
     <button
       onClick={() => formatText("justifyCenter")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Align Center"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
+        width="16"
+        height="16"
         viewBox="0 0 29 24"
       >
         <path
@@ -237,13 +310,13 @@ const Toolbar = ({ formatText, onFileAttach }) => (
     </button>
     <button
       onClick={() => formatText("justifyRight")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Align Right"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
+        width="16"
+        height="16"
         viewBox="0 0 29 24"
       >
         <path
@@ -254,14 +327,14 @@ const Toolbar = ({ formatText, onFileAttach }) => (
     </button>
     <button
       onClick={() => formatText("superscript")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Superscript"
     >
       Sup
     </button>
     <button
       onClick={() => formatText("subscript")}
-      className="px-2 py-1 hover:bg-gray-200 rounded"
+      className="px-2 py-1 hover:bg-gray-200 rounded text-sm"
       title="Subscript"
     >
       Sub
