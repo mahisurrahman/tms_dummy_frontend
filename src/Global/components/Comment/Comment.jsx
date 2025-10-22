@@ -4,7 +4,7 @@ import { formatReadableDateTime } from "../../Utils/formatReadableDateTime";
 
 const Comment = ({ comments, index, comment, commentDelete }) => {
   return (
-    <div className={`p-3 rounded-lg border-2 border-purple-400 mb-10`}>
+    <div className={`p-3 rounded-lg border-2 bg-purple-100 border-purple-400 mb-10`}>
       <CommentHeader
         comments={comments}
         index={index}

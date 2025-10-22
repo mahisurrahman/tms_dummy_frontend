@@ -73,8 +73,8 @@ const QuickCreateColumn = ({
       )}
 
       <div className="space-y-2 md:space-y-3 mt-3 md:mt-5">
-        <div className="flex items-center justify-between gap-x-1 md:gap-x-2">
-          <h1 className="text-sm md:text-md font-bold text-white">
+        <div className="flex flex-col items-center justify-center gap-x-1 md:gap-x-2">
+          <h1 className="text-sm md:text-lg font-bold text-white">
             {user?.username}
           </h1>
           <p className="text-xs md:text-sm font-bold text-blue-400">

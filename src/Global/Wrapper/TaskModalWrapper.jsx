@@ -20,6 +20,7 @@ function TaskModalWrapper({
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
   const [taskNotification, setTaskNotification] = useState([]);
+  const [commentNotification, setCommentNotification] = useState([]);
   const { user } = useContext(AuthContext);
 
   const fetchTaskLogByTaskLogId = async () => {
@@ -44,10 +45,22 @@ function TaskModalWrapper({
     }
   };
 
+   const fetchCommentTaskStatusByTaskIdandUserId = async () => {
+    try {
+      const body = { taskId: data?.task?.taskId, userId: user?._id };
+      const response = await notificationAPI.getCommentNotificationByTaskIdAndUserId(body);
+      setCommentNotification(response.data);
+      console.log(response.data, "Comment Notfiication`")
+    } catch (error) {
+      console.log(error, "Fetch Comment Notification error");
+    }
+  };
+
   useEffect(() => {
     if (data) {
       fetchTaskLogByTaskLogId();
       fetchTaskStatusByTaskIdandUserId();
+      fetchCommentTaskStatusByTaskIdandUserId();
     }
   }, [data]);
 

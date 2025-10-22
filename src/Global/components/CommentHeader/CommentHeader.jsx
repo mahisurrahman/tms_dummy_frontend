@@ -57,13 +57,6 @@ const CommentHeader = ({
           />
         </span>
       </div>
-
-      <div>
-        <button className="px-2 py-1 rounded bg-gradient-to-br from-purple-700 to-blue-700 hover:from-purple-800 hover:to-blue-800 cursor-pointer text-xs duration-500 flex items-center gap-x-1 justify-center text-white">
-          <Eye size={10} />
-          Seen
-        </button>
-      </div>
     </div>
   );
 };
