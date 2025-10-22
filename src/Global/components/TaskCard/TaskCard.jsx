@@ -236,8 +236,6 @@ const TaskCard = ({
     Low: "shadow-emerald-100 hover:shadow-emerald-200",
   };
 
-  console.log(task, "task data");
-
   return (
     <>
       <div

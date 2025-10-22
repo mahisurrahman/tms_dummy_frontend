@@ -20,6 +20,9 @@ const TaskModal = ({
   moveTask,
   updateTask,
   changeStatusTask,
+  taskNotification,
+  handleReadNotification,
+  refreshTask,
 }) => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -130,6 +133,10 @@ const TaskModal = ({
           startTime,
           endTime
         );
+        
+        if (refreshTask) {
+          await refreshTask();
+        }
       }
 
       setShowStatusModal(false);
@@ -165,6 +172,8 @@ const TaskModal = ({
               data={task}
               user={user}
               onStatusChange={() => setShowStatusModal(true)}
+              taskNotification={taskNotification}
+              handleReadNotification={handleReadNotification}
             />
           </div>
 

@@ -25,6 +25,8 @@ export default function TaskDetailsSection({
   user,
   onStatusChange,
   onPriorityChange,
+  taskNotification,
+  handleReadNotification,
 }) {
   const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
@@ -36,6 +38,7 @@ export default function TaskDetailsSection({
   const [commentChecked, setCommentChecked] = useState(false);
   const [everythingChecked, setEverythingChecked] = useState(false);
   const [seen, isSeen] = useState(false);
+  
 
   useEffect(() => {
     if (!notifyControll || !notifyControll.followers || !user?._id) return;
@@ -317,6 +320,7 @@ export default function TaskDetailsSection({
 
   const statusInfo = getStatusInfo();
 
+
   return (
     <>
       <div className="bg-white border-4 border-green-500 rounded-2xl p-4 w-full">
@@ -404,24 +408,26 @@ export default function TaskDetailsSection({
               {formatReadableDateTime(data?.taskDetails?.expectedDeadline)}
             </div>
           </div>
-          <div>
-            <h1 className="font-bold">Status Changed</h1>
-            {!seen ? (
-              <button
-                onClick={() => {
-                  isSeen(!seen);
-                  toast.success("Change Status Notification Seen");
-                }}
-                className="px-2 py-1 rounded text-xs font-semibold bg-gradient-to-br from-purple-700 to-blue-700 text-white w-full hover:from-purple-800 hover:to-from-blue-800 duration-500 hover:scale-110 cursor-pointer flex items-center justify-center  gap-x-1"
-              >
-                <BellDot size={13} /> Notified
-              </button>
-            ) : (
-              <button className="px-2 py-1 rounded text-xs font-semibold bg-gray-400 text-white w-full text-center">
-                Seen
-              </button>
-            )}
-          </div>
+          {taskNotification.length > 0 && (
+            <div>
+              <h1 className="font-bold">Status Changed</h1>
+              {!seen ? (
+                <button
+                  onClick={() => {
+                    isSeen(!seen);
+                    handleReadNotification()
+                  }}
+                  className="px-2 py-1 rounded text-xs font-semibold bg-gradient-to-br from-purple-700 to-blue-700 text-white w-full hover:from-purple-800 hover:to-from-blue-800 duration-500 hover:scale-110 cursor-pointer flex items-center justify-center  gap-x-1"
+                >
+                  <BellDot size={13} /> Notified
+                </button>
+              ) : (
+                <button className="px-2 py-1 rounded text-xs font-semibold bg-gray-400 text-white w-full text-center">
+                  Seen
+                </button>
+              )}
+            </div>
+          )}
         </div>
         <div className="mb-4">
           <h3 className="font-bold text-gray-800 mb-1">Task Description:</h3>
@@ -494,7 +500,7 @@ export default function TaskDetailsSection({
           </div>
         </div>
 
-        {user && user?._id === data?.assignedToId && (
+        {user && user?._id === data?.assignedToId || user?.userType === 1 && (
           <div className="w-full flex items-center gap-x-2">
             <button
               onClick={onStatusChange}

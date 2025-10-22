@@ -7,6 +7,7 @@ import {
   User,
   Settings,
   LogOut,
+  BadgeAlertIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../../../provider/AuthProvider";
@@ -31,12 +32,12 @@ const QuickCreateColumn = ({
 
   return (
     <div className="w-1/6 bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out shrink-0">
-      {/* <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
           <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-2">
-            <Plus className="w-3 h-3 md:w-4 md:h-4 text-white" />
+            <BadgeAlertIcon className="w-3 h-3 md:w-4 md:h-4 text-white" />
           </div>
-          Quick Create
+          At a glance
         </h2>
         <button
           onClick={() => setShowRightColumn(false)}
@@ -44,7 +45,7 @@ const QuickCreateColumn = ({
         >
           <ChevronRight className="w-4 h-4" />
         </button>
-      </div> */}
+      </div>
 
       {user && user.userType === 1 && (
         <div>
@@ -72,12 +73,12 @@ const QuickCreateColumn = ({
       )}
 
       <div className="space-y-2 md:space-y-3 mt-3 md:mt-5">
-        <div className="flex flex-col items-center justify-start gap-x-1 md:gap-x-2">
+        <div className="flex items-center justify-between gap-x-1 md:gap-x-2">
           <h1 className="text-sm md:text-md font-bold text-white">
-            Mahisur Rahman
+            {user?.username}
           </h1>
           <p className="text-xs md:text-sm font-bold text-blue-400">
-            (Junior Frontend Developer)
+            ({user?.designation})
           </p>
         </div>
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">

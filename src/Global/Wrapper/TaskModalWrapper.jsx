@@ -3,6 +3,7 @@ import TaskModal from "../components/TaskModal/TaskModal";
 import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 import { AuthContext } from "../../provider/AuthProvider";
 import { notificationAPI } from "../../api/endpoints/notification.api";
+import toast from "react-hot-toast";
 
 function TaskModalWrapper({
   data,
@@ -16,7 +17,6 @@ function TaskModalWrapper({
   selectedTask,
   setSelectedTask,
 }) {
-  console.log(data, "data datadata data data ");
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
   const [taskNotification, setTaskNotification] = useState([]);
@@ -38,7 +38,7 @@ function TaskModalWrapper({
     try {
       const body = { taskId: data?.task?.taskId, userId: user?._id };
       const response = await notificationAPI.getByTaskIdAndUserId(body);
-      console.log(response.data, "TAsk status change notifcation response");
+      setTaskNotification(response.data);
     } catch (error) {
       console.log(error, "Fetch Task STatus Notification error");
     }
@@ -50,6 +50,22 @@ function TaskModalWrapper({
       fetchTaskStatusByTaskIdandUserId();
     }
   }, [data]);
+
+  const refreshTask = async () => {
+    await fetchTaskLogByTaskLogId();
+  };
+
+  const handleReadNotification = async () => {
+    try {
+      const body = { taskId: data?.task?.taskId, userId: user?._id };
+      const response = await notificationAPI.readByTaskIdAndUserId(body);
+      if (response?.data) {
+        toast.success("Change Status Notification Seen");
+      }
+    } catch (error) {
+      console.log("Notification Read Failed", error);
+    }
+  };
 
   return (
     <div>
@@ -71,6 +87,9 @@ function TaskModalWrapper({
           moveTask={moveTask}
           updateTask={updateTask}
           changeStatusTask={changeStatusTask}
+          taskNotification={taskNotification}
+          handleReadNotification={handleReadNotification}
+          refreshTask={refreshTask}
         />
       ) : null}
     </div>

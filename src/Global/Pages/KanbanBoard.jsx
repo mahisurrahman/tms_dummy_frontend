@@ -170,7 +170,11 @@ function KanbanBoard() {
           );
 
           if (createTaskLogResponse.error === false) {
-            // 5️⃣ Update state
+            // 5️⃣ Refresh data to update the UI
+            await fetchUsers();
+            await fetchBacklogs();
+
+            // 6️⃣ Update state
             setUserTaskLogs((prev) => {
               const updated = { ...prev };
               Object.keys(updated).forEach((userId) => {
