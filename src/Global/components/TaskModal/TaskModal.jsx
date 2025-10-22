@@ -10,6 +10,7 @@ import { AuthContext } from "../../../provider/AuthProvider.jsx";
 import { commentsApi } from "../../../api/endpoints/comments.api.js";
 import toast from "react-hot-toast";
 import { notiFyCntrlAPI } from "../../../api/endpoints/notificationControll.api.js";
+import { notificationAPI } from "../../../api/endpoints/notification.api.js";
 
 const TaskModal = ({
   task,
@@ -23,6 +24,8 @@ const TaskModal = ({
   taskNotification,
   handleReadNotification,
   refreshTask,
+  commentNotification,
+  handleSeenComment,
 }) => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -133,7 +136,7 @@ const TaskModal = ({
           startTime,
           endTime
         );
-        
+
         if (refreshTask) {
           await refreshTask();
         }
@@ -153,6 +156,8 @@ const TaskModal = ({
     });
     setShowPriorityModal(false);
   };
+
+
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-xl flex items-center justify-center z-50 p-4">
       <div className="bg-transparent rounded-2xl max-w-4xl w-full max-h-[100vh] overflow-y-auto">
@@ -191,6 +196,8 @@ const TaskModal = ({
             editorRef={commentEditorRef}
             onClose={onClose}
             commentDelete={handleDeleteComment}
+            commentNotification={commentNotification}
+            handleSeenComment={handleSeenComment}
           />
         </div>
 

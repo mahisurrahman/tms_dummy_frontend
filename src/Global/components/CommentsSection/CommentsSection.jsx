@@ -14,6 +14,8 @@ const CommentsSection = ({
   editorRef,
   onClose,
   commentDelete,
+  commentNotification,
+  handleSeenComment,
 }) => {
   return (
     <div className="bg-white rounded-2xl p-6 border-4 border-blue-600">
@@ -22,7 +24,12 @@ const CommentsSection = ({
         Comments & Updates
       </h3>
 
-      <CommentList comments={comments} commentDelete={commentDelete} />
+      <CommentList
+        comments={comments}
+        commentDelete={commentDelete}
+        commentNotification={commentNotification}
+        handleSeenComment={handleSeenComment}
+      />
 
       <div className="mt-4">
         <SimpleTextEditor

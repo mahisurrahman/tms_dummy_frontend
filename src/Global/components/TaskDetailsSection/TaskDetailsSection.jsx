@@ -405,7 +405,9 @@ export default function TaskDetailsSection({
             </div>
             <div className="text-red-600 text-3xl">
               <span className="font-bold">Expected Deadline:</span>{" "}
-              {formatReadableDateTime(data?.taskDetails?.expectedDeadline)}
+              {
+                data?.taskDetails?.expectedDeadline !== "" ? formatReadableDateTime(data?.taskDetails?.expectedDeadline) : "Not Given"
+              }
             </div>
           </div>
           {taskNotification.length > 0 && (

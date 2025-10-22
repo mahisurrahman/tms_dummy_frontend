@@ -50,7 +50,6 @@ function TaskModalWrapper({
       const body = { taskId: data?.task?.taskId, userId: user?._id };
       const response = await notificationAPI.getCommentNotificationByTaskIdAndUserId(body);
       setCommentNotification(response.data);
-      console.log(response.data, "Comment Notfiication`")
     } catch (error) {
       console.log(error, "Fetch Comment Notification error");
     }
@@ -80,6 +79,20 @@ function TaskModalWrapper({
     }
   };
 
+  const handleSeenComment = async (commentId) => {
+  try {
+    const body = { taskId: data?.task?.taskId, userId: user?._id, commentId };
+    const response = await notificationAPI.readCommentByTaskIdAndUserId(body);
+    if (response?.data) {
+      toast.success("Comment's Notification Seen");
+      // Update comment notifications state by removing the seen comment
+      setCommentNotification(prev => prev.filter(notification => notification.commentId !== commentId));
+    }
+  } catch (error) {
+    console.log("Notification Read Failed", error);
+  }
+};
+
   return (
     <div>
       {loading ? (
@@ -103,6 +116,8 @@ function TaskModalWrapper({
           taskNotification={taskNotification}
           handleReadNotification={handleReadNotification}
           refreshTask={refreshTask}
+          commentNotification={commentNotification}
+          handleSeenComment={handleSeenComment}
         />
       ) : null}
     </div>

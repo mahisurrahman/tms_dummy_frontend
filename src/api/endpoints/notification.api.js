@@ -15,6 +15,12 @@ export const notificationAPI = {
       "Failed to read Notification with task ID and UserId"
     ),
 
+    readCommentByTaskIdAndUserId: (payload) =>
+    handleRequest(
+      apiClient.post(`${baseMiddlePoint}/comment/read/byTask`, payload),
+      "Failed to read Comment Notification with task ID and UserId"
+    ),
+
   getCommentNotificationByTaskIdAndUserId: (payload) =>
     handleRequest(
       apiClient.post(`${baseMiddlePoint}/comment/getByTaskIdAndUserId`, payload),

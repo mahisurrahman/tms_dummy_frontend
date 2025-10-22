@@ -1,7 +1,7 @@
 import React from "react";
 import Comment from "../Comment/Comment";
 
-const CommentList = ({ comments, commentDelete }) => {
+const   CommentList = ({ comments, commentDelete, commentNotification, handleSeenComment }) => {
   if (!comments || comments.length === 0) {
     return <p className="text-gray-500 text-center">No comments yet</p>;
   }
@@ -15,6 +15,8 @@ const CommentList = ({ comments, commentDelete }) => {
           key={comment.id}
           comment={comment}
           commentDelete={commentDelete}
+          commentNotification={commentNotification}
+          handleSeenComment={handleSeenComment}
         />
       ))}
     </div>
