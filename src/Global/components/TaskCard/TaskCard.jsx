@@ -393,27 +393,11 @@ const TaskCard = ({
               <span className="text-[10px] font-semibold text-black block">
                 Label/Project:
               </span>
-              <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
-                DOL
-              </span>
-              <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
-                MOLE
-              </span>
-              <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
-                TRAIBUN
-              </span>
-              <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
-                DOL
-              </span>
-              <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
-                DOL
-              </span>
-              <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
-                DOL
-              </span>
-              <span className="text-[10px] text-gray-900 px-2 py-0.2 rounded-xs border">
-                DOL
-              </span>
+              {task?.taskDetails?.labels.map((lbl) => (
+                <span className="text-[10px] text-gray-50 bg-slate-900 rounded-lg px-2 py-0.2 shadow-md border">
+                  {lbl.name}
+                </span>
+              ))}
             </div>
           </div>
         </div>

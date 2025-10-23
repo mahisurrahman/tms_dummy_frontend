@@ -93,15 +93,14 @@ const CreateTaskForm = ({
       };
 
       const response = await labelAPI.createLabel(payload);
-      // Make sure we're accessing the correct response structure
       const createdLabel = response.data;
 
       setLabels((prev) => [...prev, createdLabel]);
 
-      // Auto-select the newly created label
+      // Auto-select the newly created label (store the full object)
       setFormData((prev) => ({
         ...prev,
-        labels: [...(prev.labels || []), createdLabel._id],
+        labels: [...(prev.labels || []), createdLabel._id], // Still store IDs in form state for checkbox management
       }));
 
       setNewLabel({ labelTitle: "", labelDescription: "" });
@@ -114,13 +113,17 @@ const CreateTaskForm = ({
   };
 
   const handleSubmit = () => {
-    handleAddTask(formData);
+    const selectedLabelObjects = getSelectedLabels(); // Get full label objects
+    const taskData = {
+      ...formData,
+      labels: selectedLabelObjects, // Send full objects instead of just IDs
+    };
+    handleAddTask(taskData);
   };
 
   const getSelectedLabels = () => {
     return labels.filter((label) => formData.labels?.includes(label._id));
   };
-
   return (
     <>
       <div className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4">

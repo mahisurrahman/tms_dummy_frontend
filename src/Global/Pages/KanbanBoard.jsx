@@ -343,6 +343,7 @@ function KanbanBoard() {
           taskAssignedBy: "",
           deadline: formData.deadline,
           assignedDate: null,
+          labels: formData.labels || [],
         };
       } else {
         payload = {
@@ -355,6 +356,7 @@ function KanbanBoard() {
           taskAssignedBy: "",
           deadline: formData.deadline,
           assignedDate: new Date(),
+          labels: formData.labels || [],
         };
       }
 
