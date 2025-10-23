@@ -4,6 +4,7 @@ import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 import { AuthContext } from "../../provider/AuthProvider";
 import { notificationAPI } from "../../api/endpoints/notification.api";
 import toast from "react-hot-toast";
+import { taskAPI } from "../../api/endpoints/task.api";
 
 function TaskModalWrapper({
   data,
@@ -66,6 +67,27 @@ function TaskModalWrapper({
     }
   }, [data]);
 
+  const handleUpdateTask = async (priority) => {
+    try {
+      if (data?.task?.taskId) {
+        const response = await taskAPI.update(data?.task?.taskId, {
+          taskPriority: priority,
+        });
+
+        if (response.data) {
+          toast.success("Priority updated successfully!");
+          fetchTaskLogByTaskLogId();
+        } else {
+          toast.error(response.message || "Failed to update priority");
+        }
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error.message);
+      toast.error("Something went wrong while updating priority");
+    }
+  };
+
   const refreshTask = async () => {
     await fetchTaskLogByTaskLogId();
   };
@@ -126,6 +148,7 @@ function TaskModalWrapper({
           handleSeenComment={handleSeenComment}
           refreshNotis={refreshNotis}
           setRefresNotis={setRefresNotis}
+          handleUpdateTask={handleUpdateTask}
         />
       ) : null}
     </div>

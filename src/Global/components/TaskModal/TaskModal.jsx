@@ -28,14 +28,15 @@ const TaskModal = ({
   handleSeenComment,
   refreshNotis,
   setRefresNotis,
+  handleUpdateTask,
 }) => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [allComments, setAllComments] = useState([]);
   const [notifyControll, setNotifyControll] = useState(null);
+  const [showPriorityModal, setShowPriorityModal] = useState(false);
   const commentEditorRef = useRef(null);
   const { user } = useContext(AuthContext);
   const userId = user?._id;
@@ -153,9 +154,9 @@ const TaskModal = ({
   };
 
   const handlePriorityChange = (priority) => {
-    updateTask(userId, task.id, {
-      priority: priority,
-    });
+    console.log(priority, "priority");
+    let taskPriority = priority;
+    handleUpdateTask(taskPriority);
     setShowPriorityModal(false);
   };
 
@@ -178,8 +179,12 @@ const TaskModal = ({
               data={task}
               user={user}
               onStatusChange={() => setShowStatusModal(true)}
+              onPriorityChange={() => setShowPriorityModal(true)}
               taskNotification={taskNotification}
               handleReadNotification={handleReadNotification}
+              handlePriorityChange={handlePriorityChange}
+              setShowPriorityModal={setShowPriorityModal}
+              showPriorityModal={showPriorityModal}
             />
           </div>
 
@@ -210,20 +215,6 @@ const TaskModal = ({
             onStatusChange={handleStatusChange}
             onClose={() => setShowStatusModal(false)}
             loading={statusLoading}
-          />
-        )}
-
-        {showPriorityModal && (
-          <PriorityModal
-            priorities={[
-              { value: "extreme", label: "Extreme", color: "#dc2626" },
-              { value: "high", label: "High", color: "#ea580c" },
-              { value: "medium", label: "Medium", color: "#d97706" },
-              { value: "low", label: "Low", color: "#16a34a" },
-              { value: "extra", label: "Extra", color: "#9333ea" },
-            ]}
-            onPriorityChange={handlePriorityChange}
-            onClose={() => setShowPriorityModal(false)}
           />
         )}
       </div>

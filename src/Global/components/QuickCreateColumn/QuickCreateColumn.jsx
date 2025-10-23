@@ -20,6 +20,12 @@ const QuickCreateColumn = ({
   setShowCreateTask,
   setShowCreateUser,
   handleLogoutButton,
+  totalTasks,
+  completedTotalTasks,
+  ongoingTotalTasks,
+  pendingTotalTasks,
+  inqueTotalTasks,
+  reviewTotalTasks,
 }) => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -87,7 +93,7 @@ const QuickCreateColumn = ({
               Total Tasks
             </span>
             <span className="text-white font-bold text-base md:text-lg">
-              24
+              {totalTasks?.length}
             </span>
           </div>
         </div>
@@ -96,36 +102,34 @@ const QuickCreateColumn = ({
           <div className="flex items-center justify-between">
             <span className="text-white/80 text-xs md:text-sm">Completed</span>
             <span className="text-green-400 font-bold text-base md:text-lg">
-              12
+              {completedTotalTasks.length}
             </span>
           </div>
         </div>
 
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
-            <span className="text-white/80 text-xs md:text-sm">
-              In Progress
-            </span>
+            <span className="text-white/80 text-xs md:text-sm">On Going</span>
             <span className="text-blue-400 font-bold text-base md:text-lg">
-              8
+              {ongoingTotalTasks.length}
             </span>
           </div>
         </div>
 
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
-            <span className="text-white/80 text-xs md:text-sm">Overdue</span>
-            <span className="text-white font-bold text-base md:text-lg animate-pulse">
-              4
+            <span className="text-white/80 text-xs md:text-sm">Pending</span>
+            <span className="text-white font-bold text-base md:text-lg">
+              {pendingTotalTasks.length}
             </span>
           </div>
         </div>
 
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
-            <span className="text-white/80 text-xs md:text-sm">Cancelled</span>
-            <span className="text-red-500 font-bold text-base md:text-lg animate-pulse">
-              5
+            <span className="text-white/80 text-xs md:text-sm">In Que</span>
+            <span className="text-red-500 font-bold text-base md:text-lg">
+              {inqueTotalTasks.length}
             </span>
           </div>
         </div>
@@ -133,8 +137,8 @@ const QuickCreateColumn = ({
         <div className="bg-white/20 backdrop-blur-md rounded-lg p-2 md:p-3 border border-white/30">
           <div className="flex items-center justify-between">
             <span className="text-white/80 text-xs md:text-sm">Review</span>
-            <span className="text-purple-400 font-bold text-base md:text-lg animate-pulse">
-              10
+            <span className="text-purple-400 font-bold text-base md:text-lg">
+              {reviewTotalTasks.length}
             </span>
           </div>
         </div>

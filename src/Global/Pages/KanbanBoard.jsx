@@ -45,6 +45,12 @@ function KanbanBoard() {
   const [backlogs, setBacklogs] = useState([]);
   const [allNotis, setAllNotis] = useState([]);
   const [refreshNotis, setRefresNotis] = useState(false);
+  const [totalTasks, setTotalTasks] = useState([]);
+  const [completedTotalTasks, setCompletedTotalTasks] = useState([]);
+  const [ongoingTotalTasks, setOngoingTotalTasks] = useState([]);
+  const [pendingTotalTasks, setPendingTotalTasks] = useState([]);
+  const [inqueTotalTasks, setInqueTotalTasks] = useState([]);
+  const [reviewTotalTasks, setreviewTotalTasks] = useState([]);
 
   const { user, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -58,6 +64,60 @@ function KanbanBoard() {
     try {
       const response = await userAPI.getAll();
       setUsers(response.data);
+    } catch (error) {
+      console.error("Fetch Users Error:", error.message);
+    }
+  };
+
+  const fetchTotalTasks = async () => {
+    try {
+      const response = await taskAPI.getAllTaskByUserId(user?._id);
+      setTotalTasks(response.data);
+    } catch (error) {
+      console.error("Fetch Users Error:", error.message);
+    }
+  };
+
+  const fetchTotalCompletedTasks = async () => {
+    try {
+      const response = await taskAPI.getAllCompletedTaskByUserId(user?._id);
+      setCompletedTotalTasks(response.data);
+    } catch (error) {
+      console.error("Fetch Users Error:", error.message);
+    }
+  };
+
+  const fetchTotalOngoingTasks = async () => {
+    try {
+      const response = await taskAPI.getAllOnGoingTaskByUserId(user?._id);
+      setOngoingTotalTasks(response.data);
+    } catch (error) {
+      console.error("Fetch Users Error:", error.message);
+    }
+  };
+
+  const fetchTotalPendingTasks = async () => {
+    try {
+      const response = await taskAPI.getAllPendingTaskByUserId(user?._id);
+      setPendingTotalTasks(response.data);
+    } catch (error) {
+      console.error("Fetch Users Error:", error.message);
+    }
+  };
+
+  const fetchTotalInQueTasks = async () => {
+    try {
+      const response = await taskAPI.getAllInQueTaskByUserId(user?._id);
+      setInqueTotalTasks(response.data);
+    } catch (error) {
+      console.error("Fetch Users Error:", error.message);
+    }
+  };
+
+  const fetchTotalReviewTasks = async () => {
+    try {
+      const response = await taskAPI.getAllReviewTaskByUserId(user?._id);
+      setreviewTotalTasks(response.data);
     } catch (error) {
       console.error("Fetch Users Error:", error.message);
     }
@@ -131,6 +191,12 @@ function KanbanBoard() {
     if (users && users.length > 0) {
       fetchTaskLogFilter();
       fetchAllNotifications();
+      fetchTotalTasks();
+      fetchTotalCompletedTasks();
+      fetchTotalOngoingTasks();
+      fetchTotalPendingTasks();
+      fetchTotalInQueTasks();
+      fetchTotalReviewTasks();
     }
   }, [users, refreshNotis]);
 
@@ -416,6 +482,12 @@ function KanbanBoard() {
               setShowCreateTask={setShowCreateTask}
               setShowCreateUser={setShowCreateUser}
               handleLogoutButton={handleLogoutButton}
+              totalTasks={totalTasks}
+              completedTotalTasks={completedTotalTasks}
+              ongoingTotalTasks={ongoingTotalTasks}
+              pendingTotalTasks={pendingTotalTasks}
+              inqueTotalTasks={inqueTotalTasks}
+              reviewTotalTasks={reviewTotalTasks}
             />
 
             <FloatingButtons

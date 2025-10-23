@@ -27,8 +27,10 @@ export default function TaskDetailsSection({
   onPriorityChange,
   taskNotification,
   handleReadNotification,
+  handlePriorityChange,
+  showPriorityModal,
+  setShowPriorityModal,
 }) {
-  const [showPriorityModal, setShowPriorityModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [startClicked, setStartClicked] = useState(false);
   const [localStartTime, setLocalStartTime] = useState(null);
@@ -273,13 +275,6 @@ export default function TaskDetailsSection({
     { value: "low", label: "Low", color: "#16a34a" },
   ];
 
-  const handlePriorityChange = (priority) => {
-    if (onPriorityChange) {
-      onPriorityChange(priority);
-    }
-    setShowPriorityModal(false);
-  };
-
   const getCurrentPriority = () => {
     const priorityValue = data?.taskDetails.taskPriority;
     return {
@@ -326,9 +321,13 @@ export default function TaskDetailsSection({
           <div className="w-full bg-orange-100 p-2 rounded-lg flex justify-center items-center">
             <span className="font-semibold">Priority:</span>
             <button
-              className={`ml-2 bg-gradient-to-r ${getPriorityColor(
-                currentPriority.label
-              )} text-white px-3 py-0.5 rounded text-sm font-medium cursor-pointer transition-all`}
+              className={`ml-2 bg-gradient-to-r ${
+                currentPriority.label === "high"
+                  ? "bg-red-700"
+                  : currentPriority.label === "medium"
+                  ? "bg-yellow-700"
+                  : "bg-green-700"
+              } text-white px-3 py-0.5 rounded text-sm font-medium cursor-pointer transition-all`}
             >
               {currentPriority.label}
             </button>
@@ -510,7 +509,7 @@ export default function TaskDetailsSection({
             </button>
 
             <button
-              onClick={() => setShowPriorityModal(true)}
+              onClick={onPriorityChange} // This should call the prop to open modal
               className="w-full py-3 bg-orange-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-orange-800"
             >
               Change Priority
@@ -523,7 +522,7 @@ export default function TaskDetailsSection({
       {showPriorityModal && (
         <PriorityModal
           priorities={priorities}
-          onPriorityChange={handlePriorityChange}
+          onPriorityChange={handlePriorityChange} // This should call the prop to handle the change
           onClose={() => setShowPriorityModal(false)}
         />
       )}
