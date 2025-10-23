@@ -469,7 +469,7 @@ export default function TaskDetailsSection({
                     checked={mentionChecked}
                     onChange={(e) => handleCheckboxChange(1, e.target.checked)}
                   />{" "}
-                  Mentions
+                  Status Change
                 </label>
 
                 <label>
@@ -478,17 +478,17 @@ export default function TaskDetailsSection({
                     checked={commentChecked}
                     onChange={(e) => handleCheckboxChange(2, e.target.checked)}
                   />{" "}
-                  Comments
+                  Comments & Mentions
                 </label>
 
-                <label>
+                {/* <label>
                   <input
                     type="checkbox"
                     checked={everythingChecked}
                     onChange={(e) => handleCheckboxChange(3, e.target.checked)}
                   />{" "}
                   Everything
-                </label>
+                </label> */}
               </div>
             )}
 

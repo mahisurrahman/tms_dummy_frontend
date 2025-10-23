@@ -183,8 +183,8 @@ const QuickCreateColumn = ({
       </div> */}
 
       {/* Navigation Buttons */}
-      <div className="mt-6 md:mt-8 space-y-2 md:space-y-3">
-        <button
+      <div className="mt-6 md:mt-4 space-y-2 md:space-y-3">
+        {/* <button
           onClick={() => handleNavigation("/profile")}
           className="w-full flex items-center justify-start gap-x-2 md:gap-x-3 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg font-medium text-sm md:text-base transition-all duration-200 transform hover:scale-105 border border-white/20 hover:border-white/30"
         >
@@ -198,7 +198,7 @@ const QuickCreateColumn = ({
         >
           <Settings className="w-4 h-4 md:w-5 md:h-5" />
           Settings
-        </button>
+        </button> */}
 
         <button
           onClick={handleLogoutButton}
