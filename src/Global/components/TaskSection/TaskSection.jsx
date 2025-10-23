@@ -19,7 +19,14 @@ const TaskSection = ({
   moveTask,
   setSelectedTask,
   changeStatusTask,
+  allNotis,
 }) => {
+  const notificationCount = tasks.filter((task) =>
+    allNotis.some(
+      (noti) => noti.taskId === task._id || noti.taskId === task.taskId
+    )
+  ).length;
+
   return (
     <div key={status}>
       <div
@@ -29,11 +36,16 @@ const TaskSection = ({
         <h4 className="text-white font-semibold text-sm md:text-base">
           {title} ({tasks.length})
         </h4>
-        <ChevronDown
-          className={`w-5 h-5 text-white transition-transform duration-300 ${
-            isExpanded ? "rotate-180" : ""
-          }`}
-        />
+        <div className="flex items-center gap-x-2">
+          {notificationCount > 0 && (
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+          )}
+          <ChevronDown
+            className={`w-5 h-5 text-white transition-transform duration-300 ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+          />
+        </div>
       </div>
       {isExpanded && (
         <div className="gap-y-1">
@@ -55,6 +67,7 @@ const TaskSection = ({
                 moveTask={moveTask}
                 onClick={() => setSelectedTask({ task, userId })}
                 changeStatusTask={changeStatusTask}
+                allNotis={allNotis}
               />
             ))
           ) : (

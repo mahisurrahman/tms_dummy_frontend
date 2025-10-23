@@ -21,6 +21,7 @@ const UserColumn = ({
   setSelectedUserForCreate,
   setShowCreateTask,
   changeStatusTask,
+  allNotis,
 }) => {
   const { user } = useContext(AuthContext);
   return (
@@ -95,6 +96,7 @@ const UserColumn = ({
             moveTask={moveTask}
             setSelectedTask={setSelectedTask}
             changeStatusTask={changeStatusTask}
+            allNotis={allNotis}
           />
         ))}
       </div>

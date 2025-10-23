@@ -16,6 +16,8 @@ function TaskModalWrapper({
   changeStatusTask,
   selectedTask,
   setSelectedTask,
+  setRefresNotis,
+  refreshNotis,
 }) {
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -45,10 +47,11 @@ function TaskModalWrapper({
     }
   };
 
-   const fetchCommentTaskStatusByTaskIdandUserId = async () => {
+  const fetchCommentTaskStatusByTaskIdandUserId = async () => {
     try {
       const body = { taskId: data?.task?.taskId, userId: user?._id };
-      const response = await notificationAPI.getCommentNotificationByTaskIdAndUserId(body);
+      const response =
+        await notificationAPI.getCommentNotificationByTaskIdAndUserId(body);
       setCommentNotification(response.data);
     } catch (error) {
       console.log(error, "Fetch Comment Notification error");
@@ -73,6 +76,7 @@ function TaskModalWrapper({
       const response = await notificationAPI.readByTaskIdAndUserId(body);
       if (response?.data) {
         toast.success("Change Status Notification Seen");
+        setRefresNotis(!refreshNotis);
       }
     } catch (error) {
       console.log("Notification Read Failed", error);
@@ -80,18 +84,20 @@ function TaskModalWrapper({
   };
 
   const handleSeenComment = async (commentId) => {
-  try {
-    const body = { taskId: data?.task?.taskId, userId: user?._id, commentId };
-    const response = await notificationAPI.readCommentByTaskIdAndUserId(body);
-    if (response?.data) {
-      toast.success("Comment's Notification Seen");
-      // Update comment notifications state by removing the seen comment
-      setCommentNotification(prev => prev.filter(notification => notification.commentId !== commentId));
+    try {
+      const body = { taskId: data?.task?.taskId, userId: user?._id, commentId };
+      const response = await notificationAPI.readCommentByTaskIdAndUserId(body);
+      if (response?.data) {
+        toast.success("Comment's Notification Seen");
+        setCommentNotification((prev) =>
+          prev.filter((notification) => notification.commentId !== commentId)
+        );
+        setRefresNotis(!refreshNotis);
+      }
+    } catch (error) {
+      console.log("Notification Read Failed", error);
     }
-  } catch (error) {
-    console.log("Notification Read Failed", error);
-  }
-};
+  };
 
   return (
     <div>
@@ -118,6 +124,8 @@ function TaskModalWrapper({
           refreshTask={refreshTask}
           commentNotification={commentNotification}
           handleSeenComment={handleSeenComment}
+          refreshNotis={refreshNotis}
+          setRefresNotis={setRefresNotis}
         />
       ) : null}
     </div>

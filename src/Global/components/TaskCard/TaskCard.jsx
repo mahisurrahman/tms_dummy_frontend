@@ -22,6 +22,7 @@ const TaskCard = ({
   moveTask,
   onClick,
   changeStatusTask,
+  allNotis = [],
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
@@ -30,6 +31,10 @@ const TaskCard = ({
   const [startClicked, setStartClicked] = useState(false);
   const [localStartTime, setLocalStartTime] = useState(null);
   const [timerInterval, setTimerInterval] = useState(null);
+
+  const hasNotification = allNotis.some(
+    (noti) => noti.taskId === task._id || noti.taskId === task.taskId
+  );
 
   const statuses = ["Pending", "InQueue", "Ongoing", "Review", "Complete"];
 
@@ -256,13 +261,25 @@ const TaskCard = ({
         {/* HEADER */}
         <div>
           {!isBacklog ? (
-            <h4 className="font-bold text-lg mb-1 text-gray-900 leading-tight">
-              {index + 1}. {task?.taskDetails?.taskTitle}
-            </h4>
+            <div className="flex mb-1 items-center justify-between">
+              <h4 className="font-bold text-lg text-gray-900 leading-tight">
+                {index + 1}. {task?.taskDetails?.taskTitle}
+              </h4>
+              {/* Notification Dot */}
+              {hasNotification && (
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse z-10"></div>
+              )}
+            </div>
           ) : (
-            <h4 className="font-bold text-md mb-1 text-gray-900 leading-tight">
-              {index + 1}. {task?.taskTitle}
-            </h4>
+            <div className="flex items-center justify-between mb-1">
+              <h4 className="font-bold text-md text-gray-900 leading-tight">
+                {index + 1}. {task?.taskTitle}
+              </h4>
+              {/* Notification Dot */}
+              {hasNotification && (
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse z-10"></div>
+              )}
+            </div>
           )}
           {!isBacklog && task?.taskStatus === "ongoing" && (
             <div className="w-full flex items-center justify-center">

@@ -29,6 +29,7 @@ import { taskAPI } from "../../api/endpoints/task.api";
 import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 import TaskModalWrapper from "../Wrapper/TaskModalWrapper";
 import { notiFyCntrlAPI } from "../../api/endpoints/notificationControll.api";
+import { notificationAPI } from "../../api/endpoints/notification.api";
 
 function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -42,6 +43,8 @@ function KanbanBoard() {
   const [users, setUsers] = useState([]);
   const [userTaskLogs, setUserTaskLogs] = useState({});
   const [backlogs, setBacklogs] = useState([]);
+  const [allNotis, setAllNotis] = useState([]);
+  const [refreshNotis, setRefresNotis] = useState(false);
 
   const { user, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -63,7 +66,6 @@ function KanbanBoard() {
   const fetchBacklogs = async () => {
     try {
       const response = await taskAPI.getAllTask();
-      // Filter tasks with backlog === true
       const backlogTasksFiltered = response.data.filter(
         (task) => task.backlog === true
       );
@@ -106,6 +108,17 @@ function KanbanBoard() {
     }
   };
 
+  const fetchAllNotifications = async () => {
+    try {
+      const response = await notificationAPI.getNotificationsByUserId(
+        user?._id
+      );
+      setAllNotis(response.data);
+    } catch (error) {
+      console.error("Fetch Users Error:", error.message);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       await fetchUsers();
@@ -117,8 +130,9 @@ function KanbanBoard() {
   useEffect(() => {
     if (users && users.length > 0) {
       fetchTaskLogFilter();
+      fetchAllNotifications();
     }
-  }, [users]);
+  }, [users, refreshNotis]);
 
   // Change status of a task
   const changeStatusTask = async (
@@ -390,6 +404,7 @@ function KanbanBoard() {
                 setSelectedUserForCreate={setSelectedUserForCreate}
                 setShowCreateTask={setShowCreateTask}
                 changeStatusTask={changeStatusTask}
+                allNotis={allNotis}
               />
             )}
 
@@ -426,6 +441,8 @@ function KanbanBoard() {
               changeStatusTask={changeStatusTask}
               selectedTask={selectedTask}
               setSelectedTask={setSelectedTask}
+              setRefresNotis={setRefresNotis}
+              refreshNotis={refreshNotis}
             />
           )}
 

@@ -26,6 +26,8 @@ const TaskModal = ({
   refreshTask,
   commentNotification,
   handleSeenComment,
+  refreshNotis,
+  setRefresNotis,
 }) => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -141,7 +143,7 @@ const TaskModal = ({
           await refreshTask();
         }
       }
-
+      setRefresNotis(!refreshNotis);
       setShowStatusModal(false);
     } catch (error) {
       console.error("Failed to change status:", error);
@@ -156,7 +158,6 @@ const TaskModal = ({
     });
     setShowPriorityModal(false);
   };
-
 
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-xl flex items-center justify-center z-50 p-4">

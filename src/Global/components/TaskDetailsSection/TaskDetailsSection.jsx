@@ -38,7 +38,6 @@ export default function TaskDetailsSection({
   const [commentChecked, setCommentChecked] = useState(false);
   const [everythingChecked, setEverythingChecked] = useState(false);
   const [seen, isSeen] = useState(false);
-  
 
   useEffect(() => {
     if (!notifyControll || !notifyControll.followers || !user?._id) return;
@@ -320,7 +319,6 @@ export default function TaskDetailsSection({
 
   const statusInfo = getStatusInfo();
 
-
   return (
     <>
       <div className="bg-white border-4 border-green-500 rounded-2xl p-4 w-full">
@@ -405,9 +403,9 @@ export default function TaskDetailsSection({
             </div>
             <div className="text-red-600 text-3xl">
               <span className="font-bold">Expected Deadline:</span>{" "}
-              {
-                data?.taskDetails?.expectedDeadline !== "" ? formatReadableDateTime(data?.taskDetails?.expectedDeadline) : "Not Given"
-              }
+              {data?.taskDetails?.expectedDeadline !== ""
+                ? formatReadableDateTime(data?.taskDetails?.expectedDeadline)
+                : "Not Given"}
             </div>
           </div>
           {taskNotification.length > 0 && (
@@ -417,7 +415,7 @@ export default function TaskDetailsSection({
                 <button
                   onClick={() => {
                     isSeen(!seen);
-                    handleReadNotification()
+                    handleReadNotification();
                   }}
                   className="px-2 py-1 rounded text-xs font-semibold bg-gradient-to-br from-purple-700 to-blue-700 text-white w-full hover:from-purple-800 hover:to-from-blue-800 duration-500 hover:scale-110 cursor-pointer flex items-center justify-center  gap-x-1"
                 >
@@ -502,7 +500,7 @@ export default function TaskDetailsSection({
           </div>
         </div>
 
-        {user && user?._id === data?.assignedToId || user?.userType === 1 && (
+        {user && user?._id === data?.assignedToId && (
           <div className="w-full flex items-center gap-x-2">
             <button
               onClick={onStatusChange}
