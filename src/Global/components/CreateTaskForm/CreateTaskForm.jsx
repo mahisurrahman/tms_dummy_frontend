@@ -126,17 +126,23 @@ const CreateTaskForm = ({
   };
 
   const handleSubmit = () => {
-    const selectedLabelObjects = getSelectedLabels(); // Get full label objects
+    // Get full label objects for selected labels
+    const selectedLabelObjects = labels.filter((label) =>
+      formData.labels?.includes(label._id)
+    );
+
     const taskData = {
       ...formData,
-      labels: selectedLabelObjects, // Send full objects instead of just IDs
+      labels: selectedLabelObjects, // Send full objects to the API
     };
+
     handleAddTask(taskData);
   };
 
   const getSelectedLabels = () => {
     return labels.filter((label) => formData.labels?.includes(label._id));
   };
+
   return (
     <>
       <div className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4">
@@ -197,7 +203,7 @@ const CreateTaskForm = ({
                         className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
                       >
                         <Tag className="w-3 h-3" />
-                        {label.name}
+                        {label.name} {/* Use labelTitle instead of name */}
                         <button
                           type="button"
                           onClick={() => handleLabelToggle(label._id)}
@@ -213,7 +219,7 @@ const CreateTaskForm = ({
                 {/* Labels Dropdown */}
                 <div className="relative">
                   {labels.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-32 overflow-y-auto p-2 border border-gray-300 rounded-lg">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto p-2 border border-gray-300 rounded-lg">
                       {labels.map((label) => (
                         <div
                           key={label._id}
@@ -231,7 +237,7 @@ const CreateTaskForm = ({
                             onClick={() => handleLabelToggle(label._id)}
                             className="text-sm text-gray-700 flex-1 cursor-pointer select-none"
                           >
-                            {label.name}
+                            {label.name}{" "}
                           </span>
                           {user && user.userType === 1 ? (
                             <div className="flex items-center justify-end gap-x-4">

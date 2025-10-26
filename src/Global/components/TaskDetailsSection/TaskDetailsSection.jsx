@@ -421,65 +421,73 @@ export default function TaskDetailsSection({
         </div>
         <div className="mb-4">
           <div className="flex items-start justify-between">
-            <div>
-              <h3 className="font-bold text-gray-800 mb-1 -mt-1">
-                Assigned To:
-              </h3>
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2">
-                  {data?.assignedToDetails?.username
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-800">
-                    {data?.assignedToDetails?.username}
-                  </span>
-                  <span className="text-xs text-gray-600 ml-2">
-                    ({data?.assignedToDetails?.designation})
-                  </span>
+            {data?.assignedToDetails && (
+              <div>
+                <h3 className="font-bold text-gray-800 mb-1 -mt-1">
+                  Assigned To:
+                </h3>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2">
+                    {data?.assignedToDetails?.username
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-800">
+                      {data?.assignedToDetails?.username}
+                    </span>
+                    <span className="text-xs text-gray-600 ml-2">
+                      ({data?.assignedToDetails?.designation})
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             {loading === true ? (
               <LoaderIcon />
             ) : (
-              <div className="">
-                <h1 className="font-semibold mb-2">Notification Controls:</h1>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left border-b">User</th>
-                        <th className="px-4 py-2 text-left border-b">
+              <>
+                {notifyControll?.followers && (
+                  <div className="">
+                    <h1 className="font-semibold mb-2">
+                      Notification Controls:
+                    </h1>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-2 text-center border-b">
+                              User
+                            </th>
+                            {/* <th className="px-4 py-2 text-left border-b">
                           Status Change
                         </th>
                         <th className="px-4 py-2 text-left border-b">
                           Comments & Mentions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {notifyControll?.followers?.map((follower) => (
-                        <tr
-                          key={follower.receiverId}
-                          className="border-b last:border-b-0"
-                        >
-                          <td className="px-4 py-2">
-                            <div className="flex items-center">
-                              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2">
-                                {follower.receiverData?.username
-                                  ?.split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </div>
-                              <span className="font-medium">
-                                {follower.receiverData?.username}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-2">
+                        </th> */}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {notifyControll?.followers?.map((follower) => (
+                            <tr
+                              key={follower.receiverId}
+                              className="border-b last:border-b-0"
+                            >
+                              <td className="px-4 py-2">
+                                <div className="flex items-center">
+                                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2">
+                                    {follower.receiverData?.username
+                                      ?.split(" ")
+                                      .map((n) => n[0])
+                                      .join("")}
+                                  </div>
+                                  <span className="font-medium">
+                                    {follower.receiverData?.username}
+                                  </span>
+                                </div>
+                              </td>
+                              {/* <td className="px-4 py-2">
                             <input
                               type="checkbox"
                               checked={follower.controlType?.includes(1)}
@@ -508,39 +516,39 @@ export default function TaskDetailsSection({
                               // disabled={follower.receiverId !== user?._id}
                               disabled
                             />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                          </td> */}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
-
-            {/* <button className="flex items-center bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm py-2 px-3 rounded-lg shadow-sm cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all">
-              <Pin className="w-4 h-4 mr-1" />
-              Poke
-            </button> */}
           </div>
         </div>
 
-        {user && user?._id === data?.assignedToId && (
-          <div className="w-full flex items-center gap-x-2">
-            <button
-              onClick={onStatusChange}
-              className="w-full py-3 bg-blue-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-blue-800"
-            >
-              Change Status
-            </button>
+        {(user._id === data?.assignedToId ||
+          user?.userType === 1 ||
+          data?.taskDetails?.backlog === false) &&
+          data?.taskDetails?.backlog !== true && ( // Add this condition
+            <div className="w-full flex items-center gap-x-2">
+              <button
+                onClick={onStatusChange}
+                className="w-full py-3 bg-blue-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-blue-800"
+              >
+                Change Status
+              </button>
 
-            <button
-              onClick={onPriorityChange} // This should call the prop to open modal
-              className="w-full py-3 bg-orange-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-orange-800"
-            >
-              Change Priority
-            </button>
-          </div>
-        )}
+              <button
+                onClick={onPriorityChange}
+                className="w-full py-3 bg-orange-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-orange-800"
+              >
+                Change Priority
+              </button>
+            </div>
+          )}
       </div>
 
       {/* Priority Modal */}

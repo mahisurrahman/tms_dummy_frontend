@@ -214,7 +214,7 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
                   />
                 </div>
 
-                <span className="text-white/70 mx-1">-</span>
+                {/* <span className="text-white/70 mx-1">-</span> */}
 
                 <div className="flex flex-col">
                   <label className="text-xs text-white/70 mb-1">To</label>

@@ -32,7 +32,16 @@ const BacklogSection = ({
             key={task.id}
             task={task}
             isBacklog={true}
-            onClick={() => setSelectedTask({ task, userId: null })}
+            onClick={() =>
+              setSelectedTask({
+                task: {
+                  ...task,
+                  _id: task._id || task.id,
+                  taskId: task._id || task.id,
+                },
+                userId: null,
+              })
+            }
           />
         ))}
       </div>

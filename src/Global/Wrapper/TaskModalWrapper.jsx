@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import TaskModal from "../components/TaskModal/TaskModal";
+import EditTaskForm from "../components/EditTaskForm/EditTaskForm"; // Import the EditTaskForm
 import { taskLogAPI } from "../../api/endpoints/taskLog.api";
 import { AuthContext } from "../../provider/AuthProvider";
 import { notificationAPI } from "../../api/endpoints/notification.api";
@@ -19,18 +20,27 @@ function TaskModalWrapper({
   setSelectedTask,
   setRefresNotis,
   refreshNotis,
+  handleEditTask, // Add this prop
 }) {
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
   const [taskNotification, setTaskNotification] = useState([]);
   const [commentNotification, setCommentNotification] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false); // State for edit modal
   const { user } = useContext(AuthContext);
 
   const fetchTaskLogByTaskLogId = async () => {
     try {
       setLoading(true);
-      const response = await taskLogAPI.getTaskLogById(data?.task?._id);
-      setTask(response.data);
+      if (data?.userId === null) {
+        setTask({
+          ...data.task,
+          taskDetails: data.task,
+        });
+      } else {
+        const response = await taskLogAPI.getTaskLogById(data?.task?._id);
+        setTask(response.data);
+      }
     } catch (error) {
       console.log(error, "Fetch Task Log By Task Log ID error");
     } finally {
@@ -121,6 +131,19 @@ function TaskModalWrapper({
     }
   };
 
+  // Handler for edit button click
+  const handleEditClick = () => {
+    setShowEditModal(true);
+  };
+
+  // Handler for edit form submission
+  const handleEditFormSubmit = (editData) => {
+    if (handleEditTask) {
+      handleEditTask(editData);
+    }
+    setShowEditModal(false);
+  };
+
   return (
     <div>
       {loading ? (
@@ -131,25 +154,40 @@ function TaskModalWrapper({
           </div>
         </div>
       ) : task ? (
-        <TaskModal
-          user={user}
-          task={task}
-          onClose={() => setSelectedTask(null)}
-          users={users}
-          sections={sections}
-          sectionTitles={sectionTitles}
-          moveTask={moveTask}
-          updateTask={updateTask}
-          changeStatusTask={changeStatusTask}
-          taskNotification={taskNotification}
-          handleReadNotification={handleReadNotification}
-          refreshTask={refreshTask}
-          commentNotification={commentNotification}
-          handleSeenComment={handleSeenComment}
-          refreshNotis={refreshNotis}
-          setRefresNotis={setRefresNotis}
-          handleUpdateTask={handleUpdateTask}
-        />
+        <>
+          <TaskModal
+            onEdit={handleEditClick}
+            user={user}
+            task={task}
+            onClose={onClose}
+            users={users}
+            sections={sections}
+            sectionTitles={sectionTitles}
+            moveTask={moveTask}
+            updateTask={updateTask}
+            changeStatusTask={changeStatusTask}
+            taskNotification={taskNotification}
+            handleReadNotification={handleReadNotification}
+            refreshTask={refreshTask}
+            commentNotification={commentNotification}
+            handleSeenComment={handleSeenComment}
+            refreshNotis={refreshNotis}
+            setRefresNotis={setRefresNotis}
+            handleUpdateTask={handleUpdateTask}
+          />
+
+          {/* Edit Task Modal */}
+          {showEditModal && (
+            <EditTaskForm
+              onClose={() => setShowEditModal(false)}
+              task={task}
+              users={users}
+              handleEditTask={handleEditFormSubmit}
+              loading={loading}
+              user={user}
+            />
+          )}
+        </>
       ) : null}
     </div>
   );
