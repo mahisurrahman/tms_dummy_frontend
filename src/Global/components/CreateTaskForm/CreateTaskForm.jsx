@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { X, Plus, Upload, Tag } from "lucide-react";
+import { X, Plus, Upload, Tag, Pen } from "lucide-react";
 import Spinner from "../Spinner/Spinner";
 import { labelAPI } from "../../../api/endpoints/label.api";
+import toast from "react-hot-toast";
 
 const CreateTaskForm = ({
   onClose,
@@ -43,6 +44,18 @@ const CreateTaskForm = ({
   useEffect(() => {
     fetchAllLabels();
   }, []);
+
+  const handleLabelRemove = async (id) => {
+    try {
+      const response = await labelAPI.removeLabel(id);
+      if (response.data) {
+        toast.success("Remvoed the label");
+        fetchAllLabels();
+      }
+    } catch (error) {
+      console.log(error, "Removing Label Error");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -199,26 +212,67 @@ const CreateTaskForm = ({
 
                 {/* Labels Dropdown */}
                 <div className="relative">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto p-2 border border-gray-300 rounded-lg">
-                    {labels.map((label) => (
-                      <label
-                        key={label._id}
-                        className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={
-                            formData.labels?.includes(label._id) || false
-                          }
-                          onChange={() => handleLabelToggle(label._id)}
-                          className="rounded text-green-600 focus:ring-green-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {label.name}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                  {labels.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-32 overflow-y-auto p-2 border border-gray-300 rounded-lg">
+                      {labels.map((label) => (
+                        <div
+                          key={label._id}
+                          className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={
+                              formData.labels?.includes(label._id) || false
+                            }
+                            onChange={() => handleLabelToggle(label._id)}
+                            className="rounded text-green-600 focus:ring-green-500"
+                          />
+                          <span
+                            onClick={() => handleLabelToggle(label._id)}
+                            className="text-sm text-gray-700 flex-1 cursor-pointer select-none"
+                          >
+                            {label.name}
+                          </span>
+                          {user && user.userType === 1 ? (
+                            <div className="flex items-center justify-end gap-x-4">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  handleLabelRemove(label._id);
+                                }}
+                                className="text-red-600 hover:text-red-800 transition-transform hover:scale-125"
+                              >
+                                <X size={12} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  handleLabelRemove(label._id);
+                                }}
+                                className="text-red-600 hover:text-red-800 transition-transform hover:scale-125"
+                              >
+                                <Pen size={12} />
+                              </button>
+                            </div>
+                          ) : (
+                            <></>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg text-center text-gray-500">
+                      <Tag className="w-4 h-4 mb-1 text-gray-400" />
+                      <p className="text-sm">No labels found</p>
+                      <p className="text-xs text-gray-400">
+                        Create one below to get started
+                      </p>
+                    </div>
+                  )}
 
                   {/* Add New Label Button */}
                   <button

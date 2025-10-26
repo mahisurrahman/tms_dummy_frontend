@@ -230,17 +230,17 @@ export default function TaskDetailsSection({
     }
   }, [data?.totalOnGoingTime, data?.startTime]);
 
-  const handleCheckboxChange = async (type, checked) => {
+  const handleCheckboxChange = async (type, checked, receiverId) => {
     const follower = notifyControll?.followers?.find(
-      (f) => f.receiverId === user?._id
+      (f) => f.receiverId === receiverId
     );
     if (!follower) return;
     setLoading(true);
 
     const payload = {
       taskId: data?.taskId,
-      receiverId: follower.receiverId,
-      controlTypes: [type], // ✅ always send array
+      receiverId: receiverId,
+      controlTypes: [type],
     };
 
     const response = checked
@@ -248,21 +248,6 @@ export default function TaskDetailsSection({
       : await notiFyCntrlAPI.removeControllTypes(payload);
 
     if (response?.data) {
-      // ✅ update local UI state based on type
-      switch (type) {
-        case 1:
-          setMentionChecked(checked);
-          break;
-        case 2:
-          setCommentChecked(checked);
-          break;
-        case 3:
-          setEverythingChecked(checked);
-          break;
-        default:
-          break;
-      }
-
       toast.success("Notification Control Updated");
       setLoading(false);
     }
@@ -460,35 +445,75 @@ export default function TaskDetailsSection({
             {loading === true ? (
               <LoaderIcon />
             ) : (
-              <div className="flex items-center gap-x-5">
-                <h1 className="font-semibold">Get Notifications For:</h1>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={mentionChecked}
-                    onChange={(e) => handleCheckboxChange(1, e.target.checked)}
-                  />{" "}
-                  Status Change
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={commentChecked}
-                    onChange={(e) => handleCheckboxChange(2, e.target.checked)}
-                  />{" "}
-                  Comments & Mentions
-                </label>
-
-                {/* <label>
-                  <input
-                    type="checkbox"
-                    checked={everythingChecked}
-                    onChange={(e) => handleCheckboxChange(3, e.target.checked)}
-                  />{" "}
-                  Everything
-                </label> */}
+              <div className="">
+                <h1 className="font-semibold mb-2">Notification Controls:</h1>
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left border-b">User</th>
+                        <th className="px-4 py-2 text-left border-b">
+                          Status Change
+                        </th>
+                        <th className="px-4 py-2 text-left border-b">
+                          Comments & Mentions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {notifyControll?.followers?.map((follower) => (
+                        <tr
+                          key={follower.receiverId}
+                          className="border-b last:border-b-0"
+                        >
+                          <td className="px-4 py-2">
+                            <div className="flex items-center">
+                              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2">
+                                {follower.receiverData?.username
+                                  ?.split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </div>
+                              <span className="font-medium">
+                                {follower.receiverData?.username}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2">
+                            <input
+                              type="checkbox"
+                              checked={follower.controlType?.includes(1)}
+                              onChange={(e) =>
+                                handleCheckboxChange(
+                                  1,
+                                  e.target.checked,
+                                  follower.receiverId
+                                )
+                              }
+                              // disabled={follower.receiverId !== user?._id}
+                              disabled
+                            />
+                          </td>
+                          <td className="px-4 py-2">
+                            <input
+                              type="checkbox"
+                              checked={follower.controlType?.includes(2)}
+                              onChange={(e) =>
+                                handleCheckboxChange(
+                                  2,
+                                  e.target.checked,
+                                  follower.receiverId
+                                )
+                              }
+                              // disabled={follower.receiverId !== user?._id}
+                              disabled
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
