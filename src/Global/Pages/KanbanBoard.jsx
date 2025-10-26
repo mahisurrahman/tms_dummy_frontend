@@ -292,10 +292,31 @@ function KanbanBoard() {
     try {
       setLoading(true);
       let response = null;
-      if (editData.changes.taskAssignedTo) {
+
+      // Create a copy of changes to avoid mutating the original
+      const updatedChanges = { ...editData.changes };
+
+      // Map form field names to API field names if needed
+      if (updatedChanges.deadline) {
+        updatedChanges.expectedDeadline = updatedChanges.deadline;
+        delete updatedChanges.deadline;
+      }
+
+      // Map taskAssignedTo if it exists
+      if (updatedChanges.taskAssignedTo !== undefined) {
+        updatedChanges.assignedToId = updatedChanges.taskAssignedTo;
+        // Only set backlog to false if actually assigning to a user (not empty string)
+        if (updatedChanges.taskAssignedTo) {
+          updatedChanges.backlog = false;
+        } else {
+          updatedChanges.backlog = true;
+        }
+        delete updatedChanges.taskAssignedTo;
+      }
+
+      if (updatedChanges.assignedToId || updatedChanges.taskAssignedTo === "") {
         const payload = {
-          ...editData.changes,
-          backlog: false,
+          ...updatedChanges,
         };
 
         response = await taskAPI.update(editData.taskId, payload);
@@ -311,23 +332,26 @@ function KanbanBoard() {
           setShowEditTask(false);
           setLoading(false);
           setSelectedTask(null);
+          return; // Important: return after successful update
         }
-        setLoading(false);
-      }
-      response = await taskAPI.update(editData.taskId, editData.changes);
-      if (response.error === false) {
-        toast.success(
-          `Task updated with ${Object.keys(editData.changes).length} changes`
-        );
-        setShowEditTask(false);
-        setTaskToEdit(null);
+      } else {
+        // For other updates (not assignment related)
+        response = await taskAPI.update(editData.taskId, updatedChanges);
+        if (response.error === false) {
+          toast.success(
+            `Task updated with ${Object.keys(editData.changes).length} changes`
+          );
+          setShowEditTask(false);
+          setTaskToEdit(null);
 
-        await fetchUsers();
-        await fetchBacklogs();
-        setShowEditTask(false);
-        setLoading(false);
-        setSelectedTask(null);
+          await fetchUsers();
+          await fetchBacklogs();
+          setShowEditTask(false);
+          setLoading(false);
+          setSelectedTask(null);
+        }
       }
+
       setLoading(false);
     } catch (error) {
       console.log("Edit Task Failed", error);
