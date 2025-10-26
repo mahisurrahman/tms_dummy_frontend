@@ -246,7 +246,6 @@ const EditTaskForm = ({
                 placeholder="Enter task title..."
               />
             </div>
-
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -261,7 +260,7 @@ const EditTaskForm = ({
                 placeholder="Describe the task..."
               />
             </div>
-
+            {/* Blank Commit */}
             {/* Labels Section */}
             {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -344,7 +343,6 @@ const EditTaskForm = ({
                 </div>
               </div>
             </div> */}
-
             {/* Priority & Assign To */}
             {user?.userType === 1 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -401,7 +399,6 @@ const EditTaskForm = ({
                 </select>
               </div>
             )}
-
             {/* Deadline */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -414,7 +411,6 @@ const EditTaskForm = ({
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
             {/* Submit Buttons */}
             <div className="flex gap-3 justify-end pt-4">
               <button
