@@ -152,8 +152,7 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
             Traiban
           </h1>
 
-          <div className="flex flex-col md:flex-row gap-x-4 md:gap-x-6">
-            {/* Week Filter */}
+          {/* <div className="flex flex-col md:flex-row gap-x-4 md:gap-x-6">
             <div className="flex items-center gap-3">
               <button
                 onClick={handlePreviousWeek}
@@ -197,7 +196,6 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
               </div>
             </div>
 
-            {/* Date Range Filter */}
             <div className="border-l-2 pl-10 border-white flex items-center gap-x-3">
               <Calendar className="w-5 h-5 text-white" />
 
@@ -214,8 +212,6 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
                   />
                 </div>
 
-                {/* <span className="text-white/70 mx-1">-</span> */}
-
                 <div className="flex flex-col">
                   <label className="text-xs text-white/70 mb-1">To</label>
                   <input
@@ -229,7 +225,7 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
