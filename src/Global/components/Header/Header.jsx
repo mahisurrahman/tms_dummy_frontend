@@ -1,80 +1,130 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import logo from "../../../assets/images/Final-V.png";
 
 const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
-  const [currentWeek, setCurrentWeek] = useState(() => {
-    // Calculate current week based on today's date (October 23, 2025)
-    const today = new Date(2025, 9, 23); // Month is 0-indexed, so 9 = October
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const firstSaturday = new Date(firstDayOfMonth);
-
-    // Find the first Saturday of the month
-    while (firstSaturday.getDay() !== 6) {
-      // 6 = Saturday
-      firstSaturday.setDate(firstSaturday.getDate() + 1);
-    }
-
-    // Calculate which week we're in
-    const diffInTime = today.getTime() - firstSaturday.getTime();
-    const diffInDays = Math.floor(diffInTime / (1000 * 60 * 60 * 24));
-    const weekNumber = Math.floor(diffInDays / 7) + 1;
-
-    return weekNumber;
-  });
-
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(1);
   const [dateRange, setDateRange] = useState({
     from: "",
     to: "",
   });
 
-  // Generate week data for display
-  const generateWeekData = (weekNumber) => {
-    const today = new Date(2025, 9, 23); // October 23, 2025
-    const currentDate = today.getDate();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
+  // Fixed: store today's actual date separately
+  const realToday = new Date();
 
-    // Find first Saturday of the month
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  // Calculate current week based on today's date
+  const calculateCurrentWeek = (date) => {
+    const today = new Date(date);
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const firstSaturday = new Date(firstDayOfMonth);
+
     while (firstSaturday.getDay() !== 6) {
-      // 6 = Saturday
       firstSaturday.setDate(firstSaturday.getDate() + 1);
     }
 
-    // Calculate start date of the requested week
+    const diffInTime = today.getTime() - firstSaturday.getTime();
+    const diffInDays = Math.floor(diffInTime / (1000 * 60 * 60 * 24));
+
+    if (diffInDays < 0) return 1;
+
+    return Math.floor(diffInDays / 7) + 1;
+  };
+
+  // Helper: calculate how many weeks are in a given month
+  const calculateWeeksInMonth = (date) => {
+    const month = new Date(date);
+    const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
+    const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+
+    const firstSaturday = new Date(firstDay);
+    while (firstSaturday.getDay() !== 6) {
+      firstSaturday.setDate(firstSaturday.getDate() + 1);
+    }
+
+    const lastSaturday = new Date(lastDay);
+    while (lastSaturday.getDay() !== 6) {
+      lastSaturday.setDate(lastSaturday.getDate() - 1);
+    }
+
+    const diffInTime = lastSaturday.getTime() - firstSaturday.getTime();
+    const diffInDays = Math.floor(diffInTime / (1000 * 60 * 60 * 24));
+    return Math.floor(diffInDays / 7) + 1;
+  };
+
+  // Generate week data
+  const generateWeekData = (weekNumber, referenceDate) => {
+    const currentDate = new Date(referenceDate);
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const firstSaturday = new Date(firstDayOfMonth);
+    while (firstSaturday.getDay() !== 6) {
+      firstSaturday.setDate(firstSaturday.getDate() + 1);
+    }
+
     const startDate = new Date(firstSaturday);
-    const daysToAdd = (weekNumber - 1) * 7;
-    startDate.setDate(firstSaturday.getDate() + daysToAdd);
+    startDate.setDate(firstSaturday.getDate() + (weekNumber - 1) * 7);
 
     const weekDays = [];
+
     for (let i = 0; i < 7; i++) {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + i);
+
+      // ✅ FIXED: Always compare against realToday, not currentDate
+      const isToday =
+        date.getDate() === realToday.getDate() &&
+        date.getMonth() === realToday.getMonth() &&
+        date.getFullYear() === realToday.getFullYear();
 
       weekDays.push({
         day: date.toLocaleDateString("en-US", { weekday: "short" }),
         date: date.getDate(),
         month: date.getMonth(),
-        isToday:
-          date.getDate() === currentDate && date.getMonth() === currentMonth,
+        year: date.getFullYear(),
+        fullDate: date,
+        isToday,
       });
     }
 
     return weekDays;
   };
 
-  const weekDays = generateWeekData(currentWeek);
+  useEffect(() => {
+    const today = new Date();
+    setCurrentDate(today);
+    setCurrentWeek(calculateCurrentWeek(today));
+  }, []);
+
+  const weekDays = generateWeekData(currentWeek, currentDate);
 
   const handlePreviousWeek = () => {
     if (currentWeek > 1) {
       setCurrentWeek(currentWeek - 1);
+    } else {
+      const prevMonth = new Date(currentDate);
+      prevMonth.setMonth(prevMonth.getMonth() - 1);
+      prevMonth.setDate(1);
+
+      const weeksInPrevMonth = calculateWeeksInMonth(prevMonth);
+      setCurrentWeek(weeksInPrevMonth);
+      setCurrentDate(prevMonth);
     }
   };
 
   const handleNextWeek = () => {
-    setCurrentWeek(currentWeek + 1);
+    const weeksInCurrentMonth = calculateWeeksInMonth(currentDate);
+    if (currentWeek < weeksInCurrentMonth) {
+      setCurrentWeek(currentWeek + 1);
+    } else {
+      const nextMonth = new Date(currentDate);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      nextMonth.setDate(1);
+      setCurrentWeek(1);
+      setCurrentDate(nextMonth);
+    }
   };
 
   const handleDateRangeChange = (field, value) => {
@@ -82,6 +132,13 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  const getMonthName = () => {
+    return currentDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
   };
 
   return (
@@ -101,25 +158,29 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
               <button
                 onClick={handlePreviousWeek}
                 className="p-1 hover:bg-white/20 rounded transition-colors"
-                disabled={currentWeek === 1}
               >
                 <ChevronLeft className="w-5 h-5 text-white" />
               </button>
 
-              <div className="flex items-center gap-1">
-                {weekDays.map((day, index) => (
-                  <div
-                    key={index}
-                    className={`flex flex-col items-center p-2 rounded min-w-12 ${
-                      day.isToday
-                        ? "bg-blue-500 text-white"
-                        : "bg-white/10 text-white/80"
-                    }`}
-                  >
-                    <span className="text-xs font-medium">{day.day}</span>
-                    <span className="text-sm font-bold">{day.date}</span>
-                  </div>
-                ))}
+              <div className="flex flex-col items-center">
+                <span className="text-white text-sm font-medium mb-1">
+                  {getMonthName()}
+                </span>
+                <div className="flex items-center gap-1">
+                  {weekDays.map((day, index) => (
+                    <div
+                      key={index}
+                      className={`flex flex-col items-center p-2 rounded min-w-12 ${
+                        day.isToday
+                          ? "bg-blue-500 text-white"
+                          : "bg-white/10 text-white/80"
+                      }`}
+                    >
+                      <span className="text-xs font-medium">{day.day}</span>
+                      <span className="text-sm font-bold">{day.date}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <button
@@ -137,7 +198,7 @@ const Header = ({ setShowCreateTask, setSelectedUserForCreate }) => {
             </div>
 
             {/* Date Range Filter */}
-            <div className="border-l-2  pl-10 border-white flex items-center gap-x-3">
+            <div className="border-l-2 pl-10 border-white flex items-center gap-x-3">
               <Calendar className="w-5 h-5 text-white" />
 
               <div className="flex items-center gap-2">

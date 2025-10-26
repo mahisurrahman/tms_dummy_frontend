@@ -253,8 +253,7 @@ const TaskCard = ({
             ? "border-green-600"
             : "border-white"
         } rounded-lg p-3 mb-2 transition-all duration-300 cursor-pointer border-4 bg-white hover:-translate-y-1 ${
-          priorityStyles[task?.taskDetails?.taskPriority] ||
-          "border-l-gray-500 shadow-gray-100"
+          priorityStyles[task?.taskDetails?.taskPriority] || " shadow-gray-100"
         }`}
         onClick={onClick}
       >
@@ -273,7 +272,7 @@ const TaskCard = ({
           ) : (
             <div className="flex items-center justify-between mb-1">
               <h4 className="font-bold text-md text-gray-900 leading-tight">
-                {index + 1}. {task?.taskTitle}
+                {task?.taskTitle}
               </h4>
               {/* Notification Dot */}
               {hasNotification && (

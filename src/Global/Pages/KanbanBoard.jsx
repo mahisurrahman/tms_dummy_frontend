@@ -69,14 +69,14 @@ function KanbanBoard() {
     }
   };
 
-  const fetchTotalTasks = async () => {
-    try {
-      const response = await taskAPI.getAllTaskByUserId(user?._id);
-      setTotalTasks(response.data);
-    } catch (error) {
-      console.error("Fetch Users Error:", error.message);
-    }
-  };
+  // const fetchTotalTasks = async () => {
+  //   try {
+  //     const response = await taskAPI.getAllTaskByUserId(user?._id);
+  //     setTotalTasks(response.data);
+  //   } catch (error) {
+  //     console.error("Fetch Users Error:", error.message);
+  //   }
+  // };
 
   const fetchTotalCompletedTasks = async () => {
     try {
@@ -191,7 +191,7 @@ function KanbanBoard() {
     if (users && users.length > 0) {
       fetchTaskLogFilter();
       fetchAllNotifications();
-      fetchTotalTasks();
+      // fetchTotalTasks();
       fetchTotalCompletedTasks();
       fetchTotalOngoingTasks();
       fetchTotalPendingTasks();
