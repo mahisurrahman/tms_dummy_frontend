@@ -516,7 +516,7 @@ export default function TaskDetailsSection({
                 </div>
               </div>
             )}
-
+            {/* Blank commit */}
             {/* <button className="flex items-center bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm py-2 px-3 rounded-lg shadow-sm cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all">
               <Pin className="w-4 h-4 mr-1" />
               Poke
