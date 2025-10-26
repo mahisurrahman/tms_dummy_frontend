@@ -51,6 +51,8 @@ function KanbanBoard() {
   const [pendingTotalTasks, setPendingTotalTasks] = useState([]);
   const [inqueTotalTasks, setInqueTotalTasks] = useState([]);
   const [reviewTotalTasks, setreviewTotalTasks] = useState([]);
+  const [showEditTask, setShowEditTask] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState(null);
 
   const { user, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -286,6 +288,54 @@ function KanbanBoard() {
     }
   };
 
+  const handleEditTask = async (editData) => {
+    try {
+      setLoading(true);
+      let response = null;
+      if (editData.changes.taskAssignedTo) {
+        const payload = {
+          ...editData.changes,
+          backlog: false,
+        };
+
+        response = await taskAPI.update(editData.taskId, payload);
+        if (response.error === false) {
+          toast.success(
+            `Task updated with ${Object.keys(editData.changes).length} changes`
+          );
+          setShowEditTask(false);
+          setTaskToEdit(null);
+
+          await fetchUsers();
+          await fetchBacklogs();
+          setShowEditTask(false);
+          setLoading(false);
+          setSelectedTask(null);
+        }
+        setLoading(false);
+      }
+      response = await taskAPI.update(editData.taskId, editData.changes);
+      if (response.error === false) {
+        toast.success(
+          `Task updated with ${Object.keys(editData.changes).length} changes`
+        );
+        setShowEditTask(false);
+        setTaskToEdit(null);
+
+        await fetchUsers();
+        await fetchBacklogs();
+        setShowEditTask(false);
+        setLoading(false);
+        setSelectedTask(null);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log("Edit Task Failed", error);
+      setLoading(false);
+      toast.error("Failed to update task");
+    }
+  };
+
   // Logout handler
   const handleLogoutButton = async () => {
     try {
@@ -332,6 +382,9 @@ function KanbanBoard() {
       setLoading(true);
       let payload = {};
 
+      // Send full label objects instead of just IDs
+      const labelObjects = formData.labels || [];
+
       if (formData.assignedTo === "") {
         payload = {
           taskTitle: formData.title,
@@ -343,7 +396,7 @@ function KanbanBoard() {
           taskAssignedBy: "",
           deadline: formData.deadline,
           assignedDate: null,
-          labels: formData.labels || [],
+          labels: labelObjects,
         };
       } else {
         payload = {
@@ -356,50 +409,51 @@ function KanbanBoard() {
           taskAssignedBy: "",
           deadline: formData.deadline,
           assignedDate: new Date(),
-          labels: formData.labels || [],
+          labels: labelObjects,
         };
       }
 
       const response = await taskAPI.create(payload);
-      if (response.data) {
-        if (formData.assignedTo !== "") {
-          const taskLogPayload = {
-            startTime: new Date(),
-            assignedDate: new Date(),
-            expectedDuration: formData.deadline,
-            taskStatus: "pending",
-            taskId: response?.data?._id,
-            assignedToId: formData.assignedTo,
-            creatorId: user._id,
-          };
-          const taskLogResponse = await taskLogAPI.create(taskLogPayload);
-          if (taskLogResponse.data) {
-            const data = {
-              taskId: response.data._id,
-              taskTitle: payload.taskTitle,
-              taskActive: response.data.isActive,
-              assignedById: payload.taskCreatedBy,
-              assignedToId: payload.taskAssignedTo,
-            };
 
-            const notificationControllCreate = await notiFyCntrlAPI.create(
-              data
-            );
-            if (notificationControllCreate.data) {
-              fetchUsers();
-              toast.success("Task Created Sir !!");
-              setShowCreateTask(false);
-            }
+      if (response.data) {
+        // For assigned tasks
+        const taskLogPayload = {
+          startTime: new Date(),
+          assignedDate: new Date(),
+          expectedDuration: formData.deadline,
+          taskStatus: "pending",
+          taskId: response?.data?._id,
+          assignedToId: formData.assignedTo,
+          creatorId: user._id,
+        };
+
+        const taskLogResponse = await taskLogAPI.create(taskLogPayload);
+        if (taskLogResponse.data) {
+          const data = {
+            taskId: response.data._id,
+            taskTitle: payload.taskTitle,
+            taskActive: response.data.isActive,
+            assignedById: payload.taskCreatedBy,
+            assignedToId: payload.taskAssignedTo,
+          };
+
+          const notificationControllCreate = await notiFyCntrlAPI.create(data);
+          if (notificationControllCreate.data) {
+            await fetchUsers();
+            await fetchBacklogs(); // Add this for assigned tasks too
+            toast.success("Task Created Successfully!");
+            setShowCreateTask(false);
           }
         }
       }
+
       setLoading(false);
     } catch (error) {
       console.log("Create Task Failed", error);
+      toast.error("Failed to create task");
       setLoading(false);
     }
   };
-
   const toggleSection = (userId, status) => {
     const key = `${userId}-${status}`;
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -438,7 +492,6 @@ function KanbanBoard() {
             setShowCreateTask={setShowCreateTask}
             setSelectedUserForCreate={setSelectedUserForCreate}
           />
-
           <div className="flex h-[calc(100vh-78px)]">
             {user && user?.userType === 1 && (
               <BacklogSection
@@ -503,7 +556,7 @@ function KanbanBoard() {
             />
           </div>
 
-          {selectedTask && (
+          {selectedTask && Object.keys(selectedTask).length > 0 && (
             <TaskModalWrapper
               data={selectedTask}
               onClose={() => setSelectedTask(null)}
@@ -517,15 +570,29 @@ function KanbanBoard() {
               setSelectedTask={setSelectedTask}
               setRefresNotis={setRefresNotis}
               refreshNotis={refreshNotis}
+              handleEditTask={handleEditTask}
             />
           )}
-
           {showCreateTask && (
             <CreateTaskForm
               onClose={() => setShowCreateTask(false)}
               defaultUserId={selectedUserForCreate}
               users={users}
               handleAddTask={handleAddTask}
+              loading={loading}
+              user={user}
+            />
+          )}
+
+          {showEditTask && (
+            <EditTaskForm
+              onClose={() => {
+                setShowEditTask(false);
+                setTaskToEdit(null);
+              }}
+              task={taskToEdit}
+              users={users}
+              handleEditTask={handleEditTask}
               loading={loading}
               user={user}
             />

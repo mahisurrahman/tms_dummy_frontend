@@ -13,6 +13,7 @@ import { notiFyCntrlAPI } from "../../../api/endpoints/notificationControll.api.
 import { notificationAPI } from "../../../api/endpoints/notification.api.js";
 
 const TaskModal = ({
+  onEdit,
   task,
   onClose,
   users,
@@ -168,7 +169,7 @@ const TaskModal = ({
         <TaskModalHeader
           title={task?.taskDetails?.taskTitle}
           onClose={onClose}
-          onStatusChange={() => setShowStatusModal(true)}
+          onEdit={onEdit}
         />
 
         <div className="space-y-6">
