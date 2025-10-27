@@ -15,6 +15,12 @@ export const taskAPI = {
       "Failed to Update Tasks"
     ),
 
+  remove: (id) =>
+    handleRequest(
+      apiClient.get(`${baseMiddlePoint}/remove/${id}`),
+      "Failed to Remove Tasks"
+    ),
+
   getAllTask: () =>
     handleRequest(
       apiClient.get(`${baseMiddlePoint}/get/all`),

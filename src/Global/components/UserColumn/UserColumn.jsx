@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Plus, Timer, Star } from "lucide-react";
 import TaskSection from "../TaskSection/TaskSection";
 import { AuthContext } from "../../../provider/AuthProvider";
@@ -22,11 +22,41 @@ const UserColumn = ({
   setShowCreateTask,
   changeStatusTask,
   allNotis,
+  handleDeleteTask,
 }) => {
   const { user } = useContext(AuthContext);
+  const [showDeleteUser, setShowDeleteUser] = useState(false);
+
+  const handleDeleteUser = async () => {
+    // 🔥 Add your delete user logic here
+    console.log("Delete user:", userCol._id);
+    setShowDeleteUser(false);
+  };
+
   return (
     <div className="w-[45vw] md:w-[19vw] bg-transparent p-2 md:p-4">
-      <div className="mb-2 md:mb-4 border rounded-lg pt-2 px-4 border-white/20 bg-white/20 backdrop-blur-3xl">
+      <div
+        className="mb-2 md:mb-4 border rounded-lg pt-2 px-4 border-white/20 bg-white/20 backdrop-blur-3xl relative"
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setShowDeleteUser((prev) => !prev);
+        }}
+      >
+        {/* DELETE USER BUTTONS */}
+        {showDeleteUser && (
+          <div className="absolute top-2 right-2 flex gap-2 z-20">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteUser();
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1 cursor-pointer rounded shadow-md transition-colors"
+            >
+              Delete User
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-1 md:mb-2">
           <div className="flex items-center space-x-2 md:space-x-3">
             <div
@@ -98,6 +128,7 @@ const UserColumn = ({
             setSelectedTask={setSelectedTask}
             changeStatusTask={changeStatusTask}
             allNotis={allNotis}
+            handleDeleteTask={handleDeleteTask}
           />
         ))}
       </div>
