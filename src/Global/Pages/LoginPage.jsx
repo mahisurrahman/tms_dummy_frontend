@@ -48,7 +48,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     const payload = {
-      email,
+      username: email,
       password,
     };
     const response = await handleLoginData(payload);
