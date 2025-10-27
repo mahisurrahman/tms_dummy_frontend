@@ -138,9 +138,9 @@ function TaskModalWrapper({
   };
 
   // Update the handleEditFormSubmit to ensure loading state flows through
-  const handleEditFormSubmit = (editData) => {
+  const handleEditFormSubmit = (editData, notifyPayload) => {
     if (handleEditTask) {
-      handleEditTask(editData);
+      handleEditTask(editData, notifyPayload);
     }
   };
 

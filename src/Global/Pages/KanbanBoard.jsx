@@ -290,9 +290,9 @@ function KanbanBoard() {
     }
   };
 
-  const handleEditTask = async (editData) => {
+  const handleEditTask = async (editData, notifyPayload) => {
     try {
-      setEditLoading(true); // Use the dedicated loading state
+      setEditLoading(true);
       let response = null;
       const updatedChanges = { ...editData.changes };
 
@@ -316,7 +316,18 @@ function KanbanBoard() {
         };
 
         response = await taskAPI.update(editData.taskId, payload);
+        console.log(notifyPayload, "notifyPayload");
         if (response.error === false) {
+          const data = {
+            taskId: editData.taskId,
+            taskTitle: notifyPayload.taskTitle,
+            taskActive: notifyPayload.isActive,
+            assignedById: notifyPayload.taskCreatedBy,
+            assignedToId: updatedChanges.assignedToId,
+          };
+
+          const notificationControllCreate = await notiFyCntrlAPI.create(data);
+
           setTaskToEdit(null);
           await fetchUsers();
           await fetchBacklogs();
@@ -396,8 +407,6 @@ function KanbanBoard() {
     try {
       setLoading(true);
       let payload = {};
-
-      // Send full label objects instead of just IDs
       const labelObjects = formData.labels || [];
 
       if (formData.assignedTo === "") {
@@ -431,7 +440,6 @@ function KanbanBoard() {
       const response = await taskAPI.create(payload);
 
       if (response.data) {
-        // For assigned tasks
         const taskLogPayload = {
           startTime: new Date(),
           assignedDate: new Date(),
@@ -452,10 +460,19 @@ function KanbanBoard() {
             assignedToId: payload.taskAssignedTo,
           };
 
-          const notificationControllCreate = await notiFyCntrlAPI.create(data);
-          if (notificationControllCreate.data) {
+          if (data.assignedToId) {
+            const notificationControllCreate = await notiFyCntrlAPI.create(
+              data
+            );
+            if (notificationControllCreate.data) {
+              await fetchUsers();
+              await fetchBacklogs();
+              toast.success("Task Created Successfully!");
+              setShowCreateTask(false);
+            }
+          } else {
             await fetchUsers();
-            await fetchBacklogs(); // Add this for assigned tasks too
+            await fetchBacklogs();
             toast.success("Task Created Successfully!");
             setShowCreateTask(false);
           }

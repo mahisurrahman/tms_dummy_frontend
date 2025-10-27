@@ -180,6 +180,8 @@ const EditTaskForm = ({
     return changes;
   };
 
+  console.log(task, "task");
+
   const handleSubmit = () => {
     const changedFields = getChangedFields();
 
@@ -208,7 +210,19 @@ const EditTaskForm = ({
     delete taskData.changes.assignedTo;
     delete taskData.changes.deadline;
 
-    handleEditTask(taskData);
+    const notifyPayload = {
+      taskId: taskData.taskId,
+      taskTitle: changedFields.title || originalData.title,
+      taskDescription: changedFields.description,
+      taskPriority: changedFields.priority,
+      taskAssignedTo: changedFields.assignedTo,
+      expectedDeadline: changedFields.deadline,
+      labels: changedFields.labels,
+      isActive: task?.isActive,
+      taskCreatedBy: task?.taskCreatedBy?._id,
+    };
+
+    handleEditTask(taskData, notifyPayload);
   };
 
   const getSelectedLabels = () => {
