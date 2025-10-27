@@ -491,6 +491,8 @@ function KanbanBoard() {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  // BLANK COMMIT
+
   const handleDeleteTask = async (id) => {
     try {
       // Remove: setLoading(true);
