@@ -21,6 +21,7 @@ const UserColumns = ({
   setShowCreateTask,
   changeStatusTask,
   allNotis,
+  handleDeleteTask,
 }) => {
   const devUsers = users?.filter((user) => user.userType === 2) || [];
 
@@ -49,6 +50,7 @@ const UserColumns = ({
               setShowCreateTask={setShowCreateTask}
               changeStatusTask={changeStatusTask}
               allNotis={allNotis}
+              handleDeleteTask={handleDeleteTask}
             />
           ))
         ) : (

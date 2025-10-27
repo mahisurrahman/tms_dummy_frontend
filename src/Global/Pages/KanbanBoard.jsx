@@ -491,6 +491,23 @@ function KanbanBoard() {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handleDeleteTask = async (id) => {
+    try {
+      // Remove: setLoading(true);
+      const response = await taskAPI.remove(id);
+      if (response.data) {
+        await fetchUsers();
+        await fetchBacklogs();
+        // Remove: setLoading(false);
+        toast.success("Task Removed Successfully");
+      }
+      // Remove: setLoading(false);
+    } catch (error) {
+      console.log(error);
+      // Remove: setLoading(false);
+    }
+  };
+
   const handleCreateUser = async (userData) => {
     try {
       setLoading(true);
@@ -531,6 +548,8 @@ function KanbanBoard() {
                 setShowBacklog={setShowBacklog}
                 backlogTasks={backlogs}
                 setSelectedTask={setSelectedTask}
+                handleDeleteTask={handleDeleteTask}
+                loading={loading}
               />
             )}
 
@@ -558,6 +577,7 @@ function KanbanBoard() {
                 setShowCreateTask={setShowCreateTask}
                 changeStatusTask={changeStatusTask}
                 allNotis={allNotis}
+                handleDeleteTask={handleDeleteTask}
               />
             )}
 

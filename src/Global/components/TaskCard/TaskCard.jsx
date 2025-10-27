@@ -13,6 +13,8 @@ import { truncateText } from "../../Utils/truncateText";
 import { taskLogAPI } from "../../../api/endpoints/taskLog.api";
 
 const TaskCard = ({
+  loading,
+  handleDeleteTask,
   index,
   task,
   userTask,
@@ -31,6 +33,8 @@ const TaskCard = ({
   const [startClicked, setStartClicked] = useState(false);
   const [localStartTime, setLocalStartTime] = useState(null);
   const [timerInterval, setTimerInterval] = useState(null);
+  const [showDelete, setShowDelete] = useState(false);
+  const [localDeleteLoading, setLocalDeleteLoading] = useState(false);
 
   const hasNotification = allNotis.some(
     (noti) => noti.taskId === task._id || noti.taskId === task.taskId
@@ -252,10 +256,14 @@ const TaskCard = ({
             : task?.taskDetails?.taskPriority === "Low"
             ? "border-green-600"
             : "border-white"
-        } rounded-lg p-3 mb-2 transition-all duration-300 cursor-pointer border-4 bg-white hover:-translate-y-1 ${
+        } relative rounded-lg p-3 mb-2 transition-all duration-300 cursor-pointer border-4 bg-white hover:-translate-y-1 ${
           priorityStyles[task?.taskDetails?.taskPriority] || " shadow-gray-100"
         }`}
         onClick={onClick}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setShowDelete((prev) => !prev);
+        }}
       >
         {/* HEADER */}
         <div>
@@ -381,7 +389,11 @@ const TaskCard = ({
                   Deadline
                 </span>
                 <span className="text-[10px] text-gray-900">
-                  {formatReadableDateTime(task?.expectedDeadline)}
+                  {task.expectedDeadline ? (
+                    <>{formatReadableDateTime(task?.expectedDeadline)} </>
+                  ) : (
+                    "No Deadline Assigned"
+                  )}
                 </span>
               </div>
             )}
@@ -424,6 +436,29 @@ const TaskCard = ({
               </div>
             )}
           </>
+        )}
+
+        {/* DELETE BUTTONS - Positioned at top right inside card */}
+        {showDelete && (
+          <div className="flex justify-end gap-2 mt-3 ">
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                setLocalDeleteLoading(true); // Add this - immediate visual feedback
+                setShowDelete(false); // Hide delete buttons immediately
+                {
+                  !isBacklog
+                    ? await handleDeleteTask(task?.taskId)
+                    : await handleDeleteTask(task?._id);
+                }
+                setLocalDeleteLoading(false); // Reset loading state
+              }}
+              className="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded cursor-pointer shadow-md transition-colors"
+            >
+              {localDeleteLoading ? "Deleting..." : "Delete"}{" "}
+              {/* Use local loading state */}
+            </button>
+          </div>
         )}
       </div>
 

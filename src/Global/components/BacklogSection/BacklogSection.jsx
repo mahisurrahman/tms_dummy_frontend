@@ -7,6 +7,8 @@ const BacklogSection = ({
   setShowBacklog,
   backlogTasks,
   setSelectedTask,
+  handleDeleteTask,
+  loading,
 }) => {
   if (!showBacklog) return null;
 
@@ -30,6 +32,8 @@ const BacklogSection = ({
         <div className="space-y-2 md:space-y-3">
           {backlogTasks.map((task) => (
             <TaskCard
+              loading={loading}
+              handleDeleteTask={handleDeleteTask}
               key={task.id}
               task={task}
               isBacklog={true}

@@ -20,6 +20,7 @@ const TaskSection = ({
   setSelectedTask,
   changeStatusTask,
   allNotis,
+  handleDeleteTask,
 }) => {
   const notificationCount = tasks.filter((task) =>
     allNotis.some(
@@ -52,6 +53,7 @@ const TaskSection = ({
           {tasks?.length > 0 ? (
             tasks.map((task, index) => (
               <TaskCard
+                handleDeleteTask={handleDeleteTask}
                 key={task?._id}
                 index={index}
                 task={task}
