@@ -52,7 +52,6 @@ const QuickCreateColumn = ({
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
-
       {user && user.userType === 1 && (
         <div>
           <button
@@ -77,6 +76,8 @@ const QuickCreateColumn = ({
           </button>
         </div>
       )}
+
+      {/* Blank Commit */}
 
       <div className="space-y-2 md:space-y-3 mt-3 md:mt-5">
         <div className="flex items-center justify-between gap-x-1 md:gap-x-2">
@@ -146,7 +147,6 @@ const QuickCreateColumn = ({
           </div>
         </div>
       </div>
-
       {/* <div className="mt-4 md:mt-6">
         <h3 className="text-base md:text-lg font-semibold text-white mb-2 md:mb-3 flex items-center">
           <Trophy className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 text-yellow-400" />
@@ -184,7 +184,6 @@ const QuickCreateColumn = ({
             ))}
         </div>
       </div> */}
-
       {/* Navigation Buttons */}
       <div className="mt-6 md:mt-4 space-y-2 md:space-y-3">
         {/* <button
