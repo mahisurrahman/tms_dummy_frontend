@@ -44,6 +44,8 @@ export default function LoginPage() {
     setFloatingIcons(newFloatingIcons);
   }, []);
 
+  // Blank Commit
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
