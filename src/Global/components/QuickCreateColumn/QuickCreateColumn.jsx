@@ -37,7 +37,7 @@ const QuickCreateColumn = ({
   };
 
   return (
-    <div className="w-1/6 bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out shrink-0">
+    <div className="w-[20vw] bg-white/10 backdrop-blur-md border-l border-white/20 p-2 md:p-4 overflow-y-auto transition-all duration-300 ease-in-out shrink-0">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
           <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-2">
@@ -73,7 +73,7 @@ const QuickCreateColumn = ({
             className="w-full flex items-center justify-center gap-x-1 md:gap-x-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 rounded font-semibold text-sm md:text-base hover:from-blue-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mb-4"
           >
             <User className="w-3 h-3 md:w-4 md:h-4" />
-            Add User
+            Add Developers
           </button>
         </div>
       )}

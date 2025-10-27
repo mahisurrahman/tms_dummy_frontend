@@ -40,8 +40,9 @@ const UserColumn = ({
                 .join("")}
             </div>
             <div>
-              <h3 className="font-bold text-white text-sm md:text-xs">
-                {userCol.username}
+              <h3 className="font-bold text-white text-xs">
+                {userCol.username} <br />
+                <span className="text-xs">ID-{userCol.traId}</span>
               </h3>
               <p className="text-xs md:text-sm text-white/70">
                 {userCol.userType === 1
@@ -55,7 +56,7 @@ const UserColumn = ({
             </div>
           </div>
           <div>
-            <div className="flex text-sm md:text-lg text-white flex-col items-end justify-between">
+            {/* <div className="flex text-sm md:text-lg text-white flex-col items-end justify-between">
               <div className="flex items-center gap-x-1">
                 <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
                 <span className="font-bold text-orange-400 text-xs md:text-sm">
@@ -71,7 +72,7 @@ const UserColumn = ({
                   {userCol.totalTime || "00:00"}
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

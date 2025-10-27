@@ -71,7 +71,9 @@ const TaskSection = ({
               />
             ))
           ) : (
-            <div className="text-center py-4 text-white/60">No tasks</div>
+            <div className="text-center py-4 text-white/60 w-full h-full border-2 rounded-lg border-gray-600">
+              😊 No tasks yet !!
+            </div>
           )}
         </div>
       )}
