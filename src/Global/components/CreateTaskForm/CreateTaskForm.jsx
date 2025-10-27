@@ -322,13 +322,15 @@ const CreateTaskForm = ({
                       onChange={handleChange}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     >
-                      <option value="">Select Developer / Backlog</option>
-                      {users?.map((user) => (
-                        <option key={user._id} value={user._id}>
-                          {user.username}
-                        </option>
-                      ))}
-                      <option value="">Backlog</option>
+                      <option value="">Select </option>
+                      {users
+                        ?.filter((user) => user.userType === 2)
+                        .map((user) => (
+                          <option key={user._id} value={user._id}>
+                            {user.username}
+                          </option>
+                        ))}
+                      {/* <option value="">Backlog</option> */}
                     </select>
                   </div>
                 )}

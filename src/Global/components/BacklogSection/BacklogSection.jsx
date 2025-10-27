@@ -26,25 +26,31 @@ const BacklogSection = ({
           <ChevronLeft className="w-4 h-4" />
         </button>
       </div>
-      <div className="space-y-2 md:space-y-3">
-        {backlogTasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            isBacklog={true}
-            onClick={() =>
-              setSelectedTask({
-                task: {
-                  ...task,
-                  _id: task._id || task.id,
-                  taskId: task._id || task.id,
-                },
-                userId: null,
-              })
-            }
-          />
-        ))}
-      </div>
+      {backlogTasks.length > 0 ? (
+        <div className="space-y-2 md:space-y-3">
+          {backlogTasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              isBacklog={true}
+              onClick={() =>
+                setSelectedTask({
+                  task: {
+                    ...task,
+                    _id: task._id || task.id,
+                    taskId: task._id || task.id,
+                  },
+                  userId: null,
+                })
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="w-full h-[85vh] font-bold border-2 rounded-lg border-gray-500 flex items-center justify-center text-gray-500">
+          😁 No Backlogs created yet !!!
+        </div>
+      )}
     </div>
   );
 };

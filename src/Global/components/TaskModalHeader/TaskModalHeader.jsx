@@ -9,13 +9,13 @@ const TaskModalHeader = ({ title, onClose, onEdit }) => {
           {1}. Task Title: {title}
         </h2>
         <div className="flex items-center gap-4">
-          {/* <button
+          <button
             onClick={onEdit}
             className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all duration-200 border border-white/30 hover:border-white/50 cursor-pointer"
           >
             <Edit3 className="w-4 h-4" />
-            <span className="font-semibold">Edit</span>
-          </button> */}
+            <span className="font-semibold">Edit 😞</span>
+          </button>
           <button
             onClick={onClose}
             className="p-2 hover:bg-white/20 rounded-full transition-all"

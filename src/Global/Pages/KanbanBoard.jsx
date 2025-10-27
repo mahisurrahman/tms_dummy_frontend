@@ -53,6 +53,8 @@ function KanbanBoard() {
   const [reviewTotalTasks, setreviewTotalTasks] = useState([]);
   const [showEditTask, setShowEditTask] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
+  const [backlogTasks, setBackLogTasks] = useState([]);
+  const [editLoading, setEditLoading] = useState(false);
 
   const { user, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -290,22 +292,16 @@ function KanbanBoard() {
 
   const handleEditTask = async (editData) => {
     try {
-      setLoading(true);
+      setEditLoading(true); // Use the dedicated loading state
       let response = null;
-
-      // Create a copy of changes to avoid mutating the original
       const updatedChanges = { ...editData.changes };
 
-      // Map form field names to API field names if needed
       if (updatedChanges.deadline) {
         updatedChanges.expectedDeadline = updatedChanges.deadline;
         delete updatedChanges.deadline;
       }
-
-      // Map taskAssignedTo if it exists
       if (updatedChanges.taskAssignedTo !== undefined) {
         updatedChanges.assignedToId = updatedChanges.taskAssignedTo;
-        // Only set backlog to false if actually assigning to a user (not empty string)
         if (updatedChanges.taskAssignedTo) {
           updatedChanges.backlog = false;
         } else {
@@ -321,41 +317,36 @@ function KanbanBoard() {
 
         response = await taskAPI.update(editData.taskId, payload);
         if (response.error === false) {
-          toast.success(
-            `Task updated with ${Object.keys(editData.changes).length} changes`
-          );
-          setShowEditTask(false);
           setTaskToEdit(null);
-
           await fetchUsers();
           await fetchBacklogs();
           setShowEditTask(false);
-          setLoading(false);
           setSelectedTask(null);
-          return; // Important: return after successful update
+          setEditLoading(false);
+          toast.success(
+            `Task updated with ${Object.keys(editData.changes).length} changes`
+          );
+          return;
         }
       } else {
-        // For other updates (not assignment related)
         response = await taskAPI.update(editData.taskId, updatedChanges);
         if (response.error === false) {
-          toast.success(
-            `Task updated with ${Object.keys(editData.changes).length} changes`
-          );
-          setShowEditTask(false);
           setTaskToEdit(null);
-
           await fetchUsers();
           await fetchBacklogs();
           setShowEditTask(false);
-          setLoading(false);
           setSelectedTask(null);
+          setEditLoading(false);
+          toast.success(
+            `Task updated with ${Object.keys(editData.changes).length} changes`
+          );
         }
       }
 
-      setLoading(false);
+      setEditLoading(false);
     } catch (error) {
       console.log("Edit Task Failed", error);
-      setLoading(false);
+      setEditLoading(false);
       toast.error("Failed to update task");
     }
   };
@@ -516,12 +507,12 @@ function KanbanBoard() {
             setShowCreateTask={setShowCreateTask}
             setSelectedUserForCreate={setSelectedUserForCreate}
           />
-          <div className="flex h-[calc(100vh-78px)]">
+          <div className="flex h-[calc(100vh-60px)]">
             {user && user?.userType === 1 && (
               <BacklogSection
                 showBacklog={showBacklog}
                 setShowBacklog={setShowBacklog}
-                backlogTasks={backlogs} // updated from backlogTasks
+                backlogTasks={backlogs}
                 setSelectedTask={setSelectedTask}
               />
             )}
@@ -595,8 +586,10 @@ function KanbanBoard() {
               setRefresNotis={setRefresNotis}
               refreshNotis={refreshNotis}
               handleEditTask={handleEditTask}
+              editLoading={editLoading}
             />
           )}
+
           {showCreateTask && (
             <CreateTaskForm
               onClose={() => setShowCreateTask(false)}
@@ -617,7 +610,7 @@ function KanbanBoard() {
               task={taskToEdit}
               users={users}
               handleEditTask={handleEditTask}
-              loading={loading}
+              loading={editLoading} // Pass the dedicated loading state
               user={user}
             />
           )}

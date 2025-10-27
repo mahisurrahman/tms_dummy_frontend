@@ -136,7 +136,7 @@ const CreateUserForm = ({ onClose, onCreateUser, loading }) => {
             >
               <option value="1">Admin</option>
               <option value="2">Developer</option>
-              <option value="3">Manager</option>
+              {/* <option value="3">Manager</option> */}
               {/* <option value="4">Viewer</option> */}
             </select>
           </div>

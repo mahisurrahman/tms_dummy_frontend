@@ -387,18 +387,20 @@ const TaskCard = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <div className="flex items-center flex-wrap gap-x-1 gap-y-1">
-              <span className="text-[10px] font-semibold text-black block">
-                Label/Project:
-              </span>
-              {task?.taskDetails?.labels.map((lbl) => (
-                <span className="text-[10px] text-gray-50 bg-slate-900 rounded-lg px-2 py-0.2 shadow-md border">
-                  {lbl.name}
+          {!isBacklog && (
+            <div className="flex items-center gap-2 text-sm">
+              <div className="flex items-center flex-wrap gap-x-1 gap-y-1">
+                <span className="text-[10px] font-semibold text-black block">
+                  Label/Project:
                 </span>
-              ))}
+                {task?.taskDetails?.labels.map((lbl) => (
+                  <span className="text-[10px] text-gray-50 bg-slate-900 rounded-lg px-2 py-0.2 shadow-md border">
+                    {lbl.name}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* TIMER BUTTONS */}

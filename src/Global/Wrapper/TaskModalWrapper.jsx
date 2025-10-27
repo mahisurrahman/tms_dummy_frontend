@@ -21,6 +21,7 @@ function TaskModalWrapper({
   setRefresNotis,
   refreshNotis,
   handleEditTask, // Add this prop
+  editLoading,
 }) {
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -136,12 +137,11 @@ function TaskModalWrapper({
     setShowEditModal(true);
   };
 
-  // Handler for edit form submission
+  // Update the handleEditFormSubmit to ensure loading state flows through
   const handleEditFormSubmit = (editData) => {
     if (handleEditTask) {
       handleEditTask(editData);
     }
-    setShowEditModal(false);
   };
 
   return (
@@ -183,7 +183,7 @@ function TaskModalWrapper({
               task={task}
               users={users}
               handleEditTask={handleEditFormSubmit}
-              loading={loading}
+              loading={editLoading}
               user={user}
             />
           )}

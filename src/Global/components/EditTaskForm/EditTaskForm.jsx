@@ -374,13 +374,15 @@ const EditTaskForm = ({
                     onChange={handleChange}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">Select Developer / Backlog</option>
-                    {users?.map((u) => (
-                      <option key={u._id} value={u._id}>
-                        {u.username}
-                      </option>
-                    ))}
-                    <option value="">Backlog</option>
+                    <option value="">Select Developer</option>
+                    {users
+                      ?.filter((user) => user.userType == 2)
+                      .map((u) => (
+                        <option key={u._id} value={u._id}>
+                          {u.username}
+                        </option>
+                      ))}
+                    {/* <option value="">Backlog</option> */}
                   </select>
                 </div>
               </div>
@@ -426,10 +428,13 @@ const EditTaskForm = ({
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center disabled:opacity-50"
+                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center disabled:opacity-50 min-w-[120px]"
               >
                 {loading ? (
-                  <Spinner />
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </div>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
