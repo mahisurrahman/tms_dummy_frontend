@@ -339,29 +339,31 @@ export default function TaskDetailsSection({
               </h1>
             </div>
 
-            {user && user?._id === data?.assignedToId && (
-              <>
-                {" "}
-                {data?.taskStatus === "ongoing" && (
-                  <div className="flex gap-1 ">
-                    <button
-                      onClick={startTask}
-                      className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
-                    >
-                      <Play className="w-3 h-3 mr-1" />
-                      Start
-                    </button>
-                    <button
-                      onClick={pauseTask}
-                      className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center"
-                    >
-                      <PauseCircle className="w-3 h-3 mr-1" />
-                      Pause
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
+            {!data?.taskDetails?.backlog &&
+              ((user?._id === data?.assignedToId && user?.userType === 2) ||
+                user?.userType === 1) && (
+                <>
+                  {data?.taskStatus === "ongoing" && (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={startTask}
+                        className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                      >
+                        <Play className="w-3 h-3 mr-1" />
+                        Start
+                      </button>
+
+                      <button
+                        onClick={pauseTask}
+                        className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center"
+                      >
+                        <PauseCircle className="w-3 h-3 mr-1" />
+                        Pause
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
           </div>
         )}
 
@@ -529,10 +531,9 @@ export default function TaskDetailsSection({
           </div>
         </div>
 
-        {(user._id === data?.assignedToId ||
-          user?.userType === 1 ||
-          data?.taskDetails?.backlog === false) &&
-          data?.taskDetails?.backlog !== true && ( // Add this condition
+        {!data?.taskDetails?.backlog &&
+          ((user?._id === data?.assignedToId && user?.userType === 2) ||
+            user?.userType === 1) && (
             <div className="w-full flex items-center gap-x-2">
               <button
                 onClick={onStatusChange}
