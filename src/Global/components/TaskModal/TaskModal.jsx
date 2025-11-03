@@ -11,6 +11,7 @@ import { commentsApi } from "../../../api/endpoints/comments.api.js";
 import toast from "react-hot-toast";
 import { notiFyCntrlAPI } from "../../../api/endpoints/notificationControll.api.js";
 import { notificationAPI } from "../../../api/endpoints/notification.api.js";
+import { taskLogAPI } from "../../../api/endpoints/taskLog.api.js";
 
 const TaskModal = ({
   onEdit,
@@ -38,6 +39,7 @@ const TaskModal = ({
   const [allComments, setAllComments] = useState([]);
   const [notifyControll, setNotifyControll] = useState(null);
   const [showPriorityModal, setShowPriorityModal] = useState(false);
+  const [totalHour, setTotalHour] = useState(null);
   const commentEditorRef = useRef(null);
   const { user } = useContext(AuthContext);
   const userId = user?._id;
@@ -161,6 +163,21 @@ const TaskModal = ({
     setShowPriorityModal(false);
   };
 
+  useEffect(() => {
+    const fetchTaskHour = async () => {
+      try {
+        const response = await taskLogAPI.getTotalHour(task?.taskId);
+        setTotalHour(response.data);
+      } catch (error) {
+        console.log(error, "Failed to fetch task hour");
+      }
+    };
+
+    if (task?.taskStatus === "review" || task?.taskStatus === "complete") {
+      fetchTaskHour();
+    }
+  }, [task?.taskStatus]);
+
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-xl flex items-center justify-center z-50 p-4">
       <div className="bg-transparent rounded-2xl max-w-4xl w-full max-h-[100vh] overflow-y-auto">
@@ -186,6 +203,7 @@ const TaskModal = ({
               handlePriorityChange={handlePriorityChange}
               setShowPriorityModal={setShowPriorityModal}
               showPriorityModal={showPriorityModal}
+              totalHour={totalHour}
             />
           </div>
 

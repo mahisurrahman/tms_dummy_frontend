@@ -50,4 +50,10 @@ export const taskLogAPI = {
       apiClient.post(`${baseMiddlePoint}/updateStatus/${params}`, payload),
       "Failed to Update task status"
     ),
+
+  getTotalHour: (params)=>
+    handleRequest(
+      apiClient.get(`${baseMiddlePoint}/totalHour/${params}`),
+      "Failed to fetch task Hour"
+    )
 };

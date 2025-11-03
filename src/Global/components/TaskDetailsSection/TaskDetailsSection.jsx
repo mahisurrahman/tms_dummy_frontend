@@ -7,6 +7,7 @@ import {
   PauseCircle,
   LoaderIcon,
   BellDot,
+  Clock,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import PriorityModal from "../PriorityModa/PriorityModal";
@@ -30,6 +31,7 @@ export default function TaskDetailsSection({
   handlePriorityChange,
   showPriorityModal,
   setShowPriorityModal,
+  totalHour,
 }) {
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [startClicked, setStartClicked] = useState(false);
@@ -60,63 +62,63 @@ export default function TaskDetailsSection({
     setLoading(false);
   }, [notifyControll, user?._id]);
 
- const startTask = async () => {
-  try {
-    const response = await taskLogAPI.startTask(data?._id);
-    const totalOnGoing = response.data.totalOnGoingTime || 0;
+  const startTask = async () => {
+    try {
+      const response = await taskLogAPI.startTask(data?._id);
+      const totalOnGoing = response.data.totalOnGoingTime || 0;
 
-    data.totalOnGoingTime = totalOnGoing;
+      data.totalOnGoingTime = totalOnGoing;
 
-    setStartClicked(true);
-    setLocalStartTime(new Date());
-    setIsPaused(false);
-    
-    // Immediately update button visibility
-    setShowStartButton(false);
-    setShowPauseButton(true);
-  } catch (error) {
-    console.log(error, "Failed to start Task");
-  }
-};
+      setStartClicked(true);
+      setLocalStartTime(new Date());
+      setIsPaused(false);
 
-const pauseTask = async () => {
-  try {
-    const response = await taskLogAPI.pauseTask(data?._id);
-    const updatedTotal = response.data.totalOnGoingTime;
-
-    setIsPaused(true);
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      setTimerInterval(null);
+      // Immediately update button visibility
+      setShowStartButton(false);
+      setShowPauseButton(true);
+    } catch (error) {
+      console.log(error, "Failed to start Task");
     }
-    
-    // Immediately update button visibility  
-    setShowStartButton(true);
-    setShowPauseButton(false);
-    
-    if (updatedTotal) {
-      let totalMs;
-      if (typeof updatedTotal === "string") {
-        const [h, m, s] = updatedTotal.split(":").map(Number);
-        totalMs = (h * 3600 + m * 60 + s) * 1000;
-      } else {
-        totalMs = updatedTotal;
+  };
+
+  const pauseTask = async () => {
+    try {
+      const response = await taskLogAPI.pauseTask(data?._id);
+      const updatedTotal = response.data.totalOnGoingTime;
+
+      setIsPaused(true);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        setTimerInterval(null);
       }
 
-      const hours = Math.floor(totalMs / (1000 * 60 * 60));
-      const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
-      setElapsedTime(
-        `${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-      );
+      // Immediately update button visibility
+      setShowStartButton(true);
+      setShowPauseButton(false);
+
+      if (updatedTotal) {
+        let totalMs;
+        if (typeof updatedTotal === "string") {
+          const [h, m, s] = updatedTotal.split(":").map(Number);
+          totalMs = (h * 3600 + m * 60 + s) * 1000;
+        } else {
+          totalMs = updatedTotal;
+        }
+
+        const hours = Math.floor(totalMs / (1000 * 60 * 60));
+        const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+        setElapsedTime(
+          `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+        );
+      }
+      data.totalOnGoingTime = updatedTotal;
+    } catch (error) {
+      console.log(error, "Failed to pause Task");
     }
-    data.totalOnGoingTime = updatedTotal;
-  } catch (error) {
-    console.log(error, "Failed to pause Task");
-  }
-};
+  };
 
   // useEffect(() => {
   //   if (data?.isPause !== undefined) {
@@ -412,7 +414,7 @@ const pauseTask = async () => {
             </div>
           </div>
         )}
-        <div className="space-y-0.5 text-sm text-gray-700 mb-8 flex items-start justify-between">
+        <div className="space-y-0.5 text-sm text-gray-700 mb-2 flex items-start justify-between">
           <div>
             <div>
               <span className="font-bold">Assigned By:</span>{" "}
@@ -450,6 +452,27 @@ const pauseTask = async () => {
             </div>
           )}
         </div>
+        <div className="w-full flex items-center justify-center mb-4">
+          {(data?.taskStatus === "review" ||
+            data?.taskStatus === "complete") && (
+            <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between shadow-sm mt-4">
+              <div className="flex items-center gap-2">
+                <div>
+                  <p className="text-purple-800 font-semibold text-lg">
+                    Total Working Hour (till last paused)
+                  </p>
+                  <p className="text-3xl font-bold flex justify-center text-purple-600 tracking-wide mt-1">
+                    <div className="bg-purple-100 text-purple-600 p-2 rounded-full">
+                      <Clock />
+                    </div>
+                    {totalHour || "00:00:00"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="mb-4">
           <h3 className="font-bold text-gray-800 mb-1">Task Description:</h3>
           <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200 whitespace-pre-wrap">
@@ -572,7 +595,12 @@ const pauseTask = async () => {
             <div className="w-full flex items-center gap-x-2">
               <button
                 onClick={onStatusChange}
-                className="w-full py-3 bg-blue-700 text-white rounded-lg font-extrabold cursor-pointer hover:bg-blue-800"
+                disabled={showPauseButton} // Disable when timer is running (pause button visible)
+                className={`w-full py-3 rounded-lg font-extrabold cursor-pointer ${
+                  showPauseButton
+                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                    : "bg-blue-700 text-white hover:bg-blue-800"
+                }`}
               >
                 Change Status
               </button>
