@@ -39,6 +39,8 @@ export default function TaskDetailsSection({
   const [mentionChecked, setMentionChecked] = useState(false);
   const [commentChecked, setCommentChecked] = useState(false);
   const [everythingChecked, setEverythingChecked] = useState(false);
+  const [showStartButton, setShowStartButton] = useState(false);
+  const [showPauseButton, setShowPauseButton] = useState(false);
   const [seen, isSeen] = useState(false);
 
   useEffect(() => {
@@ -58,67 +60,96 @@ export default function TaskDetailsSection({
     setLoading(false);
   }, [notifyControll, user?._id]);
 
-  const startTask = async () => {
-    try {
-      const response = await taskLogAPI.startTask(data?._id);
-      const totalOnGoing = response.data.totalOnGoingTime || 0;
+ const startTask = async () => {
+  try {
+    const response = await taskLogAPI.startTask(data?._id);
+    const totalOnGoing = response.data.totalOnGoingTime || 0;
 
-      data.totalOnGoingTime = totalOnGoing;
+    data.totalOnGoingTime = totalOnGoing;
 
-      setStartClicked(true);
-      setLocalStartTime(new Date());
-      setIsPaused(false);
-    } catch (error) {
-      console.log(error, "Failed to start Task");
+    setStartClicked(true);
+    setLocalStartTime(new Date());
+    setIsPaused(false);
+    
+    // Immediately update button visibility
+    setShowStartButton(false);
+    setShowPauseButton(true);
+  } catch (error) {
+    console.log(error, "Failed to start Task");
+  }
+};
+
+const pauseTask = async () => {
+  try {
+    const response = await taskLogAPI.pauseTask(data?._id);
+    const updatedTotal = response.data.totalOnGoingTime;
+
+    setIsPaused(true);
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      setTimerInterval(null);
     }
-  };
-
-  const pauseTask = async () => {
-    try {
-      const response = await taskLogAPI.pauseTask(data?._id);
-      const updatedTotal = response.data.totalOnGoingTime;
-
-      setIsPaused(true);
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        setTimerInterval(null);
+    
+    // Immediately update button visibility  
+    setShowStartButton(true);
+    setShowPauseButton(false);
+    
+    if (updatedTotal) {
+      let totalMs;
+      if (typeof updatedTotal === "string") {
+        const [h, m, s] = updatedTotal.split(":").map(Number);
+        totalMs = (h * 3600 + m * 60 + s) * 1000;
+      } else {
+        totalMs = updatedTotal;
       }
-      if (updatedTotal) {
-        let totalMs;
-        if (typeof updatedTotal === "string") {
-          const [h, m, s] = updatedTotal.split(":").map(Number);
-          totalMs = (h * 3600 + m * 60 + s) * 1000;
-        } else {
-          totalMs = updatedTotal;
-        }
 
-        const hours = Math.floor(totalMs / (1000 * 60 * 60));
-        const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
-        setElapsedTime(
-          `${hours.toString().padStart(2, "0")}:${minutes
-            .toString()
-            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-        );
-      }
-      data.totalOnGoingTime = updatedTotal;
-    } catch (error) {
-      console.log(error, "Failed to pause Task");
+      const hours = Math.floor(totalMs / (1000 * 60 * 60));
+      const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+      setElapsedTime(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
     }
-  };
+    data.totalOnGoingTime = updatedTotal;
+  } catch (error) {
+    console.log(error, "Failed to pause Task");
+  }
+};
+
+  // useEffect(() => {
+  //   if (data?.isPause !== undefined) {
+  //     setIsPaused(data.isPause);
+  //   }
+  //   if (data?.startTime && data.startTime !== 0) {
+  //     setStartClicked(true);
+  //   }
+  //   if (!data?.startTime || data.startTime === 0) {
+  //     setStartClicked(false);
+  //     setLocalStartTime(null);
+  //   }
+  // }, [data?.totalOnGoingTime, data?.startTime]);
 
   useEffect(() => {
-    if (data?.isPause !== undefined) {
-      setIsPaused(data.isPause);
-    }
-    if (data?.startTime && data.startTime !== 0) {
-      setStartClicked(true);
-    }
+    if (!data) return;
+
+    // CASE 1: Timer not started yet
     if (!data?.startTime || data.startTime === 0) {
-      setStartClicked(false);
-      setLocalStartTime(null);
+      setShowStartButton(true);
+      setShowPauseButton(false);
     }
-  }, [data?.totalOnGoingTime, data?.startTime]);
+    // CASE 2: Timer paused
+    else if (data?.isPause) {
+      setShowStartButton(true);
+      setShowPauseButton(false);
+    }
+    // CASE 3: Timer ongoing (started & not paused)
+    else if (data?.startTime && !data?.isPause) {
+      setShowStartButton(false);
+      setShowPauseButton(true);
+    }
+  }, [data?.startTime, data?.isPause]);
 
   useEffect(() => {
     if (isPaused && data?.totalOnGoingTime) {
@@ -345,21 +376,25 @@ export default function TaskDetailsSection({
                 <>
                   {data?.taskStatus === "ongoing" && (
                     <div className="flex gap-1">
-                      <button
-                        onClick={startTask}
-                        className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
-                      >
-                        <Play className="w-3 h-3 mr-1" />
-                        Start
-                      </button>
+                      {showStartButton && (
+                        <button
+                          onClick={startTask}
+                          className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-green-600 hover:to-emerald-600 transition-all flex items-center justify-center"
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          Start
+                        </button>
+                      )}
 
-                      <button
-                        onClick={pauseTask}
-                        className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center"
-                      >
-                        <PauseCircle className="w-3 h-3 mr-1" />
-                        Pause
-                      </button>
+                      {showPauseButton && (
+                        <button
+                          onClick={pauseTask}
+                          className="flex-1 bg-gradient-to-r from-yellow-700 to-yellow-700 text-white text-lg py-1 px-2 rounded cursor-pointer hover:from-yellow-600 hover:to-pink-600 transition-all flex items-center justify-center"
+                        >
+                          <PauseCircle className="w-3 h-3 mr-1" />
+                          Pause
+                        </button>
+                      )}
                     </div>
                   )}
                 </>
